@@ -1,0 +1,15 @@
+# Backend
+backend/.env
+backend/uploads/
+backend/node_modules/
+backend/-p/
+backend/qa/results/
+
+# Frontend
+frontend/.env
+frontend/dist/
+frontend/node_modules/
+frontend/.vite/
+
+# Logs
+*.log

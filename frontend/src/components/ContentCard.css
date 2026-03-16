@@ -1,0 +1,371 @@
+/* ============================================
+   CHISTETECA CONTENT CARD - Basado en Canvas Portfolio
+   ============================================ */
+
+.chisteteca-card {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.chisteteca-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ============================================
+   IMAGEN / CONTENIDO
+   ============================================ */
+.card-image-wrapper {
+  position: relative;
+  overflow: hidden;
+  background: #f8f9fa;
+  aspect-ratio: 4/3;
+}
+
+.card-chiste-preview {
+  width: 100%;
+  height: 100%;
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+.card-chiste-preview.card-gradient-0 {
+  background: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
+}
+
+.card-chiste-preview.card-gradient-1 {
+  background: linear-gradient(135deg, #0f766e 0%, #2563eb 100%);
+}
+
+.card-chiste-preview.card-gradient-2 {
+  background: linear-gradient(135deg, #be123c 0%, #7c2d12 100%);
+}
+
+.card-chiste-preview.card-gradient-3 {
+  background: linear-gradient(135deg, #065f46 0%, #0ea5e9 100%);
+}
+
+.card-chiste-preview.card-gradient-4 {
+  background: linear-gradient(135deg, #c2410c 0%, #b91c1c 100%);
+}
+
+.card-chiste-preview.card-gradient-5 {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+}
+
+.card-chiste-preview.card-gradient-6 {
+  background: linear-gradient(135deg, #166534 0%, #0d9488 100%);
+}
+
+.card-chiste-preview.card-gradient-7 {
+  background: linear-gradient(135deg, #7f1d1d 0%, #1e3a8a 100%);
+}
+
+.card-chiste-preview p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  text-align: center;
+  margin: 0;
+  font-style: italic;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.chisteteca-card:hover .card-image {
+  transform: scale(1.1);
+}
+
+.card-video-preview {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.card-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.play-icon {
+  font-size: 3rem;
+  color: #fff;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+/* Badge de tipo */
+.card-type-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a2e;
+  z-index: 3;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-type-badge svg,
+.card-type-badge i {
+  font-size: 14px;
+  color: #ffc107;
+}
+
+/* ============================================
+   DESCRIPCIÓN
+   ============================================ */
+.card-desc {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+/* Autor */
+.card-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.author-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffc107;
+}
+
+.author-name {
+  font-weight: 600;
+  color: #1a1a2e;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.author-name:hover {
+  color: #0066ff;
+}
+
+.character-badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  background: #6c757d;
+  color: #fff;
+  border-radius: 50px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Título */
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.card-title a {
+  color: #1a1a2e;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-title a:hover {
+  color: #0066ff;
+}
+
+/* Categorías */
+.card-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+
+.category-tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   ACCIONES
+   ============================================ */
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid #e9ecef;
+}
+
+.actions-left {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+}
+
+.action-btn.like-btn.liked {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+.action-btn.like-btn.liked:hover {
+  background: #dc3545;
+  color: #fff;
+}
+
+.action-btn.favorite-btn.active {
+  background: rgba(255, 193, 7, 0.15);
+  border-color: #ffc107;
+  color: #ffc107;
+}
+
+.action-btn.favorite-btn.active:hover {
+  background: #ffc107;
+  color: #1a1a2e;
+}
+
+.action-btn svg,
+.action-btn i {
+  font-size: 16px;
+}
+
+.action-btn span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 767px) {
+  .card-image-wrapper {
+    aspect-ratio: 16/9;
+  }
+
+  .card-desc {
+    padding: 15px;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .actions-left {
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+.chisteteca-card {
+  animation: cardFadeIn 0.6s ease-out;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

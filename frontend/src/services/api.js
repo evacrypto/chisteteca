@@ -1,0 +1,138 @@
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const MULTIPART_HEADERS = { 'Content-Type': 'multipart/form-data' };
+
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  timeout: 10000 // 10 seconds timeout
+});
+
+// Add token to requests
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Handle response errors with retry logic
+let isServerDownToastShown = false;
+
+const clearAuthAndRedirect = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = '/login';
+};
+
+const withLimitParam = (limit) => ({ params: { limit } });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      clearAuthAndRedirect();
+    }
+    
+    // Handle connection errors
+    if (!error.response && error.code === 'ERR_NETWORK') {
+      if (!isServerDownToastShown) {
+        isServerDownToastShown = true;
+        toast.error('⚠️ Servidor no disponible. Intentando reconectar...', {
+          autoClose: 5000,
+          onClose: () => {
+            isServerDownToastShown = false;
+          }
+        });
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+// Auth API
+export const authAPI = {
+  register: (data) => api.post('/auth/register', data),
+  login: (data) => api.post('/auth/login', data),
+  logout: () => api.post('/auth/logout'),
+  getMe: () => api.get('/auth/me')
+};
+
+// Users API
+export const usersAPI = {
+  getProfile: (id) => api.get(`/users/${id}`),
+  updateProfile: (data) => api.put('/users/profile', data),
+  updateAvatar: (data) => api.put('/users/avatar', data, { headers: MULTIPART_HEADERS }),
+  getFavorites: () => api.get('/users/favorites'),
+  addToFavorites: (contentId) => api.post(`/users/favorites/${contentId}`),
+  removeFromFavorites: (contentId) => api.delete(`/users/favorites/${contentId}`),
+  followUser: (userId) => api.post(`/users/follow/${userId}`),
+  unfollowUser: (userId) => api.delete(`/users/unfollow/${userId}`),
+  getNotifications: () => api.get('/users/notifications'),
+  markNotificationRead: (id) => api.put(`/users/notifications/${id}/read`)
+};
+
+// Content API
+export const contentAPI = {
+  getAll: (params) => api.get('/content', { params }),
+  getOne: (id) => api.get(`/content/${id}`),
+  create: (data) => api.post('/content', data, { headers: MULTIPART_HEADERS }),
+  update: (id, data) => api.put(`/content/${id}`, data),
+  delete: (id) => api.delete(`/content/${id}`),
+  getPopular: (limit) => api.get('/content/popular', withLimitParam(limit)),
+  getTrending: (limit) => api.get('/content/trending', withLimitParam(limit)),
+  getRandom: (limit) => api.get('/content/random', withLimitParam(limit)),
+  report: (id, reason) => api.post(`/content/${id}/report`, { reason }),
+  share: (id) => api.post(`/content/${id}/share`)
+};
+
+// Interactions API
+export const interactionsAPI = {
+  likeContent: (contentId) => api.post(`/interactions/like/${contentId}`),
+  getComments: (contentId, params) => api.get(`/interactions/comment/${contentId}`, { params }),
+  createComment: (contentId, data) => api.post(`/interactions/comment/${contentId}`, data),
+  likeComment: (commentId) => api.post(`/interactions/comment/${commentId}/like`),
+  updateComment: (commentId, data) => api.put(`/interactions/comment/${commentId}`, data),
+  deleteComment: (commentId) => api.delete(`/interactions/comment/${commentId}`)
+};
+
+// Categories API
+export const categoriesAPI = {
+  getAll: () => api.get('/categories'),
+  getOne: (id) => api.get(`/categories/${id}`),
+  create: (data) => api.post('/categories', data),
+  update: (id, data) => api.put(`/categories/${id}`, data),
+  delete: (id) => api.delete(`/categories/${id}`)
+};
+
+// Admin API
+export const adminAPI = {
+  getStats: () => api.get('/admin/stats'),
+  getAnalytics: (period) => api.get('/admin/analytics', { params: { period } }),
+  getUsers: (params) => api.get('/users', { params }),
+  getPendingContent: (params) => api.get('/admin/content/pending', { params }),
+  getAllContent: (params) => api.get('/admin/content/all', { params }),
+  approveContent: (id) => api.put(`/admin/content/${id}/approve`),
+  rejectContent: (id, reason) => api.put(`/admin/content/${id}/reject`, { reason }),
+  deleteContent: (id) => api.delete(`/admin/content/${id}`),
+  suspendUser: (id, reason) => api.put(`/admin/users/${id}/suspend`, { reason }),
+  unsuspendUser: (id) => api.put(`/admin/users/${id}/unsuspend`),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+  getReportedContent: () => api.get('/admin/content/reported'),
+  getPendingCategories: () => api.get('/admin/categories/pending'),
+  approveCategory: (id) => api.put(`/admin/categories/${id}/approve`),
+  rejectCategory: (id, reason) => api.put(`/admin/categories/${id}/reject`, { reason })
+};
+
+export default api;

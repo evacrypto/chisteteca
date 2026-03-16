@@ -1,0 +1,379 @@
+/* ============================================
+   CHISTETECA FOOTER - Basado en Canvas Footer 2
+   ============================================ */
+
+.chisteteca-footer {
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  color: #555;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* Banda superior con newsletter */
+.footer-band {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(253, 126, 20, 0.1));
+  border-bottom: 3px solid #1a1a2e;
+  padding: 40px;
+  border-radius: 15px;
+  margin-bottom: 50px;
+}
+
+.footer-band-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title-icon {
+  font-size: 2rem;
+  color: #ffc107;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+.footer-band-note {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* Formulario de suscripción */
+.subscribe-widget .input-group {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.subscribe-widget .form-control {
+  border: none;
+  padding: 16px 20px;
+  font-size: 15px;
+}
+
+.subscribe-widget .form-control:focus {
+  box-shadow: none;
+  border: none;
+}
+
+.subscribe-widget .btn {
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  border: none;
+  color: #1a1a2e;
+  font-weight: 700;
+  padding: 16px 30px;
+  transition: all 0.3s ease;
+}
+
+.subscribe-widget .btn:hover {
+  background: linear-gradient(135deg, #fd7e14, #ffc107);
+  transform: translateX(2px);
+}
+
+/* Widgets */
+.widget {
+  margin-bottom: 30px;
+}
+
+.widget-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.widget-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  border-radius: 2px;
+}
+
+/* Logo del footer */
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.footer-logo-image {
+  height: 120px;
+  width: auto;
+  object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+.footer-logo:hover .footer-logo-image {
+  transform: translateY(-2px);
+}
+
+.footer-logo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1a1a2e;
+}
+
+.footer-logo:hover {
+  color: #0066ff;
+}
+
+.footer-logo-icon {
+  font-size: 2.5rem;
+  color: #ffc107;
+}
+
+.footer-description {
+  color: #666;
+  margin-bottom: 25px;
+  line-height: 1.9;
+}
+
+/* Redes sociales */
+.footer-social {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  color: #555;
+  font-size: 18px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+  transform: translateY(-4px);
+  color: #fff;
+}
+
+.social-icon.facebook:hover {
+  background: #1877f2;
+}
+
+.social-icon.instagram:hover {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+}
+
+.social-icon.twitter:hover {
+  background: #1da1f2;
+}
+
+.social-icon.tiktok:hover {
+  background: #000;
+}
+
+.social-icon.youtube:hover {
+  background: #ff0000;
+}
+
+/* Lista de enlaces */
+.widget_links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.widget_links li {
+  margin-bottom: 12px;
+}
+
+.widget_links a {
+  color: #666;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.widget_links a:hover {
+  color: #0066ff;
+  padding-left: 8px;
+}
+
+/* Contacto */
+.footer-contact li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 15px;
+  color: #666;
+}
+
+.contact-icon {
+  font-size: 18px;
+  color: #ffc107;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.contact-link {
+  color: #666;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.contact-link:hover {
+  color: #0066ff;
+}
+
+/* Divisoria */
+.footer-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #dee2e6, transparent);
+  margin: 40px 0;
+}
+
+/* Footer bottom */
+.footer-bottom {
+  padding: 20px 0;
+}
+
+.copyright-text {
+  color: #888;
+  font-size: 14px;
+  margin: 0;
+}
+
+.footer-legal {
+  display: flex;
+  gap: 20px;
+  justify-content: flex-end;
+}
+
+.footer-legal a {
+  color: #888;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.footer-legal a:hover {
+  color: #0066ff;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .chisteteca-footer {
+    padding-top: 40px;
+  }
+
+  .footer-band {
+    padding: 30px;
+  }
+
+  .footer-band-title {
+    font-size: 1.3rem;
+  }
+
+  .footer-logo {
+    font-size: 1.5rem;
+  }
+
+  .footer-logo-icon {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .footer-band {
+    text-align: center;
+  }
+
+  .footer-band-title {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .subscribe-widget .input-group {
+    flex-direction: column;
+  }
+
+  .subscribe-widget .btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .footer-social {
+    justify-content: center;
+  }
+
+  .widget-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .widget_links a:hover {
+    padding-left: 0;
+  }
+
+  .footer-legal {
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 15px;
+  }
+
+  .copyright-text {
+    text-align: center;
+  }
+}
+
+/* Hover effects adicionales */
+.widget {
+  transition: all 0.3s ease;
+}
+
+.widget:hover .widget-title {
+  color: #0066ff;
+}
+
+/* Animación de entrada */
+.chisteteca-footer {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,11 @@
+# Build output
+frontend/dist
+
+# Dependencies
+frontend/node_modules
+
+# Environment (we'll set these in Cloudflare dashboard)
+frontend/.env
+
+# Cache
+frontend/.vite

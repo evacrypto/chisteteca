@@ -1,0 +1,641 @@
+/* ============================================
+   CHISTETECA CREATE CONTENT PAGE
+   ============================================ */
+
+.create-content-section {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: calc(100vh - 200px);
+}
+
+.content-wrap {
+  padding: 20px 0;
+}
+
+/* Header */
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: rgba(255, 193, 7, 0.15);
+  border: 2px solid rgba(255, 193, 7, 0.3);
+  border-radius: 50px;
+  color: #b8860b;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.badge-icon {
+  font-size: 16px;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-bottom: 15px;
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+/* ============================================
+   PANEL DE BENEFICIOS (Izquierda)
+   ============================================ */
+.benefits-panel {
+  background: #fff;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  height: 100%;
+}
+
+.benefits-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #ffc107;
+}
+
+.benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 30px 0;
+}
+
+.benefit-item {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  align-items: flex-start;
+}
+
+.benefit-icon {
+  font-size: 24px;
+  color: #28a745;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.benefit-item strong {
+  display: block;
+  font-size: 1.1rem;
+  color: #1a1a2e;
+  margin-bottom: 5px;
+}
+
+.benefit-item p {
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* Tips Card */
+.tips-card {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(253, 126, 20, 0.1));
+  border: 2px solid rgba(255, 193, 7, 0.3);
+  border-radius: 12px;
+  padding: 25px;
+  margin-top: 30px;
+}
+
+.tips-card h4 {
+  display: flex;
+  align-items: center;
+  color: #1a1a2e;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.tips-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tips-list li {
+  padding: 8px 0;
+  color: #555;
+  font-size: 14px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.tips-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #ffc107;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* ============================================
+   TARJETA DEL FORMULARIO (Derecha)
+   ============================================ */
+.content-card {
+  background: #fff;
+  border-radius: 25px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  overflow: visible;
+  border: none !important;
+  margin-top: -16px;
+}
+
+.card-body {
+  padding: 20px !important;
+  background: #fff;
+}
+
+.content-form {
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+}
+
+/* Form Groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+.label-icon {
+  color: #ffc107;
+  font-size: 18px;
+}
+
+.label-hint {
+  font-size: 12px;
+  color: #888;
+  font-weight: 400;
+  margin-left: auto;
+}
+
+/* Form Controls */
+.form-control {
+  padding: 18px 20px;
+  border: 2px solid #e9ecef;
+  border-radius: 14px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  background: #fff;
+  width: 100%;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #ffc107;
+  box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.15);
+}
+
+.form-control.textarea {
+  resize: vertical;
+  min-height: 140px;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+/* Type Selector */
+.type-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 25px 20px;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #666;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.type-btn:hover {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: #ffc107;
+  color: #1a1a2e;
+}
+
+.type-btn.active {
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  border-color: #ffc107;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+.btn-icon {
+  font-size: 24px;
+}
+
+/* File Upload */
+.file-upload-wrapper {
+  position: relative;
+  padding: 10px;
+}
+
+.file-input {
+  padding: 15px;
+  background: #f8f9fa;
+  border: 2px dashed #e9ecef;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.file-input:hover {
+  border-color: #ffc107;
+  background: rgba(255, 193, 7, 0.05);
+}
+
+.file-preview {
+  margin-top: 20px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 3px solid #fff;
+}
+
+.file-preview img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ============================================
+   CATEGORIES DROPDOWN
+   ============================================ */
+.cat-dropdown-wrapper {
+  position: relative;
+}
+
+.cat-dropdown-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  color: #444;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  text-align: left;
+}
+
+.cat-dropdown-trigger:hover,
+.cat-dropdown-trigger:focus {
+  border-color: #ffc107;
+  background: #fff;
+  outline: none;
+}
+
+.cat-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: #fff;
+  border: 1.5px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.cat-search-wrapper {
+  position: relative;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cat-search-icon {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.cat-search {
+  width: 100%;
+  padding: 8px 10px 8px 32px;
+  background: #f8f9fa;
+  border: 1.5px solid #e9ecef;
+  border-radius: 8px;
+  color: #333;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.cat-search::placeholder { color: #aaa; }
+.cat-search:focus { border-color: #ffc107; }
+
+.cat-option-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+
+.cat-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s;
+  border-radius: 0;
+}
+
+.cat-option:hover { background: #f8f9fa; }
+.cat-option.selected { background: rgba(255, 193, 7, 0.08); }
+
+.cat-option-check {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #ccc;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #ffc107;
+}
+
+.cat-option.selected .cat-option-check {
+  background: rgba(255, 193, 7, 0.15);
+  border-color: #ffc107;
+}
+
+.cat-option-emoji { font-size: 16px; }
+
+.cat-option-name {
+  color: #333;
+  font-weight: 500;
+}
+
+.cat-option-empty {
+  padding: 16px 14px;
+  color: #aaa;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* Chips */
+.cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 12px;
+  border-radius: 50px;
+  border: 1.5px solid;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cat-chip-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 0 0 2px;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.cat-chip-remove:hover { opacity: 1; }
+
+/* Emoji Picker */
+.emoji-picker-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.emoji-picker-trigger {
+  width: 52px;
+  height: 52px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  background: #f8f9fa;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+  line-height: 1;
+  padding: 0;
+}
+
+.emoji-picker-trigger:hover {
+  border-color: #ffc107;
+  background: #fff;
+}
+
+.emoji-picker-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 300;
+  background: #fff;
+  border: 1.5px solid #e9ecef;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.13);
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  width: min(340px, calc(100vw - 32px));
+  max-height: 230px;
+  overflow-y: auto;
+}
+
+.emoji-option {
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: background 0.12s, border-color 0.12s;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji-option:hover {
+  background: #f0f0f0;
+}
+
+.emoji-option.selected {
+  border-color: #ffc107;
+  background: rgba(255, 193, 7, 0.12);
+}
+
+@media (max-width: 767px) {
+  .emoji-picker-panel {
+    width: min(300px, calc(100vw - 32px));
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+/* Submit Button */
+.btn-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  border: none;
+  border-radius: 15px;
+  color: #1a1a2e;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 25px rgba(255, 193, 7, 0.35);
+  margin-top: 10px;
+}
+
+.btn-submit:hover {
+  background: linear-gradient(135deg, #fd7e14, #ffc107);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(255, 193, 7, 0.4);
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(26, 26, 46, 0.2);
+  border-top-color: #1a1a2e;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 991px) {
+  .create-content-section {
+    padding: 60px 20px;
+  }
+
+  .benefits-panel {
+    padding: 35px;
+  }
+
+  .content-card {
+    margin: 15px;
+  }
+
+  .card-body {
+    padding: 20px !important;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .create-content-section {
+    padding: 40px 15px;
+  }
+
+  .content-card {
+    margin: 10px;
+    border-radius: 20px;
+  }
+
+  .type-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .benefits-panel,
+  .card-body {
+    padding: 20px !important;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+  }
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+.create-content-section {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

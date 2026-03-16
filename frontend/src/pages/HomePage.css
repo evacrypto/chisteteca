@@ -1,0 +1,12 @@
+/* ============================================
+   CHISTETECA HOME PAGE
+   ============================================ */
+
+.home-page {
+  background: #fff;
+}
+
+/* Ajustar padding después del hero */
+.home-page .container:first-child {
+  padding-top: 40px;
+}
