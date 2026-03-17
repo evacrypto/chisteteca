@@ -32,6 +32,15 @@ const ProfilePage = () => {
     }
   }, [id, isOwnProfile]);
 
+  // Debug: Log when data changes
+  useEffect(() => {
+    console.log('📊 PROFILE STATE UPDATE:');
+    console.log('  - Published:', publishedContent.length);
+    console.log('  - Pending:', pendingContent.length);
+    console.log('  - Favorites:', favorites.length);
+    console.log('  - Active Tab:', activeTab);
+  }, [publishedContent, pendingContent, favorites, activeTab]);
+
   const fetchProfileData = async () => {
     setLoading(true);
     try {
@@ -45,20 +54,42 @@ const ProfilePage = () => {
         setProfileUser(userRes.data.data.user);
       }
 
-      // Obtener contenido publicado
-      const publishedRes = await contentAPI.getAll({ author: id || currentUser?.id, limit: 50 });
-      const published = publishedRes.data.data.filter(c => c.isApproved);
-      const pending = publishedRes.data.data.filter(c => !c.isApproved);
-      setPublishedContent(published);
-      setPendingContent(pending);
+      // Obtener TODO el contenido del usuario (aprobado y pendiente)
+      const userId = id || currentUser?.id;
+      console.log('📊 PROFILE - Fetching content for userId:', userId);
+      
+      if (userId) {
+        try {
+          const allContentRes = await contentAPI.getAll({ author: userId, limit: 100 });
+          console.log('📊 PROFILE - Total content:', allContentRes.data.data.length);
+          
+          const approved = allContentRes.data.data.filter(c => c.isApproved === true);
+          const pending = allContentRes.data.data.filter(c => c.isApproved === false);
+          
+          console.log('📊 PROFILE - Approved:', approved.length, 'Pending:', pending.length);
+          setPublishedContent(approved);
+          setPendingContent(pending);
+        } catch (contentError) {
+          console.error('📊 PROFILE - Error fetching content:', contentError.message);
+          setPublishedContent([]);
+          setPendingContent([]);
+        }
+      }
 
       // Obtener favoritos (solo si es mi perfil)
       if (isOwnProfile) {
-        const favRes = await usersAPI.getFavorites();
-        setFavorites(favRes.data.data);
+        try {
+          console.log('📊 PROFILE - Fetching favorites...');
+          const favRes = await usersAPI.getFavorites();
+          console.log('📊 PROFILE - Favorites count:', favRes.data.data?.length || 0);
+          setFavorites(favRes.data.data || []);
+        } catch (favError) {
+          console.error('📊 PROFILE - Error fetching favorites:', favError.message);
+          setFavorites([]);
+        }
       }
     } catch (error) {
-      console.error('Error fetching profile data:', error);
+      console.error('📊 PROFILE - Error fetching profile data:', error);
       toast.error('Error al cargar perfil');
     } finally {
       setLoading(false);
@@ -240,28 +271,33 @@ const ProfilePage = () => {
 
         {/* Tabs de Navegación */}
         <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k)}>
-          <Nav variant="tabs" className="profile-tabs mb-4">
-            <Nav.Item>
-              <Nav.Link eventKey="published">
-                <i className="icon-file-alt me-2" aria-hidden="true"></i>
-                Publicados ({publishedContent.length})
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="pending">
-                <i className="icon-clock me-2" aria-hidden="true"></i>
-                Pendientes ({pendingContent.length})
-              </Nav.Link>
-            </Nav.Item>
-            {isOwnProfile && (
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <Nav variant="tabs" className="profile-tabs">
               <Nav.Item>
-                <Nav.Link eventKey="favorites">
-                  <i className="icon-bookmark me-2" aria-hidden="true"></i>
-                  Favoritos ({favorites.length})
+                <Nav.Link eventKey="published">
+                  <i className="icon-file-alt me-2" aria-hidden="true"></i>
+                  Publicados ({publishedContent.length})
                 </Nav.Link>
               </Nav.Item>
-            )}
-          </Nav>
+              <Nav.Item>
+                <Nav.Link eventKey="pending">
+                  <i className="icon-clock me-2" aria-hidden="true"></i>
+                  Pendientes ({pendingContent.length})
+                </Nav.Link>
+              </Nav.Item>
+              {isOwnProfile && (
+                <Nav.Item>
+                  <Nav.Link eventKey="favorites">
+                    <i className="icon-bookmark me-2" aria-hidden="true"></i>
+                    Favoritos ({favorites.length})
+                  </Nav.Link>
+                </Nav.Item>
+              )}
+            </Nav>
+            <Button variant="outline-primary" size="sm" onClick={fetchProfileData} className="ms-3">
+              <i className="icon-refresh me-1" aria-hidden="true"></i> Actualizar
+            </Button>
+          </div>
 
           {/* Contenido de las Tabs */}
           <Tab.Content>

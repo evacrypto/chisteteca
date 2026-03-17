@@ -17,8 +17,14 @@ const Navbar = () => {
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   const handleAvatarClick = () => {
-    if (isAuthenticated && user?.id) {
-      navigate(`/profile/${user.id}`);
+    if (isAuthenticated && user) {
+      const userId = user.id || user._id;
+      console.log('Navbar - Navigating to profile, userId:', userId, 'user:', user);
+      if (userId) {
+        navigate(`/profile/${userId}`);
+      } else {
+        console.error('Navbar - No userId found!');
+      }
     }
   };
 
