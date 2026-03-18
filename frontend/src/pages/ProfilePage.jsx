@@ -290,7 +290,10 @@ const ProfilePage = () => {
                 type="button"
                 role="tab"
                 className={`nav-link ${activeTab === 'favorites' ? 'active' : ''}`}
-                onClick={() => setActiveTab('favorites')}
+                onClick={() => {
+                  setActiveTab('favorites');
+                  fetchProfileData();
+                }}
               >
                 <i className="icon-bookmark me-2" aria-hidden="true"></i>
                 Favoritos ({favorites.length})

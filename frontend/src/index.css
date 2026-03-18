@@ -448,3 +448,30 @@ body {
 .table-hover tbody tr:hover {
   background: #f8f9fa;
 }
+
+/* Admin badges: texto legible según color de fondo */
+.card-custom .badge.bg-success,
+.card-custom .badge.bg-danger,
+.card-custom .badge.bg-secondary {
+  color: #fff !important;
+}
+
+.card-custom .badge.bg-warning {
+  color: #212529 !important;
+}
+
+/* Admin buttons: texto legible según variante */
+.card-custom .btn-success,
+.card-custom .btn-danger {
+  color: #fff !important;
+}
+
+.card-custom .btn-warning,
+.card-custom .btn-outline-warning {
+  color: #212529 !important;
+}
+
+.card-custom .btn-outline-secondary,
+.card-custom .btn-outline-danger {
+  color: inherit;
+}
