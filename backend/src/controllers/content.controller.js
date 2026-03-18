@@ -3,6 +3,7 @@ import User from '../models/User.model.js';
 import Category from '../models/Category.model.js';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
+import { containsProfanity } from '../utils/commentModeration.js';
 
 const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -119,6 +120,13 @@ export const createContent = async (req, res) => {
     }
 
     const { title, description, text, type, categories } = req.body;
+
+    if (containsProfanity(text) || containsProfanity(title) || containsProfanity(description)) {
+      return res.status(400).json({
+        success: false,
+        message: 'El contenido contiene lenguaje inapropiado. Por favor, evita insultos y palabrotas.'
+      });
+    }
 
     // Get user data
     const user = await User.findById(req.user.id);

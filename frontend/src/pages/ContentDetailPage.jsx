@@ -127,7 +127,8 @@ const ContentDetailPage = () => {
       fetchData();
       toast.success('Comentario añadido');
     } catch (error) {
-      toast.error('Error al comentar');
+      const msg = error.response?.data?.message || 'Error al comentar';
+      toast.error(msg);
     } finally {
       setSubmittingComment(false);
     }

@@ -3,6 +3,7 @@ import Comment from '../models/Comment.model.js';
 import User from '../models/User.model.js';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
+import { containsProfanity } from '../utils/commentModeration.js';
 
 // @desc    Like content
 // @route   POST /api/interactions/like/:contentId
@@ -73,6 +74,13 @@ export const createComment = async (req, res) => {
     }
 
     const { text, parentCommentId } = req.body;
+
+    if (containsProfanity(text)) {
+      return res.status(400).json({
+        success: false,
+        message: 'El comentario contiene lenguaje inapropiado. Por favor, evita insultos y palabrotas.'
+      });
+    }
     const content = await Content.findById(req.params.contentId);
 
     if (!content) {
@@ -236,7 +244,15 @@ export const updateComment = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }
 
-    comment.text = req.body.text || req.body.content;
+    const newText = req.body.text || req.body.content;
+    if (containsProfanity(newText)) {
+      return res.status(400).json({
+        success: false,
+        message: 'El comentario contiene lenguaje inapropiado. Por favor, evita insultos y palabrotas.'
+      });
+    }
+
+    comment.text = newText;
     comment.isEdited = true;
     await comment.save();
 
