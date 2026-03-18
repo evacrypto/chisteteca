@@ -346,9 +346,15 @@
     font-size: 1.5rem;
   }
 
+  .profile-tabs-wrapper {
+    flex-direction: column;
+    width: 100%;
+  }
+
   .profile-tabs {
     flex-direction: column;
     gap: 5px;
+    width: 100%;
   }
 
   .profile-tabs .nav-link {

@@ -309,9 +309,6 @@ const ProfilePage = () => {
               Favoritos ({favorites.length})
             </button>
           </div>
-          <Button variant="outline-primary" size="sm" onClick={fetchProfileData} className="ms-3">
-            <i className="icon-refresh me-1" aria-hidden="true"></i> Actualizar
-          </Button>
         </div>
 
         {/* Contenido de las Tabs */}

@@ -15,10 +15,11 @@
 /* Banda superior con newsletter */
 .footer-band {
   background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(253, 126, 20, 0.1));
-  border-bottom: 3px solid #1a1a2e;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   padding: 40px;
   border-radius: 15px;
   margin-bottom: 50px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
 .footer-band-title {
@@ -59,7 +60,7 @@
   background: #fff;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .subscribe-widget .form-control {
