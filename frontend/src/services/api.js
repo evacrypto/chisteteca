@@ -2,7 +2,17 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const MULTIPART_HEADERS = { 'Content-Type': 'multipart/form-data' };
+const API_BASE = API_URL.replace(/\/api\/?$/, '') || 'http://localhost:5000';
+
+/** Convierte rutas de uploads a URL válida. En dev usa ruta relativa (proxy Vite). En prod usa URL completa del backend. */
+export const getUploadUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  // En desarrollo: ruta relativa para que pase por el proxy de Vite (/uploads -> backend)
+  if (import.meta.env.DEV) return path.startsWith('/') ? path : `/${path}`;
+  // En producción: URL completa del backend
+  return `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+};
 
 const api = axios.create({
   baseURL: API_URL,
@@ -18,6 +28,10 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Con FormData, no fijar Content-Type: axios pone el boundary automáticamente
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
     }
     return config;
   },
@@ -73,7 +87,7 @@ export const authAPI = {
 export const usersAPI = {
   getProfile: (id) => api.get(`/users/${id}`),
   updateProfile: (data) => api.put('/users/profile', data),
-  updateAvatar: (data) => api.put('/users/avatar', data, { headers: MULTIPART_HEADERS }),
+  updateAvatar: (data) => api.put('/users/avatar', data),
   getFavorites: () => api.get('/users/favorites'),
   addToFavorites: (contentId) => api.post(`/users/favorites/${contentId}`),
   removeFromFavorites: (contentId) => api.delete(`/users/favorites/${contentId}`),
@@ -87,7 +101,7 @@ export const usersAPI = {
 export const contentAPI = {
   getAll: (params) => api.get('/content', { params }),
   getOne: (id) => api.get(`/content/${id}`),
-  create: (data) => api.post('/content', data, { headers: MULTIPART_HEADERS }),
+  create: (data) => api.post('/content', data),
   update: (id, data) => api.put(`/content/${id}`, data),
   delete: (id) => api.delete(`/content/${id}`),
   getPopular: (limit) => api.get('/content/popular', withLimitParam(limit)),

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { contentAPI, interactionsAPI } from '../services/api';
+import { contentAPI, interactionsAPI, getUploadUrl } from '../services/api';
 import useAuthStore from '../store/authStore';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ContentCard from '../components/ContentCard';
@@ -24,7 +24,7 @@ const ContentDetailPage = () => {
   const currentUserId = user?._id || user?.id;
   const authorId = content?.author?._id || null;
   const authorName = content?.author?.name || content?.author?.username || content?.authorName || 'Autor desconocido';
-  const authorAvatar = content?.author?.avatar || content?.authorAvatar || '/logo_chisteteca.png';
+  const authorAvatar = getUploadUrl(content?.author?.avatar || content?.authorAvatar) || '/logo_chisteteca.png';
 
   useEffect(() => {
     fetchData();
@@ -92,8 +92,8 @@ const ContentDetailPage = () => {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: content.title,
-          text: content.description || content.text?.substring(0, 100),
+          title: content.text?.substring(0, 50) || 'Chiste',
+          text: content.text?.substring(0, 100),
           url: window.location.href
         });
       } else {
@@ -145,7 +145,7 @@ const ContentDetailPage = () => {
       case 'image':
         return (
           <div className="content-image-wrapper">
-            <img src={content.mediaUrl} alt={content.title} className="content-image" />
+            <img src={content.mediaUrl} alt={content.text?.substring(0, 50) || 'Imagen'} className="content-image" />
           </div>
         );
       
@@ -212,11 +212,15 @@ const ContentDetailPage = () => {
                   </div>
                 )}
                 
-                <h1 className="article-title">{content.title}</h1>
+                {content.type !== 'chiste' && (content.title || content.text) && (
+                  <h1 className="article-title">{content.title || content.text}</h1>
+                )}
                 
                 <div className="article-meta">
                   <div className="meta-author">
-                    <img src={authorAvatar} alt={authorName} className="author-avatar" />
+                    <span className="author-avatar-wrap">
+                      <img src={authorAvatar} alt={authorName} className="author-avatar" />
+                    </span>
                     {authorId ? (
                       <Link to={`/profile/${authorId}`} className="author-name">
                         {authorName}
@@ -273,7 +277,9 @@ const ContentDetailPage = () => {
                 <strong>Publicado por {authorName}</strong>
               </div>
               <div className="author-info-body">
-                <img src={authorAvatar} alt={authorName} className="author-avatar-lg" />
+                <span className="author-avatar-lg-wrap">
+                  <img src={authorAvatar} alt={authorName} className="author-avatar-lg" />
+                </span>
                 <p>{content.author?.bio || 'Usuario de Chisteteca'}</p>
               </div>
             </div>
@@ -332,7 +338,7 @@ const ContentDetailPage = () => {
                       <div className="comment-wrap">
                         <div className="comment-avatar">
                           <img 
-                            src={comment.userAvatar || '/logo_chisteteca.png'} 
+                            src={getUploadUrl(comment.userAvatar) || '/logo_chisteteca.png'} 
                             alt={comment.username}
                           />
                         </div>

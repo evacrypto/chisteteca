@@ -1,22 +1,22 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import useAuthStore from '../store/authStore';
-import { interactionsAPI } from '../services/api';
+import { interactionsAPI, usersAPI, getUploadUrl } from '../services/api';
 import { toast } from 'react-toastify';
 import './ContentCard.css';
 
 const CHISTE_GRADIENT_COUNT = 8;
 
-const ContentCard = ({ content, onLike, onToggleFavorite }) => {
+const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = false }) => {
   const { isAuthenticated, user } = useAuthStore();
   const currentUserId = user?._id || user?.id;
   const authorId = content.author?._id || null;
   const authorName = content.author?.name || content.author?.username || content.authorName || 'Autor desconocido';
-  const authorAvatar = content.author?.avatar || content.authorAvatar || '/logo_chisteteca.png';
+  const authorAvatar = getUploadUrl(content.author?.avatar || content.authorAvatar) || '/logo_chisteteca.png';
 
   const [isLiked, setIsLiked] = useState(content.likes?.some(l => l._id === currentUserId || l === currentUserId));
   const [likesCount, setLikesCount] = useState(content.likes?.length || 0);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
 
   const handleLike = async (e) => {
     e.preventDefault();
@@ -37,15 +37,16 @@ const ContentCard = ({ content, onLike, onToggleFavorite }) => {
 
   const handleShare = async (e) => {
     e.preventDefault();
+    const contentUrl = `${window.location.origin}/content/${content._id}`;
     try {
       if (navigator.share) {
         await navigator.share({
-          title: content.title,
-          text: content.description || content.text?.substring(0, 100),
-          url: window.location.href
+          title: content.text?.substring(0, 50) || 'Chiste',
+          text: content.text?.substring(0, 100),
+          url: contentUrl
         });
       } else {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText(contentUrl);
         toast.success('Enlace copiado al portapapeles');
       }
     } catch (error) {
@@ -62,22 +63,24 @@ const ContentCard = ({ content, onLike, onToggleFavorite }) => {
       return;
     }
 
-    setIsFavorite(!isFavorite);
-    toast.success(isFavorite ? 'Eliminado de favoritos' : 'Guardado en favoritos');
-    if (onToggleFavorite) onToggleFavorite();
-  };
-
-  const getTypeIconClass = () => {
-    switch (content.type) {
-      case 'chiste': return 'icon-smile';
-      case 'image': return 'icon-image';
-      case 'video': return 'icon-video';
-      default: return 'icon-smile';
+    try {
+      if (isFavorite) {
+        await usersAPI.removeFromFavorites(content._id);
+        setIsFavorite(false);
+        toast.success('Eliminado de favoritos');
+      } else {
+        await usersAPI.addToFavorites(content._id);
+        setIsFavorite(true);
+        toast.success('Guardado en favoritos');
+      }
+      if (onToggleFavorite) onToggleFavorite();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Error al guardar favorito');
     }
   };
 
   const getChisteGradientClass = () => {
-    const source = content._id || content.title || content.text || 'chiste';
+    const source = content._id || content.text || 'chiste';
     let hash = 0;
 
     for (let i = 0; i < source.length; i += 1) {
@@ -101,8 +104,8 @@ const ContentCard = ({ content, onLike, onToggleFavorite }) => {
       case 'image':
         return (
           <img 
-            src={content.mediaUrl} 
-            alt={content.title}
+            src={getUploadUrl(content.mediaUrl) || content.mediaUrl} 
+            alt={content.text?.substring(0, 50) || 'Imagen'}
             className="card-image"
           />
         );
@@ -111,7 +114,7 @@ const ContentCard = ({ content, onLike, onToggleFavorite }) => {
         return (
           <div className="card-video-preview">
             <video 
-              src={content.mediaUrl} 
+              src={getUploadUrl(content.mediaUrl) || content.mediaUrl} 
               className="card-video"
               preload="metadata"
             />
@@ -135,23 +138,19 @@ const ContentCard = ({ content, onLike, onToggleFavorite }) => {
           <Link to={`/content/${content._id}`} className="card-link">
             {renderContent()}
           </Link>
-
-          {/* Badge de tipo */}
-          <div className="card-type-badge">
-            <i className={getTypeIconClass()} aria-hidden="true"></i>
-            <span>{content.type}</span>
-          </div>
         </div>
 
         {/* Descripción */}
         <div className="card-desc">
           {/* Autor */}
           <div className="card-author">
-            <img 
-              src={authorAvatar}
-              alt={authorName}
-              className="author-avatar"
-            />
+            <span className="author-avatar-wrap">
+              <img 
+                src={authorAvatar}
+                alt={authorName}
+                className="author-avatar"
+              />
+            </span>
             {authorId ? (
               <Link to={`/profile/${authorId}`} className="author-name">
                 {authorName}
@@ -160,15 +159,6 @@ const ContentCard = ({ content, onLike, onToggleFavorite }) => {
               <span className="author-name">{authorName}</span>
             )}
           </div>
-
-          {/* Título */}
-          {content.title && (
-            <h3 className="card-title">
-              <Link to={`/content/${content._id}`}>
-                {content.title}
-              </Link>
-            </h3>
-          )}
 
           {/* Categorías */}
           {content.categories?.length > 0 && (

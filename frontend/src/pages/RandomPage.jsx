@@ -34,7 +34,7 @@ const RandomPage = () => {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="mb-0">
             <i className="icon-random text-info me-2" aria-hidden="true"></i>
-            🎲 Contenido Aleatorio
+            Contenido Aleatorio
           </h2>
           <button 
             onClick={fetchRandomContent} 

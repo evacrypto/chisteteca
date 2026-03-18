@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import useAuthStore from '../store/authStore';
+import { getUploadUrl } from '../services/api';
 import './Navbar.css';
 
 const BASE_NAV_ITEMS = [
@@ -19,11 +20,8 @@ const Navbar = () => {
   const handleAvatarClick = () => {
     if (isAuthenticated && user) {
       const userId = user.id || user._id;
-      console.log('Navbar - Navigating to profile, userId:', userId, 'user:', user);
       if (userId) {
         navigate(`/profile/${userId}`);
-      } else {
-        console.error('Navbar - No userId found!');
       }
     }
   };
@@ -99,11 +97,13 @@ const Navbar = () => {
                   
                   <div className="user-dropdown">
                     <button onClick={handleAvatarClick} className="user-avatar-link" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <img
-                        src={user?.avatar || '/logo_chisteteca.png'}
-                        alt={user?.username}
-                        className="user-avatar"
-                      />
+                      <span className="user-avatar-wrap">
+                        <img
+                          src={getUploadUrl(user?.avatar) || '/logo_chisteteca.png'}
+                          alt={user?.username}
+                          className="user-avatar"
+                        />
+                      </span>
                       <span className="user-name">{user?.username}</span>
                     </button>
                     <button onClick={handleLogout} className="logout-btn">

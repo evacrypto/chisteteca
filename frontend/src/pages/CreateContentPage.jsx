@@ -10,20 +10,16 @@ const CreateContentPage = () => {
   const [categories, setCategories] = useState([]);
   
   const [formData, setFormData] = useState({
-    title: '',
-    type: 'chiste',
     text: '',
     categories: [],
     newCategory: '',
     newCategoryEmoji: ''
   });
-  const [mediaFile, setMediaFile] = useState(null);
   const [catDropdownOpen, setCatDropdownOpen] = useState(false);
   const [catSearch, setCatSearch] = useState('');
   const catDropdownRef = useRef(null);
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const emojiPickerRef = useRef(null);
-  const [preview, setPreview] = useState(null);
 
   const EMOJI_PALETTE = [
     '😀','😃','😄','😁','😆','😅','😂','🤣','🥲','😊',
@@ -100,37 +96,11 @@ const CreateContentPage = () => {
     }));
   };
 
-  const handleMediaChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const maxSize = formData.type === 'video' ? 50 * 1024 * 1024 : 5 * 1024 * 1024;
-      if (file.size > maxSize) {
-        toast.error(`El archivo es demasiado grande. Máximo ${maxSize / 1024 / 1024}MB`);
-        return;
-      }
-      setMediaFile(file);
-      
-      // Create preview for images
-      if (formData.type === 'image') {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.type === 'chiste' && !formData.text.trim()) {
+    if (!formData.text.trim()) {
       toast.error('Escribe el contenido del chiste');
-      return;
-    }
-
-    if ((formData.type === 'image' || formData.type === 'video') && !mediaFile) {
-      toast.error('Selecciona un archivo');
       return;
     }
 
@@ -143,16 +113,9 @@ const CreateContentPage = () => {
 
     try {
       const submitData = new FormData();
-      submitData.append('title', formData.title || 'Sin título');
-      submitData.append('type', formData.type);
-
-      if (formData.type === 'chiste') {
-        submitData.append('text', formData.text);
-      }
-
-      if (mediaFile) {
-        submitData.append('media', mediaFile);
-      }
+      submitData.append('title', formData.text?.trim().substring(0, 50) || 'Sin título');
+      submitData.append('type', 'chiste');
+      submitData.append('text', formData.text);
 
       formData.categories.forEach(cat => {
         submitData.append('categories', cat);
@@ -192,7 +155,7 @@ const CreateContentPage = () => {
                 Comparte tu humor con el mundo
               </h2>
               <p className="section-subtitle text-muted">
-                Publica chistes, imágenes graciosas o videos cortos y haz reír a miles de usuarios
+                Publica tus chistes en texto y haz reír a miles de usuarios
               </p>
             </div>
           </div>
@@ -239,9 +202,7 @@ const CreateContentPage = () => {
                   <h4><i className="icon-lightbulb me-2" aria-hidden="true"></i> Consejos para tu publicación</h4>
                   <ul className="tips-list">
                     <li>Elige la categoría correcta para más visibilidad</li>
-                    <li>Añade un título llamativo (opcional)</li>
-                    <li>Para imágenes: JPG, PNG o GIF (máx 5MB)</li>
-                    <li>Para videos: MP4 (máx 50MB, menos de 2 min)</li>
+                    <li>Escribe chistes claros y divertidos</li>
                   </ul>
                 </div>
               </div>
@@ -253,100 +214,22 @@ const CreateContentPage = () => {
                 <div className="card-body">
                   <form onSubmit={handleSubmit} className="content-form">
                     
-                    {/* Tipo de contenido */}
+                    {/* Texto del chiste */}
                     <div className="form-group">
                       <label className="form-label">
                         <i className="label-icon icon-align-left" aria-hidden="true"></i>
-                        Tipo de Contenido
+                        Texto del Chiste
                       </label>
-                      <div className="type-selector">
-                        <button
-                          type="button"
-                          className={`type-btn ${formData.type === 'chiste' ? 'active' : ''}`}
-                          onClick={() => setFormData({ ...formData, type: 'chiste' })}
-                        >
-                          <i className="btn-icon icon-align-left" aria-hidden="true"></i>
-                          <span>Chiste</span>
-                        </button>
-                        <button
-                          type="button"
-                          className={`type-btn ${formData.type === 'image' ? 'active' : ''}`}
-                          onClick={() => setFormData({ ...formData, type: 'image' })}
-                        >
-                          <i className="btn-icon icon-image" aria-hidden="true"></i>
-                          <span>Imagen</span>
-                        </button>
-                        <button
-                          type="button"
-                          className={`type-btn ${formData.type === 'video' ? 'active' : ''}`}
-                          onClick={() => setFormData({ ...formData, type: 'video' })}
-                        >
-                          <i className="btn-icon icon-video" aria-hidden="true"></i>
-                          <span>Video</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Título */}
-                    <div className="form-group">
-                      <label className="form-label">Título (opcional)</label>
-                      <input
-                        type="text"
-                        name="title"
-                        value={formData.title}
+                      <textarea
+                        name="text"
+                        value={formData.text}
                         onChange={handleChange}
-                        className="form-control"
-                        placeholder="Un título divertido"
-                        maxLength={200}
+                        className="form-control textarea"
+                        placeholder="Escribe tu chiste aquí..."
+                        rows={6}
+                        required
                       />
                     </div>
-
-                    {/* Contenido según tipo */}
-                    {formData.type === 'chiste' ? (
-                      <div className="form-group">
-                        <label className="form-label">
-                          <i className="label-icon icon-align-left" aria-hidden="true"></i>
-                          Texto del Chiste
-                        </label>
-                        <textarea
-                          name="text"
-                          value={formData.text}
-                          onChange={handleChange}
-                          className="form-control textarea"
-                          placeholder="Escribe tu chiste aquí..."
-                          rows={6}
-                          required
-                        />
-                      </div>
-                    ) : (
-                      <div className="form-group">
-                        <label className="form-label">
-                          {formData.type === 'image' ? (
-                            <i className="label-icon icon-image" aria-hidden="true"></i>
-                          ) : (
-                            <i className="label-icon icon-video" aria-hidden="true"></i>
-                          )}
-                          {formData.type === 'image' ? 'Imagen' : 'Video'}
-                          <span className="label-hint">
-                            (Máx {formData.type === 'video' ? '50MB' : '5MB'})
-                          </span>
-                        </label>
-                        <div className="file-upload-wrapper">
-                          <input
-                            type="file"
-                            accept={formData.type === 'image' ? 'image/*' : 'video/*'}
-                            onChange={handleMediaChange}
-                            className="form-control file-input"
-                            required
-                          />
-                          {preview && (
-                            <div className="file-preview">
-                              <img src={preview} alt="Preview" />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
 
                     {/* Categorías */}
                     <div className="form-group">

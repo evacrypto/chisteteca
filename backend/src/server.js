@@ -1,6 +1,12 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
@@ -26,6 +32,16 @@ app.use(cors({
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Asegurar que existan las carpetas de uploads (backend/uploads)
+const uploadsDir = path.join(process.cwd(), 'uploads');
+['avatars', 'images', 'videos'].forEach((sub) => {
+  const dir = path.join(uploadsDir, sub);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+    console.log(`📁 Created uploads/${sub}`);
+  }
+});
 
 // Static files for uploads
 app.use('/uploads', express.static('uploads'));

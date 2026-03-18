@@ -172,12 +172,27 @@
   margin-bottom: 15px;
 }
 
-.author-avatar {
+.author-avatar-wrap {
+  display: block;
   width: 40px;
   height: 40px;
+  min-width: 40px;
+  min-height: 40px;
   border-radius: 50%;
-  object-fit: cover;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
   border: 2px solid #ffc107;
+}
+
+.author-avatar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .author-name {
@@ -298,6 +313,10 @@
 .action-btn.like-btn.liked:hover {
   background: #dc3545;
   color: #fff;
+}
+
+.action-btn.favorite-btn {
+  margin-left: 12px;
 }
 
 .action-btn.favorite-btn.active {

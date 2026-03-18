@@ -41,7 +41,7 @@ const HomePage = () => {
       return (
         <>
           <i className="icon-fire text-warning me-2" aria-hidden="true"></i>
-          🔥 Populares de la Semana
+          Populares de la Semana
         </>
       );
     }
@@ -50,7 +50,7 @@ const HomePage = () => {
       return (
         <>
           <i className="icon-random text-info me-2" aria-hidden="true"></i>
-          🎲 Aleatorio
+          Aleatorio
         </>
       );
     }

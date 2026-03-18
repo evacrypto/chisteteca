@@ -34,7 +34,7 @@ const LoginPage = () => {
       if (user?.role === 'admin') {
         navigate('/admin');
       } else {
-        navigate(`/profile/${user._id}`);
+        navigate(`/profile/${user?.id || user?._id}`);
       }
     } else {
       toast.error(result.message);
@@ -70,7 +70,7 @@ const LoginPage = () => {
       if (user?.role === 'admin') {
         navigate('/admin');
       } else {
-        navigate(`/profile/${user._id}`);
+        navigate(`/profile/${user?.id || user?._id}`);
       }
     } else {
       toast.error(result.message);

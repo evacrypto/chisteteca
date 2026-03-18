@@ -32,7 +32,7 @@
 }
 
 .logo-image {
-  height: 90px;
+  height: 100px;
   width: auto;
   object-fit: contain;
   transition: all 0.3s ease;
@@ -202,18 +202,33 @@
   color: inherit;
 }
 
-.user-avatar {
+.user-avatar-wrap {
+  display: block;
   width: 36px;
   height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: 50%;
-  object-fit: cover;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
   border: 2px solid #0066ff;
   transition: all 0.3s ease;
 }
 
-.user-avatar-link:hover .user-avatar {
+.user-avatar-link:hover .user-avatar-wrap {
   border-color: #ffc107;
   transform: scale(1.05);
+}
+
+.user-avatar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .user-name {
@@ -332,6 +347,10 @@
 @media (max-width: 767px) {
   .header-row {
     height: 70px;
+  }
+
+  .logo-image {
+    height: 65px;
   }
 
   .logo-text {

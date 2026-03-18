@@ -157,14 +157,17 @@ export const getFavorites = async (req, res) => {
         path: 'favorites',
         populate: [
           { path: 'author', select: 'username avatar bio' },
-          { path: 'categories', select: 'name slug emoji' }
+          { path: 'categories', select: 'name slug emoji color' }
         ]
       })
       .select('favorites');
 
+    // Filtrar contenidos eliminados (populate devuelve null)
+    const validFavorites = (user.favorites || []).filter(Boolean);
+
     res.json({
       success: true,
-      data: user.favorites
+      data: validFavorites
     });
   } catch (error) {
     console.error('Get favorites error:', error);

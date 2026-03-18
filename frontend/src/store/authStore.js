@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { authAPI } from '../services/api';
+import { authAPI, usersAPI } from '../services/api';
 
 const useAuthStore = create((set, get) => ({
   user: JSON.parse(localStorage.getItem('user')) || null,
@@ -75,15 +75,8 @@ const useAuthStore = create((set, get) => ({
   updateProfile: async (data) => {
     set({ isLoading: true });
     try {
-      const response = await fetch('/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${get().token}`
-        },
-        body: JSON.stringify(data)
-      });
-      const result = await response.json();
+      const response = await usersAPI.updateProfile(data);
+      const result = response.data;
       
       if (result.success) {
         const updatedUser = { ...get().user, ...result.data };
@@ -93,8 +86,18 @@ const useAuthStore = create((set, get) => ({
       }
       return { success: false, message: result.message };
     } catch (error) {
+      const message = error.response?.data?.message || 'Update failed';
       set({ isLoading: false });
-      return { success: false, message: 'Update failed' };
+      return { success: false, message };
+    }
+  },
+
+  updateAvatar: async (avatarUrl) => {
+    const user = get().user;
+    if (user) {
+      const updatedUser = { ...user, avatar: avatarUrl };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      set({ user: updatedUser });
     }
   },
 

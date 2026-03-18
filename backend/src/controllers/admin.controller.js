@@ -23,7 +23,7 @@ export const getDashboardStats = async (req, res) => {
     const topContent = await Content.find({ isApproved: true })
       .sort({ likes: -1 })
       .limit(5)
-      .select('title type likes views')
+      .select('title text type likes views')
       .populate('author', 'username avatar');
 
     res.json({

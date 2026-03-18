@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Card, Row, Col, Table, Button, Badge } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { adminAPI, categoriesAPI } from '../services/api';
+import { adminAPI, categoriesAPI, getUploadUrl } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
@@ -290,8 +290,7 @@ const AdminDashboard = () => {
               <Table responsive hover>
                 <thead>
                   <tr>
-                    <th>Título</th>
-                    <th>Tipo</th>
+                    <th>Contenido</th>
                     <th>Autor</th>
                     <th>Likes</th>
                     <th>Vistas</th>
@@ -302,11 +301,11 @@ const AdminDashboard = () => {
                     <tr key={item._id}>
                       <td>
                         <Link to={`/content/${item._id}`} className="text-gradient">
-                          {item.title || 'Sin título'}
+                          {(() => {
+                            const t = (item.type === 'chiste' ? item.text : item.title) || item.title || item.text || 'Sin título';
+                            return t.length > 60 ? t.substring(0, 60) + '...' : t;
+                          })()}
                         </Link>
-                      </td>
-                      <td>
-                        <Badge bg="secondary">{item.type}</Badge>
                       </td>
                       <td>{item.author?.username || 'Desconocido'}</td>
                       <td>{item.likes?.length || 0}</td>
@@ -339,7 +338,7 @@ const AdminDashboard = () => {
           <Card className="card-custom">
             <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center">
               <h4 className="mb-0">Contenido Pendiente de Aprobación</h4>
-              <Button variant="outline-light" size="sm" onClick={handleRefreshPending}>
+              <Button variant="outline-secondary" size="sm" onClick={handleRefreshPending}>
                 🔄 Actualizar
               </Button>
             </Card.Header>
@@ -354,7 +353,6 @@ const AdminDashboard = () => {
                   <thead>
                     <tr>
                       <th style={{ width: '35%' }}>Contenido</th>
-                      <th>Tipo</th>
                       <th>Autor</th>
                       <th>Fecha</th>
                       <th className="text-end">Acciones</th>
@@ -365,8 +363,13 @@ const AdminDashboard = () => {
                       <tr key={item._id}>
                         <td>
                           <div>
-                            <strong className="text-light">{item.title || 'Sin título'}</strong>
-                            {item.text && (
+                            <strong className="text-dark">
+                              {(() => {
+                                const t = (item.type === 'chiste' ? item.text : item.title) || item.title || item.text || 'Sin título';
+                                return t.length > 80 ? t.substring(0, 80) + '...' : t;
+                              })()}
+                            </strong>
+                            {item.text && item.type !== 'chiste' && (
                               <p className="text-muted small mb-1 mt-1">
                                 📝 {item.text.length > 80 ? item.text.substring(0, 80) + '...' : item.text}
                               </p>
@@ -392,24 +395,14 @@ const AdminDashboard = () => {
                           </div>
                         </td>
                         <td>
-                          <Badge 
-                            bg={item.type === 'video' ? 'danger' : item.type === 'image' ? 'info' : 'secondary'}
-                            className="px-3 py-2"
-                          >
-                            {item.type === 'chiste' && '📝 '}
-                            {item.type === 'image' && '🖼️ '}
-                            {item.type === 'video' && '🎬 '}
-                            {item.type}
-                          </Badge>
-                        </td>
-                        <td>
                           <div className="d-flex align-items-center gap-2">
                             {item.author?.avatar && (
-                              <img 
-                                src={item.author.avatar} 
-                                alt={item.author.username}
-                                style={{ width: '30px', height: '30px', borderRadius: '50%' }}
-                              />
+                              <span className="admin-avatar-wrap">
+                                <img
+                                  src={getUploadUrl(item.author.avatar)}
+                                  alt={item.author.username}
+                                />
+                              </span>
                             )}
                             <span>{item.author?.username || 'Desconocido'}</span>
                           </div>
@@ -456,7 +449,7 @@ const AdminDashboard = () => {
           <Card className="card-custom mb-4">
             <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center">
               <h4 className="mb-0">Categorías Pendientes de Aprobación</h4>
-              <Button variant="outline-light" size="sm" onClick={fetchData}>
+              <Button variant="outline-secondary" size="sm" onClick={fetchData}>
                 🔄 Actualizar
               </Button>
             </Card.Header>
@@ -587,7 +580,7 @@ const AdminDashboard = () => {
         <Card className="card-custom">
           <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center">
             <h4 className="mb-0">Gestión de Usuarios</h4>
-            <Button variant="outline-light" size="sm" onClick={loadUsers}>🔄 Actualizar</Button>
+            <Button variant="outline-secondary" size="sm" onClick={loadUsers}>🔄 Actualizar</Button>
           </Card.Header>
           <Card.Body>
             <Table responsive hover className="align-middle">
@@ -645,14 +638,13 @@ const AdminDashboard = () => {
         <Card className="card-custom">
           <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center">
             <h4 className="mb-0">Gestión de Contenidos</h4>
-            <Button variant="outline-light" size="sm" onClick={loadAllContent}>🔄 Actualizar</Button>
+            <Button variant="outline-secondary" size="sm" onClick={loadAllContent}>🔄 Actualizar</Button>
           </Card.Header>
           <Card.Body>
             <Table responsive hover className="align-middle">
               <thead>
                 <tr>
-                  <th>Título</th>
-                  <th>Tipo</th>
+                  <th>Contenido</th>
                   <th>Autor</th>
                   <th>Estado</th>
                   <th>Fecha</th>
@@ -664,11 +656,11 @@ const AdminDashboard = () => {
                   <tr key={item._id}>
                     <td>
                       <Link to={`/content/${item._id}`} className="text-gradient">
-                        {item.title || 'Sin título'}
+                        {(() => {
+                          const t = (item.type === 'chiste' ? item.text : item.title) || item.title || item.text || 'Sin título';
+                          return t.length > 60 ? t.substring(0, 60) + '...' : t;
+                        })()}
                       </Link>
-                    </td>
-                    <td>
-                      <Badge bg="secondary">{item.type}</Badge>
                     </td>
                     <td>{item.author?.username || item.authorName || 'Desconocido'}</td>
                     <td>
@@ -681,7 +673,7 @@ const AdminDashboard = () => {
                       <Button
                         size="sm"
                         variant="danger"
-                        onClick={() => handleDeleteManagedContent(item._id, item.title)}
+                        onClick={() => handleDeleteManagedContent(item._id, (item.type === 'chiste' ? item.text : item.title) || item.title || item.text)}
                       >
                         Eliminar
                       </Button>

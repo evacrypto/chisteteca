@@ -22,7 +22,14 @@ export const getAllContent = async (req, res) => {
     const limit = parsePositiveInt(req.query.limit, 20);
     const skip = (page - 1) * limit;
 
-    const query = { isApproved: true };
+    const query = {};
+    // isApproved: true (default), false (solo pendientes), all (todos)
+    const isApprovedParam = req.query.isApproved;
+    if (isApprovedParam === 'false') {
+      query.isApproved = false;
+    } else if (isApprovedParam !== 'all') {
+      query.isApproved = true; // default: solo aprobados
+    }
 
     if (req.query.type) query.type = req.query.type;
     if (req.query.category) {

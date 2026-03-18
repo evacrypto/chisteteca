@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Container, Card, Row, Col, Nav, Tab, Badge, Modal, Button } from 'react-bootstrap';
+import { Container, Card, Row, Col, Modal, Button, Badge } from 'react-bootstrap';
 import { useParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ContentCard from '../components/ContentCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import useAuthStore from '../store/authStore';
-import { usersAPI, contentAPI } from '../services/api';
+import { usersAPI, contentAPI, getUploadUrl } from '../services/api';
 import './ProfilePage.css';
 
 const ProfilePage = () => {
@@ -32,22 +32,15 @@ const ProfilePage = () => {
     }
   }, [id, isOwnProfile]);
 
-  // Debug: Log when data changes
-  useEffect(() => {
-    console.log('📊 PROFILE STATE UPDATE:');
-    console.log('  - Published:', publishedContent.length);
-    console.log('  - Pending:', pendingContent.length);
-    console.log('  - Favorites:', favorites.length);
-    console.log('  - Active Tab:', activeTab);
-  }, [publishedContent, pendingContent, favorites, activeTab]);
 
   const fetchProfileData = async () => {
     setLoading(true);
     try {
-      // Si es mi propio perfil, usar datos del store
+      // Si es mi propio perfil, usar datos del store (siempre frescos)
       if (isOwnProfile) {
-        setProfileUser(currentUser);
-        setEditData({ username: currentUser?.username || '', bio: currentUser?.bio || '' });
+        const user = useAuthStore.getState().user;
+        setProfileUser(user);
+        setEditData({ username: user?.username || '', bio: user?.bio || '' });
       } else {
         // Si es otro perfil, obtener datos de la API
         const userRes = await usersAPI.getProfile(id);
@@ -56,21 +49,16 @@ const ProfilePage = () => {
 
       // Obtener TODO el contenido del usuario (aprobado y pendiente)
       const userId = id || currentUser?.id;
-      console.log('📊 PROFILE - Fetching content for userId:', userId);
       
       if (userId) {
         try {
-          const allContentRes = await contentAPI.getAll({ author: userId, limit: 100 });
-          console.log('📊 PROFILE - Total content:', allContentRes.data.data.length);
-          
-          const approved = allContentRes.data.data.filter(c => c.isApproved === true);
-          const pending = allContentRes.data.data.filter(c => c.isApproved === false);
-          
-          console.log('📊 PROFILE - Approved:', approved.length, 'Pending:', pending.length);
-          setPublishedContent(approved);
-          setPendingContent(pending);
+          const [approvedRes, pendingRes] = await Promise.all([
+            contentAPI.getAll({ author: userId, limit: 100, isApproved: 'true' }),
+            contentAPI.getAll({ author: userId, limit: 100, isApproved: 'false' })
+          ]);
+          setPublishedContent(approvedRes.data.data || []);
+          setPendingContent(pendingRes.data.data || []);
         } catch (contentError) {
-          console.error('📊 PROFILE - Error fetching content:', contentError.message);
           setPublishedContent([]);
           setPendingContent([]);
         }
@@ -79,17 +67,14 @@ const ProfilePage = () => {
       // Obtener favoritos (solo si es mi perfil)
       if (isOwnProfile) {
         try {
-          console.log('📊 PROFILE - Fetching favorites...');
           const favRes = await usersAPI.getFavorites();
-          console.log('📊 PROFILE - Favorites count:', favRes.data.data?.length || 0);
-          setFavorites(favRes.data.data || []);
+          const favData = favRes.data.data || [];
+          setFavorites(Array.isArray(favData) ? favData.filter(Boolean) : []);
         } catch (favError) {
-          console.error('📊 PROFILE - Error fetching favorites:', favError.message);
           setFavorites([]);
         }
       }
     } catch (error) {
-      console.error('📊 PROFILE - Error fetching profile data:', error);
       toast.error('Error al cargar perfil');
     } finally {
       setLoading(false);
@@ -98,10 +83,16 @@ const ProfilePage = () => {
 
   const handleSaveProfile = async () => {
     try {
-      await usersAPI.updateProfile(editData);
-      toast.success('Perfil actualizado');
-      setIsEditing(false);
-      fetchProfileData();
+      const result = await useAuthStore.getState().updateProfile(editData);
+      if (result.success) {
+        toast.success('Perfil actualizado');
+        setIsEditing(false);
+        const freshUser = useAuthStore.getState().user;
+        setProfileUser(freshUser);
+        setEditData({ username: freshUser?.username || '', bio: freshUser?.bio || '' });
+      } else {
+        toast.error(result.message);
+      }
     } catch (error) {
       toast.error('Error al actualizar perfil');
     }
@@ -132,10 +123,14 @@ const ProfilePage = () => {
       const formData = new FormData();
       formData.append('avatar', file);
 
-      await usersAPI.updateAvatar(formData);
+      const res = await usersAPI.updateAvatar(formData);
+      const newAvatar = res.data?.data?.avatar;
+      if (newAvatar) {
+        useAuthStore.getState().updateAvatar(newAvatar);
+        setProfileUser(useAuthStore.getState().user);
+      }
       toast.success('Avatar actualizado');
       setShowAvatarModal(false);
-      fetchProfileData();
     } catch (error) {
       toast.error('Error al actualizar avatar');
     } finally {
@@ -179,7 +174,7 @@ const ProfilePage = () => {
               <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
                 <div className="profile-avatar-large" style={{ cursor: isOwnProfile ? 'pointer' : 'default' }} onClick={handleAvatarClick}>
                   <img
-                    src={profileUser?.avatar || '/logo_chisteteca.png'}
+                    src={getUploadUrl(profileUser?.avatar) || '/logo_chisteteca.png'}
                     alt={profileUser?.username}
                     style={{ cursor: isOwnProfile ? 'pointer' : 'default' }}
                   />
@@ -270,84 +265,93 @@ const ProfilePage = () => {
         </Card>
 
         {/* Tabs de Navegación */}
-        <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k)}>
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <Nav variant="tabs" className="profile-tabs">
-              <Nav.Item>
-                <Nav.Link eventKey="published">
-                  <i className="icon-file-alt me-2" aria-hidden="true"></i>
-                  Publicados ({publishedContent.length})
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="pending">
-                  <i className="icon-clock me-2" aria-hidden="true"></i>
-                  Pendientes ({pendingContent.length})
-                </Nav.Link>
-              </Nav.Item>
-              {isOwnProfile && (
-                <Nav.Item>
-                  <Nav.Link eventKey="favorites">
-                    <i className="icon-bookmark me-2" aria-hidden="true"></i>
-                    Favoritos ({favorites.length})
-                  </Nav.Link>
-                </Nav.Item>
-              )}
-            </Nav>
-            <Button variant="outline-primary" size="sm" onClick={fetchProfileData} className="ms-3">
-              <i className="icon-refresh me-1" aria-hidden="true"></i> Actualizar
-            </Button>
-          </div>
-
-          {/* Contenido de las Tabs */}
-          <Tab.Content>
-            {/* Publicados */}
-            <Tab.Pane eventKey="published">
-              {publishedContent.length === 0 ? (
-                <div className="text-center py-5">
-                  <i className="icon-file-alt text-muted mb-3" style={{ fontSize: '60px' }} aria-hidden="true"></i>
-                  <p className="text-muted">Aún no has publicado ningún chiste</p>
-                  <Link to="/create" className="btn btn-primary">Crear mi primer chiste</Link>
-                </div>
-              ) : (
-                <Row xs={1} md={2} lg={3} className="g-4">
-                  {publishedContent.map((item) => (
-                    <Col key={item._id}>
-                      <ContentCard content={item} />
-                    </Col>
-                  ))}
-                </Row>
-              )}
-            </Tab.Pane>
-
-            {/* Pendientes */}
-            <Tab.Pane eventKey="pending">
-              {pendingContent.length === 0 ? (
-                <div className="text-center py-5">
-                  <i className="icon-clock text-muted mb-3" style={{ fontSize: '60px' }} aria-hidden="true"></i>
-                  <p className="text-muted">¡No tienes contenido pendiente!</p>
-                  <p className="text-muted small">Todo tu contenido ha sido aprobado</p>
-                </div>
-              ) : (
-                <div className="pending-info alert alert-warning">
-                  <i className="icon-clock me-2" aria-hidden="true"></i>
-                  <strong>Contenido en moderación:</strong> Estos chistes están esperando aprobación del administrador.
-                </div>
-              )}
-              {pendingContent.length > 0 && (
-                <Row xs={1} md={2} lg={3} className="g-4 mt-2">
-                  {pendingContent.map((item) => (
-                    <Col key={item._id}>
-                      <ContentCard content={item} />
-                    </Col>
-                  ))}
-                </Row>
-              )}
-            </Tab.Pane>
-
-            {/* Favoritos */}
+        <div className="d-flex justify-content-between align-items-center mb-4 profile-tabs-wrapper">
+          <div className="profile-tabs nav nav-tabs" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              className={`nav-link ${activeTab === 'published' ? 'active' : ''}`}
+              onClick={() => setActiveTab('published')}
+            >
+              <i className="icon-file-alt me-2" aria-hidden="true"></i>
+              Publicados ({publishedContent.length})
+            </button>
+            <button
+              type="button"
+              role="tab"
+              className={`nav-link ${activeTab === 'pending' ? 'active' : ''}`}
+              onClick={() => setActiveTab('pending')}
+            >
+              <i className="icon-clock me-2" aria-hidden="true"></i>
+              Pendientes ({pendingContent.length})
+            </button>
             {isOwnProfile && (
-              <Tab.Pane eventKey="favorites">
+              <button
+                type="button"
+                role="tab"
+                className={`nav-link ${activeTab === 'favorites' ? 'active' : ''}`}
+                onClick={() => setActiveTab('favorites')}
+              >
+                <i className="icon-bookmark me-2" aria-hidden="true"></i>
+                Favoritos ({favorites.length})
+              </button>
+            )}
+          </div>
+          <Button variant="outline-primary" size="sm" onClick={fetchProfileData} className="ms-3">
+            <i className="icon-refresh me-1" aria-hidden="true"></i> Actualizar
+          </Button>
+        </div>
+
+        {/* Contenido de las Tabs */}
+        <div className="profile-tab-content">
+            {activeTab === 'published' && (
+              <div className="tab-pane-content">
+                {publishedContent.length === 0 ? (
+                  <div className="text-center py-5">
+                    <i className="icon-file-alt text-muted mb-3" style={{ fontSize: '60px' }} aria-hidden="true"></i>
+                    <p className="text-muted">Aún no has publicado ningún chiste</p>
+                    <Link to="/create" className="btn btn-primary">Crear mi primer chiste</Link>
+                  </div>
+                ) : (
+                  <Row xs={1} md={2} lg={3} className="g-4">
+                    {publishedContent.map((item) => (
+                      <Col key={item._id}>
+                        <ContentCard content={item} />
+                      </Col>
+                    ))}
+                  </Row>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'pending' && (
+              <div className="tab-pane-content">
+                {pendingContent.length === 0 ? (
+                  <div className="text-center py-5">
+                    <i className="icon-clock text-muted mb-3" style={{ fontSize: '60px' }} aria-hidden="true"></i>
+                    <p className="text-muted">¡No tienes contenido pendiente!</p>
+                    <p className="text-muted small">Todo tu contenido ha sido aprobado</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="pending-info alert alert-warning">
+                      <i className="icon-clock me-2" aria-hidden="true"></i>
+                      <strong>Contenido en moderación:</strong> Estos chistes están esperando aprobación del administrador.
+                    </div>
+                    <Row xs={1} md={2} lg={3} className="g-4 mt-2">
+                      {pendingContent.map((item) => (
+                        <Col key={item._id}>
+                          <ContentCard content={item} />
+                        </Col>
+                      ))}
+                    </Row>
+                  </>
+                )}
+              </div>
+            )}
+
+            {isOwnProfile && activeTab === 'favorites' && (
+              <div className="tab-pane-content">
                 {favorites.length === 0 ? (
                   <div className="text-center py-5">
                     <i className="icon-bookmark text-muted mb-3" style={{ fontSize: '60px' }} aria-hidden="true"></i>
@@ -358,15 +362,18 @@ const ProfilePage = () => {
                   <Row xs={1} md={2} lg={3} className="g-4">
                     {favorites.map((item) => (
                       <Col key={item._id}>
-                        <ContentCard content={item} />
+                        <ContentCard
+                          content={item}
+                          initialIsFavorite={true}
+                          onToggleFavorite={fetchProfileData}
+                        />
                       </Col>
                     ))}
                   </Row>
                 )}
-              </Tab.Pane>
+              </div>
             )}
-          </Tab.Content>
-        </Tab.Container>
+        </div>
 
       </Container>
 
@@ -376,13 +383,15 @@ const ProfilePage = () => {
           <Modal.Title>Cambiar Avatar</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-center">
-          <div className="mb-4">
+          <div className="mb-4 avatar-preview-wrapper">
             <img
-              src={profileUser?.avatar || '/logo_chisteteca.png'}
+              src={getUploadUrl(profileUser?.avatar) || '/logo_chisteteca.png'}
               alt="Avatar actual"
-              className="rounded-circle mb-3"
-              style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+              className="avatar-preview-img"
             />
+          </div>
+          <div className="avatar-upload-guide">
+            <strong>Recomendado:</strong> imagen cuadrada (proporción 1:1), mínimo 200×200 px. Se recortará al centro.
           </div>
           <p className="text-muted mb-3">Sube una nueva imagen de perfil</p>
           <input
