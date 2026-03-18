@@ -7,6 +7,7 @@ import {
   addToFavorites, 
   removeFromFavorites, 
   getFavorites,
+  getPublicFavorites,
   followUser,
   unfollowUser,
   getNotifications,
@@ -33,6 +34,7 @@ router.delete('/favorites/:contentId', protect, removeFromFavorites);
 router.post('/follow/:userId', protect, followUser);
 router.delete('/unfollow/:userId', protect, unfollowUser);
 
+router.get('/:id/favorites', getPublicFavorites);
 router.get('/:id', getUserProfile);
 
 export default router;

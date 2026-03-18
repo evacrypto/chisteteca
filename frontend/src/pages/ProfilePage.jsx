@@ -24,7 +24,7 @@ const ProfilePage = () => {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
-  const isOwnProfile = isAuthenticated && (currentUser?.id === id || currentUser?.id === profileUser?.id || currentUser?.id === profileUser?._id);
+  const isOwnProfile = isAuthenticated && (String(currentUser?.id || currentUser?._id) === String(id));
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -32,6 +32,11 @@ const ProfilePage = () => {
     }
   }, [id, isOwnProfile]);
 
+  useEffect(() => {
+    if (activeTab === 'pending' && !isOwnProfile) {
+      setActiveTab('published');
+    }
+  }, [activeTab, isOwnProfile]);
 
   const fetchProfileData = async () => {
     setLoading(true);
@@ -47,32 +52,36 @@ const ProfilePage = () => {
         setProfileUser(userRes.data.data.user);
       }
 
-      // Obtener TODO el contenido del usuario (aprobado y pendiente)
       const userId = id || currentUser?.id;
       
       if (userId) {
         try {
-          const [approvedRes, pendingRes] = await Promise.all([
-            contentAPI.getAll({ author: userId, limit: 100, isApproved: 'true' }),
-            contentAPI.getAll({ author: userId, limit: 100, isApproved: 'false' })
-          ]);
+          const approvedRes = await contentAPI.getAll({ author: userId, limit: 100, isApproved: 'true' });
           setPublishedContent(approvedRes.data.data || []);
-          setPendingContent(pendingRes.data.data || []);
+          if (isOwnProfile) {
+            const pendingRes = await contentAPI.getAll({ author: userId, limit: 100, isApproved: 'false' });
+            setPendingContent(pendingRes.data.data || []);
+          } else {
+            setPendingContent([]);
+          }
         } catch (contentError) {
           setPublishedContent([]);
           setPendingContent([]);
         }
       }
 
-      // Obtener favoritos (solo si es mi perfil)
-      if (isOwnProfile) {
-        try {
+      try {
+        if (isOwnProfile) {
           const favRes = await usersAPI.getFavorites();
           const favData = favRes.data.data || [];
           setFavorites(Array.isArray(favData) ? favData.filter(Boolean) : []);
-        } catch (favError) {
-          setFavorites([]);
+        } else if (userId) {
+          const favRes = await usersAPI.getPublicFavorites(userId);
+          const favData = favRes.data.data || [];
+          setFavorites(Array.isArray(favData) ? favData.filter(Boolean) : []);
         }
+      } catch (favError) {
+        setFavorites([]);
       }
     } catch (error) {
       toast.error('Error al cargar perfil');
@@ -276,29 +285,29 @@ const ProfilePage = () => {
               <i className="icon-file-alt me-2" aria-hidden="true"></i>
               Publicados ({publishedContent.length})
             </button>
-            <button
-              type="button"
-              role="tab"
-              className={`nav-link ${activeTab === 'pending' ? 'active' : ''}`}
-              onClick={() => setActiveTab('pending')}
-            >
-              <i className="icon-clock me-2" aria-hidden="true"></i>
-              Pendientes ({pendingContent.length})
-            </button>
             {isOwnProfile && (
               <button
                 type="button"
                 role="tab"
-                className={`nav-link ${activeTab === 'favorites' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveTab('favorites');
-                  fetchProfileData();
-                }}
+                className={`nav-link ${activeTab === 'pending' ? 'active' : ''}`}
+                onClick={() => setActiveTab('pending')}
               >
-                <i className="icon-bookmark me-2" aria-hidden="true"></i>
-                Favoritos ({favorites.length})
+                <i className="icon-clock me-2" aria-hidden="true"></i>
+                Pendientes ({pendingContent.length})
               </button>
             )}
+            <button
+              type="button"
+              role="tab"
+              className={`nav-link ${activeTab === 'favorites' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('favorites');
+                fetchProfileData();
+              }}
+            >
+              <i className="icon-bookmark me-2" aria-hidden="true"></i>
+              Favoritos ({favorites.length})
+            </button>
           </div>
           <Button variant="outline-primary" size="sm" onClick={fetchProfileData} className="ms-3">
             <i className="icon-refresh me-1" aria-hidden="true"></i> Actualizar
@@ -353,12 +362,12 @@ const ProfilePage = () => {
               </div>
             )}
 
-            {isOwnProfile && activeTab === 'favorites' && (
+            {activeTab === 'favorites' && (
               <div className="tab-pane-content">
                 {favorites.length === 0 ? (
                   <div className="text-center py-5">
                     <i className="icon-bookmark text-muted mb-3" style={{ fontSize: '60px' }} aria-hidden="true"></i>
-                    <p className="text-muted">No tienes favoritos guardados</p>
+                    <p className="text-muted">{isOwnProfile ? 'No tienes favoritos guardados' : 'Este usuario no tiene favoritos guardados'}</p>
                     <Link to="/" className="btn btn-primary">Explorar contenido</Link>
                   </div>
                 ) : (
@@ -367,8 +376,8 @@ const ProfilePage = () => {
                       <Col key={item._id}>
                         <ContentCard
                           content={item}
-                          initialIsFavorite={true}
-                          onToggleFavorite={fetchProfileData}
+                          initialIsFavorite={isOwnProfile}
+                          onToggleFavorite={isOwnProfile ? fetchProfileData : undefined}
                         />
                       </Col>
                     ))}

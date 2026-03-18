@@ -89,6 +89,7 @@ export const usersAPI = {
   updateProfile: (data) => api.put('/users/profile', data),
   updateAvatar: (data) => api.put('/users/avatar', data),
   getFavorites: () => api.get('/users/favorites'),
+  getPublicFavorites: (userId) => api.get(`/users/${userId}/favorites`),
   addToFavorites: (contentId) => api.post(`/users/favorites/${contentId}`),
   removeFromFavorites: (contentId) => api.delete(`/users/favorites/${contentId}`),
   followUser: (userId) => api.post(`/users/follow/${userId}`),

@@ -147,6 +147,40 @@ export const removeFromFavorites = async (req, res) => {
   }
 };
 
+// @desc    Get a user's public favorites (for viewing their profile)
+// @route   GET /api/users/:id/favorites
+// @access  Public
+export const getPublicFavorites = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ success: false, message: 'Invalid user ID' });
+    }
+
+    const user = await User.findById(userId)
+      .populate({
+        path: 'favorites',
+        match: { isApproved: true },
+        select: 'title text type mediaUrl author categories',
+        populate: [
+          { path: 'author', select: 'username avatar' },
+          { path: 'categories', select: 'name slug emoji color' }
+        ]
+      })
+      .select('favorites');
+
+    const validFavorites = (user?.favorites || []).filter(Boolean);
+
+    res.json({
+      success: true,
+      data: validFavorites
+    });
+  } catch (error) {
+    console.error('Get public favorites error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 // @desc    Get user's favorites
 // @route   GET /api/users/favorites
 // @access  Private
