@@ -1,0 +1,14 @@
+[
+  {
+    "text": "¿Por qué los programadores confunden Halloween con Navidad? Porque 31 OCT = 25 DEC.",
+    "categoryName": "Chistes de programadores"
+  },
+  {
+    "text": "La profesora: Jaimito, ¿cuánto es 2+2? Jaimito: 4. La profesora: ¡Muy bien! Jaimito: ¿Y cuánto es 2+2+2? La profesora: 6. Jaimito: Entonces 2+2 no es 4, es 2+2.",
+    "categoryName": "Chistes de Jaimito"
+  },
+  {
+    "text": "Un hombre entra a una librería y pregunta: ¿Tienen libros sobre paranoia? El vendedor: Sí, pero están detrás de usted.",
+    "categoryNames": ["Chistes malos", "Humor absurdo"]
+  }
+]
