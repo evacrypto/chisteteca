@@ -33,6 +33,8 @@ const AdminDashboard = () => {
   const [newCategoryForm, setNewCategoryForm] = useState({ name: '', emoji: '😂', color: '#ffc107' });
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [newCategoryEmojiModalOpen, setNewCategoryEmojiModalOpen] = useState(false);
+  const [usersSortBy, setUsersSortBy] = useState('date');
+  const [usersSortOrder, setUsersSortOrder] = useState('desc');
 
   // Check if user is admin
   useEffect(() => {
@@ -77,9 +79,25 @@ const AdminDashboard = () => {
     }
   };
 
-  const loadUsers = async () => {
-    const usersRes = await adminAPI.getUsers({ limit: 50 });
+  const loadUsers = async (sortOverride) => {
+    const sortBy = sortOverride?.sortBy ?? usersSortBy;
+    const sortOrder = sortOverride?.sortOrder ?? usersSortOrder;
+    const params = { limit: 50, sortOrder };
+    if (sortBy === 'posts') params.sortBy = 'posts';
+    const usersRes = await adminAPI.getUsers(params);
     setUsers(usersRes.data.data || []);
+  };
+
+  const handleUsersSort = (field) => {
+    let newOrder;
+    if (usersSortBy === field) {
+      newOrder = usersSortOrder === 'desc' ? 'asc' : 'desc';
+    } else {
+      newOrder = field === 'posts' ? 'asc' : 'desc';
+    }
+    setUsersSortBy(field);
+    setUsersSortOrder(newOrder);
+    loadUsers({ sortBy: field, sortOrder: newOrder });
   };
 
   const loadAllContent = async (page = 1, sortOverride) => {
@@ -890,7 +908,17 @@ const AdminDashboard = () => {
                   <th>Email</th>
                   <th>Rol</th>
                   <th>Estado</th>
-                  <th>Posts</th>
+                  <th>
+                    <button
+                      type="button"
+                      className="admin-sort-th"
+                      onClick={() => handleUsersSort('posts')}
+                      title="Ordenar por posts (menos a más / más a menos)"
+                    >
+                      Posts
+                      <i className={`icon-chevron-${usersSortBy === 'posts' ? (usersSortOrder === 'asc' ? 'up' : 'down') : 'down'} ms-1 admin-sort-icon ${usersSortBy !== 'posts' ? 'admin-sort-icon-inactive' : ''}`} aria-hidden="true"></i>
+                    </button>
+                  </th>
                   <th className="text-end">Acciones</th>
                 </tr>
               </thead>

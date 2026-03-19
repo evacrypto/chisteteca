@@ -65,6 +65,26 @@
   cursor: not-allowed;
 }
 
+@media (max-width: 767px) {
+  .detail-nav-buttons {
+    gap: 6px;
+    margin-bottom: 20px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+  .btn-back-top,
+  .btn-nav-prev,
+  .btn-nav-next {
+    padding: 6px 10px;
+    gap: 4px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+  .btn-back-top {
+    padding: 6px;
+  }
+}
+
 .icon-arrow-right {
   display: inline-block;
   transform: scaleX(-1);

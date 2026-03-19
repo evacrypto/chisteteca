@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import Navbar from './components/Navbar';
 import ScrollToTop from './components/ScrollToTop';
+import BackToTop from './components/BackToTop';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -81,6 +82,8 @@ function App() {
           </Routes>
         </main>
         <Footer />
+
+        <BackToTop />
 
         <ToastContainer
           position="top-right"

@@ -336,10 +336,13 @@ export const getAllUsers = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
+    const sortBy = req.query.sortBy === 'posts' ? 'stats.totalPosts' : 'createdAt';
+    const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
+    const sort = { [sortBy]: sortOrder };
 
     const users = await User.find()
       .select('-password')
-      .sort({ createdAt: -1 })
+      .sort(sort)
       .limit(limit)
       .skip(skip);
 
