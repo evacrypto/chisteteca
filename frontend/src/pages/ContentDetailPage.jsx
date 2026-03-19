@@ -30,6 +30,11 @@ const ContentDetailPage = () => {
     fetchData();
   }, [id]);
 
+  // Scroll to top when entering the page (fixes footer visible on mobile when coming from list)
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
   // Scroll to comments if hash is present
   useEffect(() => {
     if (window.location.hash === '#comments') {
@@ -232,7 +237,7 @@ const ContentDetailPage = () => {
                   </div>
                   
                   <div className="meta-info">
-                    <span><i className="icon-calendar me-1" aria-hidden="true"></i> {new Date(content.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    <span><i className="icon-calendar me-1" aria-hidden="true"></i> {new Date(content.createdAt).toLocaleDateString('es-ES', { dateStyle: 'short' })}</span>
                     <span><i className="icon-comment me-1" aria-hidden="true"></i> {comments.length} comentarios</span>
                   </div>
                 </div>
@@ -347,11 +352,7 @@ const ContentDetailPage = () => {
                           <div className="comment-header">
                             <strong className="comment-author">{comment.username}</strong>
                             <span className="comment-date">
-                              {new Date(comment.createdAt).toLocaleDateString('es-ES', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              })}
+                              {new Date(comment.createdAt).toLocaleDateString('es-ES', { dateStyle: 'short' })}
                             </span>
                           </div>
                           <p className="comment-text">{comment.text}</p>
