@@ -1,20 +1,13 @@
 import { useState, useEffect } from 'react';
-import { contentAPI, categoriesAPI } from '../services/api';
+import { contentAPI } from '../services/api';
 import './HeroSearch.css';
 
 const HeroSearch = ({ query, onQueryChange, onSubmit, loading = false }) => {
-  const [stats, setStats] = useState({ content: null, categories: null });
+  const [totalContent, setTotalContent] = useState(null);
 
   useEffect(() => {
-    Promise.all([
-      contentAPI.getAll({ limit: 1 }),
-      categoriesAPI.getAll()
-    ])
-      .then(([contentRes, categoriesRes]) => {
-        const totalContent = contentRes.data?.pagination?.total ?? null;
-        const totalCategories = categoriesRes.data?.data?.length ?? null;
-        setStats({ content: totalContent, categories: totalCategories });
-      })
+    contentAPI.getAll({ limit: 1 })
+      .then((res) => setTotalContent(res.data?.pagination?.total ?? null))
       .catch(() => {});
   }, []);
 
@@ -49,12 +42,8 @@ const HeroSearch = ({ query, onQueryChange, onSubmit, loading = false }) => {
         {/* Stats */}
         <div className="hero-search-stats">
           <div className="hero-search-stat">
-            <span className="stat-number">{stats.content ?? '—'}</span>
+            <span className="stat-number">{totalContent ?? '—'}</span>
             <span className="stat-label">Chistes</span>
-          </div>
-          <div className="hero-search-stat">
-            <span className="stat-number">{stats.categories ?? '—'}</span>
-            <span className="stat-label">Categorías</span>
           </div>
           <div className="hero-search-stat">
             <span className="stat-number">∞</span>
