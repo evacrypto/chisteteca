@@ -92,7 +92,7 @@ export const getAllContentForAdmin = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
-    const query = {};
+    const query = { isRejected: { $ne: true } };
     if (req.query.search) {
       const searchPattern = toAccentInsensitiveRegex(req.query.search);
       query.$or = [

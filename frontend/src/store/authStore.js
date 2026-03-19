@@ -23,7 +23,7 @@ const useAuthStore = create((set, get) => ({
         isAuthenticated: true, 
         isLoading: false 
       });
-      return { success: true };
+      return { success: true, user };
     } catch (error) {
       const message = error.response?.data?.message || 'Login failed';
       set({ error: message, isLoading: false });
@@ -46,7 +46,7 @@ const useAuthStore = create((set, get) => ({
         isAuthenticated: true, 
         isLoading: false 
       });
-      return { success: true };
+      return { success: true, user };
     } catch (error) {
       const message = error.response?.data?.message || 'Registration failed';
       set({ error: message, isLoading: false });
