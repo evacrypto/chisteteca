@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Container, Row, Col, Spinner } from 'react-bootstrap';
 import { categoriesAPI } from '../services/api';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import './CategoryFilter.css';
 
 const CategoryFilter = ({ selectedCategory, onSelectCategory }) => {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,37 +42,35 @@ const CategoryFilter = ({ selectedCategory, onSelectCategory }) => {
           </h5>
         </Col>
         
-        <Col xs={12} className="text-center">
-          <button
-            className={`btn btn-sm me-1 mb-1 ${!selectedCategory ? 'btn-primary-custom' : 'btn-outline-custom'}`}
-            onClick={() => onSelectCategory(null)}
-          >
-            Todas
-          </button>
-          
-          {categories.map((category) => (
-            <Link
-              key={category._id}
-              to={`/category/${category._id}`}
-              className="text-decoration-none"
+        <Col xs={12}>
+          <div className="category-filter-scroll">
+            <button
+              className={`category-btn btn btn-sm ${!selectedCategory ? 'btn-primary-custom' : 'btn-outline-custom'}`}
+              onClick={() => {
+                onSelectCategory(null);
+                navigate('/');
+              }}
             >
-              <button
-                className={`btn btn-sm me-1 mb-1 ${
+              Todas
+            </button>
+            {categories.map((category) => (
+              <Link
+                key={category._id}
+                to={`/category/${category._id}`}
+                className={`category-btn btn btn-sm text-decoration-none ${
                   selectedCategory === category._id ? 'btn-primary-custom' : 'btn-outline-custom'
                 }`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  onSelectCategory(category._id);
-                }}
-                style={{
-                  borderColor: category.color,
-                  color: category.color
-                }}
+                onClick={() => onSelectCategory(category._id)}
+                style={
+                  selectedCategory !== category._id
+                    ? { borderColor: category.color, color: category.color }
+                    : undefined
+                }
               >
                 {category.emoji} {category.name}
-              </button>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </Col>
       </Row>
     </Container>

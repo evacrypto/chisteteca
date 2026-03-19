@@ -1,0 +1,27 @@
+.category-filter-scroll {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0;
+  justify-content: center;
+}
+
+.category-filter-scroll .category-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* En móvil: scroll horizontal para no ocupar altura */
+@media (max-width: 767px) {
+  .category-filter-scroll {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .category-filter-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
