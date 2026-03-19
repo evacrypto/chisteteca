@@ -59,11 +59,11 @@ const CategoryFilter = ({ selectedCategory, onSelectCategory }) => {
                 to={`/category/${category._id}`}
                 className={`category-btn btn btn-sm text-decoration-none ${
                   selectedCategory === category._id ? 'btn-primary-custom' : 'btn-outline-custom'
-                }`}
+                } ${selectedCategory !== category._id ? 'category-btn--hover-color' : ''}`}
                 onClick={() => onSelectCategory(category._id)}
                 style={
                   selectedCategory !== category._id
-                    ? { borderColor: category.color, color: category.color }
+                    ? { '--category-color': category.color, borderColor: category.color, color: category.color }
                     : undefined
                 }
               >

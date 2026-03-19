@@ -257,6 +257,7 @@ const ContentDetailPage = () => {
                         to={`/category/${cat._id}`}
                         className="category-badge"
                         style={{ 
+                          '--cat-color': cat.color,
                           backgroundColor: cat.color,
                           color: '#fff'
                         }}

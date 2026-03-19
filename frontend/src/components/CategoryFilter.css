@@ -11,9 +11,11 @@
   white-space: nowrap;
 }
 
-/* Hover: texto oscuro para contraste (evita amarillo sobre amarillo) */
-.category-filter-scroll .btn-outline-custom:hover {
-  color: #1a1a2e !important;
+/* Hover: fondo con el color de cada categoría */
+.category-filter-scroll .category-btn--hover-color:hover {
+  background-color: var(--category-color) !important;
+  border-color: var(--category-color) !important;
+  color: #fff !important;
 }
 
 /* En móvil: scroll horizontal para no ocupar altura */

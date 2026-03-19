@@ -283,6 +283,9 @@
 }
 
 .category-tag:hover {
+  background-color: var(--cat-color) !important;
+  color: #fff !important;
+  border-color: var(--cat-color) !important;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

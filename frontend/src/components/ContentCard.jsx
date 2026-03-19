@@ -180,6 +180,7 @@ const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = fa
                   to={`/category/${cat._id}`}
                   className="category-tag"
                   style={{ 
+                    '--cat-color': cat.color,
                     backgroundColor: cat.color + '20',
                     color: cat.color,
                     borderColor: cat.color + '40'
