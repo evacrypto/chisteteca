@@ -23,15 +23,6 @@ const HeroSearch = ({ query, onQueryChange, onSubmit, loading = false }) => {
       <div className="hero-search-overlay"></div>
       
       <div className="container hero-search-content">
-        {/* Logo grande centrado */}
-        <div className="hero-search-logo">
-          <img 
-            src="/logo_chisteteca.png" 
-            alt="Chisteteca" 
-            className="hero-search-logo-image"
-          />
-        </div>
-
         {/* Título */}
         <h1 className="hero-search-title">
           Busca <span>chistes</span>
