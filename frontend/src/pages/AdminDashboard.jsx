@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Container, Card, Row, Col, Table, Button, Badge, Pagination } from 'react-bootstrap';
+import { Container, Card, Row, Col, Table, Button, Badge, Pagination, Modal, Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { adminAPI, categoriesAPI, getUploadUrl } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
+import EmojiPicker from 'emoji-picker-react';
+import es from 'emoji-picker-react/dist/data/emojis-es';
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const { isAuthenticated, user } = useAuthStore();
@@ -17,6 +20,8 @@ const AdminDashboard = () => {
   const [contentPagination, setContentPagination] = useState({ page: 1, total: 0, pages: 1, limit: 100 });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [editForm, setEditForm] = useState({ emoji: '', color: '#ffc107' });
 
   // Check if user is admin
   useEffect(() => {
@@ -166,6 +171,23 @@ const AdminDashboard = () => {
       fetchData();
     } catch (error) {
       toast.error('Error al rechazar categoría');
+    }
+  };
+
+  const handleEditCategory = (cat) => {
+    setEditingCategory(cat);
+    setEditForm({ emoji: cat.emoji || '😂', color: cat.color || '#ffc107' });
+  };
+
+  const handleSaveCategory = async () => {
+    if (!editingCategory) return;
+    try {
+      await categoriesAPI.update(editingCategory._id, { emoji: editForm.emoji, color: editForm.color });
+      toast.success(`Categoría "${editingCategory.name}" actualizada`);
+      setEditingCategory(null);
+      await fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'No se pudo actualizar la categoría');
     }
   };
 
@@ -501,6 +523,14 @@ const AdminDashboard = () => {
                             <i className="icon-check-circle" aria-hidden="true"></i> Aprobar
                           </Button>
                           <Button
+                            variant="outline-primary"
+                            size="sm"
+                            className="me-2"
+                            onClick={() => handleEditCategory(cat)}
+                          >
+                            <i className="icon-edit" aria-hidden="true"></i> Editar
+                          </Button>
+                          <Button
                             variant="danger"
                             size="sm"
                             className="me-2"
@@ -568,6 +598,14 @@ const AdminDashboard = () => {
                           </span>
                         </td>
                         <td className="text-end">
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            className="me-2"
+                            onClick={() => handleEditCategory(cat)}
+                          >
+                            <i className="icon-edit" aria-hidden="true"></i> Editar
+                          </Button>
                           <Button
                             variant="outline-danger"
                             size="sm"
@@ -730,6 +768,68 @@ const AdminDashboard = () => {
           </Card.Body>
         </Card>
       )}
+
+      {/* Modal Editar Categoría */}
+      <Modal show={!!editingCategory} onHide={() => setEditingCategory(null)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Editar categoría</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {editingCategory && (
+            <>
+              <p className="text-muted mb-3">Modifica el emoji y el color de <strong>{editingCategory.name}</strong></p>
+              <Form.Group className="mb-3">
+                <Form.Label>Emoji</Form.Label>
+                <p className="text-muted small mb-2">Busca en el cuadro de búsqueda y elige un emoji de la lista (no se puede escribir texto libre)</p>
+                <div className="mb-2">
+                  <strong>Seleccionado:</strong> <span className="fs-4">{editForm.emoji || '—'}</span>
+                </div>
+                <div className="emoji-picker-wrapper">
+                  <EmojiPicker
+                    emojiData={es}
+                    onEmojiClick={(data) => setEditForm(f => ({ ...f, emoji: data.emoji }))}
+                    searchPlaceholder="Buscar emoji..."
+                    width={320}
+                    height={320}
+                    previewConfig={{ showPreview: false }}
+                  />
+                </div>
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Color</Form.Label>
+                <div className="d-flex align-items-center gap-2 flex-wrap">
+                  <Form.Control
+                    type="color"
+                    value={editForm.color}
+                    onChange={(e) => setEditForm(f => ({ ...f, color: e.target.value }))}
+                    style={{ width: 50, height: 38, padding: 4, cursor: 'pointer' }}
+                  />
+                  <Form.Control
+                    type="text"
+                    value={editForm.color}
+                    onChange={(e) => setEditForm(f => ({ ...f, color: e.target.value }))}
+                    placeholder="#ffc107"
+                    style={{ flex: 1, minWidth: 100 }}
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    size="sm"
+                    onClick={() => setEditForm(f => ({ ...f, color: '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0') }))}
+                  >
+                    🎲 Aleatorio
+                  </Button>
+                </div>
+              </Form.Group>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setEditingCategory(null)}>Cancelar</Button>
+          <Button variant="primary" onClick={handleSaveCategory}>
+            <i className="icon-check me-1" aria-hidden="true"></i> Guardar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

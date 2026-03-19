@@ -11,6 +11,11 @@
   white-space: nowrap;
 }
 
+/* Hover: texto oscuro para contraste (evita amarillo sobre amarillo) */
+.category-filter-scroll .btn-outline-custom:hover {
+  color: #1a1a2e !important;
+}
+
 /* En móvil: scroll horizontal para no ocupar altura */
 @media (max-width: 767px) {
   .category-filter-scroll {

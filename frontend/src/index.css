@@ -190,8 +190,8 @@ body {
 }
 
 .category-badge:hover {
-  background: rgba(255, 193, 7, 0.2);
-  color: var(--primary-color);
+  filter: brightness(0.9);
+  color: #fff !important;
 }
 
 /* Navigation */

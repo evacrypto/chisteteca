@@ -1,0 +1,9 @@
+/* Emoji picker en modal de editar categoría */
+.emoji-picker-wrapper {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.emoji-picker-wrapper .EmojiPickerReact {
+  --epr-emoji-size: 28px;
+}
