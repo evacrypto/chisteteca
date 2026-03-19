@@ -55,6 +55,10 @@
   transform: translateX(3px) translateY(-2px);
 }
 
+.btn-back-top {
+  padding: 10px;
+}
+
 .btn-nav-prev:disabled,
 .btn-nav-next:disabled {
   opacity: 0.4;

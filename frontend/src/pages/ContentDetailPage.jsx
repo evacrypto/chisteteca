@@ -203,8 +203,8 @@ const ContentDetailPage = () => {
         <div className="detail-nav-buttons">
           {contentIds.length > 0 ? (
             <>
-              <button className="btn-back-top" onClick={() => navigate(returnPath)}>
-                <i className="icon-arrow-left me-2" aria-hidden="true"></i> Volver
+              <button className="btn-back-top" onClick={() => navigate(returnPath)} title="Volver">
+                <i className="icon-home" aria-hidden="true"></i>
               </button>
               <button 
                 className="btn-nav-prev" 
@@ -234,8 +234,8 @@ const ContentDetailPage = () => {
               </button>
             </>
           ) : (
-            <button className="btn-back-top" onClick={() => navigate(returnPath)}>
-              <i className="icon-arrow-left me-2" aria-hidden="true"></i> Volver
+            <button className="btn-back-top" onClick={() => navigate(returnPath)} title="Volver">
+              <i className="icon-home" aria-hidden="true"></i>
             </button>
           )}
         </div>
