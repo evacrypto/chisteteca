@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { useParams, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -9,14 +9,18 @@ import Hero4 from '../components/Hero4';
 import { contentAPI } from '../services/api';
 import './HomePage.css';
 
-const CONTENT_LIMIT = 50;
+const PAGE_SIZE = 15;
 
 const HomePage = () => {
   const { id: categoryId } = useParams();
   const location = useLocation();
   const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const pageRef = useRef(1);
 
   // Detectar si estamos en populares o random
   const isPopularPage = location.pathname === '/popular' || location.pathname === '/trending';
@@ -32,16 +36,49 @@ const HomePage = () => {
     }
   }, [categoryId, location.pathname]);
 
+  const fetchData = useCallback(async (pageNum = 1, replace = true) => {
+    if (replace) setLoading(true);
+    else setLoadingMore(true);
+    try {
+      // Inicio y populares: 15 por página. Populares cap 50 total en backend.
+      const contentRes = isPopularPage
+        ? await contentAPI.getPopular({ limit: PAGE_SIZE, page: pageNum })
+        : await contentAPI.getAll({
+            limit: PAGE_SIZE,
+            page: pageNum,
+            ...(selectedCategory && { category: selectedCategory })
+          });
+      const newData = contentRes.data?.data || [];
+      const pagination = contentRes.data?.pagination;
+
+      setContent(prev => replace ? newData : [...prev, ...newData]);
+      setPage(pageNum);
+      pageRef.current = pageNum;
+      // Populares: solo hasta 50. Inicio/categorías: paginación normal.
+      const moreFromPagination = pagination && pageNum < pagination.pages;
+      const moreFromFullPage = newData.length >= PAGE_SIZE;
+      setHasMore(newData.length > 0 && (moreFromPagination || moreFromFullPage));
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Error al cargar contenido');
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [selectedCategory, isPopularPage]);
+
   useEffect(() => {
-    fetchData();
-  }, [selectedCategory, isPopularPage, isRandomPage]);
+    setPage(1);
+    pageRef.current = 1;
+    fetchData(1, true);
+  }, [fetchData]);
 
   const getPageTitle = () => {
     if (isPopularPage) {
       return (
         <>
           <i className="icon-fire text-warning me-2" aria-hidden="true"></i>
-          Populares de la Semana
+          Los 50 chistes más populares de esta semana
         </>
       );
     }
@@ -59,31 +96,11 @@ const HomePage = () => {
       return <>📁 Contenido por Categoría</>;
     }
 
-    return <>📢 Último Contenido</>;
+    return <>📢 Últimos chistes</>;
   };
 
-  const loadContent = async () => {
-    if (isPopularPage) {
-      return contentAPI.getPopular(CONTENT_LIMIT);
-    }
-
-    const params = { limit: CONTENT_LIMIT };
-    if (selectedCategory) params.category = selectedCategory;
-
-    return contentAPI.getAll(params);
-  };
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const contentRes = await loadContent();
-      setContent(contentRes.data.data || []);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Error al cargar contenido');
-    } finally {
-      setLoading(false);
-    }
+  const handleLoadMore = () => {
+    fetchData(pageRef.current + 1, false);
   };
 
   return (
@@ -104,7 +121,7 @@ const HomePage = () => {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="mb-0">{getPageTitle()}</h2>
           {(categoryId || isPopularPage || isRandomPage) && (
-            <a href="/" className="btn btn-outline-primary btn-sm">
+            <a href="/" className="btn btn-outline-primary btn-sm text-nowrap">
               ← Ver todo
             </a>
           )}
@@ -117,18 +134,43 @@ const HomePage = () => {
             <p className="text-muted">No hay contenido disponible</p>
           </div>
         ) : (
-          <Row xs={1} md={2} lg={3} className="g-4">
-            {content.map((item, idx) => (
-              <Col key={item._id} className="h-auto">
-                <ContentCard 
-                  content={item} 
-                  contentIds={content.map(c => c._id)}
-                  currentIndex={idx}
-                  returnPath={location.pathname}
-                />
-              </Col>
-            ))}
-          </Row>
+          <>
+            <Row xs={1} md={2} lg={3} className="g-4">
+              {content.map((item, idx) => (
+                <Col key={item._id} className="h-auto">
+                  <ContentCard 
+                    content={item} 
+                    contentIds={content.map(c => c._id)}
+                    currentIndex={idx}
+                    returnPath={location.pathname}
+                  />
+                </Col>
+              ))}
+            </Row>
+            <div className="text-center mt-4 mb-4">
+              {hasMore ? (
+                <button
+                  type="button"
+                  className="btn btn-outline-primary btn-lg"
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                >
+                  {loadingMore ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Cargando...
+                    </>
+                  ) : (
+                    'Cargar más'
+                  )}
+                </button>
+              ) : content.length > 0 ? (
+                <p className="text-muted small mb-0">
+                  {content.length} chistes mostrados. No hay más.
+                </p>
+              ) : null}
+            </div>
+          </>
         )}
       </Container>
     </div>

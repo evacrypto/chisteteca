@@ -101,7 +101,7 @@ const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = fa
         return (
           <div className={`card-chiste-preview ${getChisteGradientClass()}`}>
             <p>
-              {truncated}
+              {truncated}{hasMore && '...'}
               {hasMore && <span className="card-chiste-cta">CLICK PARA VERLO</span>}
             </p>
           </div>

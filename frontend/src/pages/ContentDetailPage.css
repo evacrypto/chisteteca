@@ -61,6 +61,11 @@
   cursor: not-allowed;
 }
 
+.icon-arrow-right {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
 /* ============================================
    ARTICLE MAIN
    ============================================ */
@@ -189,10 +194,42 @@
 }
 
 .content-chiste {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 50px;
   border-radius: 15px;
   margin-bottom: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.content-chiste.content-chiste-gradient-0 {
+  background: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
+}
+
+.content-chiste.content-chiste-gradient-1 {
+  background: linear-gradient(135deg, #0f766e 0%, #2563eb 100%);
+}
+
+.content-chiste.content-chiste-gradient-2 {
+  background: linear-gradient(135deg, #be123c 0%, #7c2d12 100%);
+}
+
+.content-chiste.content-chiste-gradient-3 {
+  background: linear-gradient(135deg, #065f46 0%, #0ea5e9 100%);
+}
+
+.content-chiste.content-chiste-gradient-4 {
+  background: linear-gradient(135deg, #c2410c 0%, #b91c1c 100%);
+}
+
+.content-chiste.content-chiste-gradient-5 {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+}
+
+.content-chiste.content-chiste-gradient-6 {
+  background: linear-gradient(135deg, #166534 0%, #0d9488 100%);
+}
+
+.content-chiste.content-chiste-gradient-7 {
+  background: linear-gradient(135deg, #7f1d1d 0%, #1e3a8a 100%);
 }
 
 .content-chiste p {

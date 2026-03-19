@@ -290,54 +290,74 @@ export const deleteContent = async (req, res) => {
 // @desc    Get trending content
 // @route   GET /api/content/trending
 // @access  Public
+const POPULAR_MAX_LIMIT = 50;
+const POPULAR_PAGE_SIZE = 15;
+
 export const getTrendingContent = async (req, res) => {
   try {
-    const limit = parsePositiveInt(req.query.limit, 10);
+    const page = parsePositiveInt(req.query.page, 1);
+    const limit = Math.min(parsePositiveInt(req.query.limit, POPULAR_PAGE_SIZE), POPULAR_PAGE_SIZE);
+    const skip = Math.min((page - 1) * limit, POPULAR_MAX_LIMIT); // No saltar más allá de 50
 
     // Weekly popularity is determined by number of likes.
     const sevenDaysAgo = new Date(Date.now() - WEEK_IN_MS);
 
-    const content = await Content.aggregate([
-      {
-        $match: {
-          isApproved: true,
-          createdAt: { $gte: sevenDaysAgo }
-        }
-      },
-      {
-        $addFields: {
-          likesCount: { $size: { $ifNull: ['$likes', []] } }
-        }
-      },
-      { $sort: { likesCount: -1, createdAt: -1 } },
-      { $limit: limit },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'author',
-          foreignField: '_id',
-          as: 'author'
-        }
-      },
-      {
-        $lookup: {
-          from: 'categories',
-          localField: 'categories',
-          foreignField: '_id',
-          as: 'categories'
-        }
-      },
-      {
-        $unwind: {
-          path: '$author',
-          preserveNullAndEmptyArrays: true
-        }
+    const matchStage = {
+      $match: {
+        isApproved: true,
+        createdAt: { $gte: sevenDaysAgo }
       }
+    };
+
+    const [countResult, content] = await Promise.all([
+      Content.aggregate([
+        matchStage,
+        { $addFields: { likesCount: { $size: { $ifNull: ['$likes', []] } } } },
+        { $count: 'total' }
+      ]).then(r => [{ total: Math.min((r[0]?.total ?? 0), POPULAR_MAX_LIMIT) }]),
+      Content.aggregate([
+        matchStage,
+        { $addFields: { likesCount: { $size: { $ifNull: ['$likes', []] } } } },
+        { $sort: { likesCount: -1, createdAt: -1 } },
+        { $limit: POPULAR_MAX_LIMIT },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'author',
+            foreignField: '_id',
+            as: 'author'
+          }
+        },
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'categories',
+            foreignField: '_id',
+            as: 'categories'
+          }
+        },
+        {
+          $unwind: {
+            path: '$author',
+            preserveNullAndEmptyArrays: true
+          }
+        }
+      ])
     ]);
+
+    const total = countResult[0]?.total ?? 0;
 
     res.json({
       success: true,
-      data: content
+      data: content,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit) || 1
+      }
     });
   } catch (error) {
     console.error('Get trending content error:', error);

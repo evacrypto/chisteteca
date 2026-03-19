@@ -141,11 +141,22 @@ const ContentDetailPage = () => {
     }
   };
 
+  const getChisteGradientClass = () => {
+    const source = content._id || content.text || 'chiste';
+    let hash = 0;
+    for (let i = 0; i < source.length; i += 1) {
+      hash = (hash << 5) - hash + source.charCodeAt(i);
+      hash |= 0;
+    }
+    const gradientIndex = Math.abs(hash) % 8;
+    return `content-chiste-gradient-${gradientIndex}`;
+  };
+
   const renderContent = () => {
     switch (content.type) {
       case 'chiste':
         return (
-          <div className="content-chiste">
+          <div className={`content-chiste ${getChisteGradientClass()}`}>
             <p>{content.text}</p>
           </div>
         );
@@ -219,7 +230,7 @@ const ContentDetailPage = () => {
                 disabled={contentIds.indexOf(id) < 0 || contentIds.indexOf(id) >= contentIds.length - 1}
                 title="Siguiente chiste"
               >
-                Siguiente <span aria-hidden="true">→</span>
+                Siguiente <i className="icon-arrow-left icon-arrow-right" aria-hidden="true"></i>
               </button>
             </>
           ) : (
