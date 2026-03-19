@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { contentAPI, interactionsAPI, getUploadUrl } from '../services/api';
 import useAuthStore from '../store/authStore';
@@ -10,6 +10,8 @@ import './ContentDetailPage.css';
 const ContentDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { contentIds = [], returnPath = '/' } = location.state || {};
   const { isAuthenticated, user } = useAuthStore();
   
   const [content, setContent] = useState(null);
@@ -186,10 +188,46 @@ const ContentDetailPage = () => {
     <section className="content-detail-page">
       <div className="container">
         
-        {/* Back button */}
-        <button className="btn-back-top" onClick={() => navigate('/')}>
-          <i className="icon-arrow-left me-2" aria-hidden="true"></i> Volver
-        </button>
+        {/* Navigation: Anterior | Volver | Siguiente */}
+        <div className="detail-nav-buttons">
+          {contentIds.length > 0 ? (
+            <>
+              <button className="btn-back-top" onClick={() => navigate(returnPath)}>
+                <i className="icon-arrow-left me-2" aria-hidden="true"></i> Volver
+              </button>
+              <button 
+                className="btn-nav-prev" 
+                onClick={() => {
+                  const idx = contentIds.indexOf(id);
+                  if (idx > 0) {
+                    navigate(`/content/${contentIds[idx - 1]}`, { state: { contentIds, returnPath } });
+                  }
+                }}
+                disabled={contentIds.indexOf(id) <= 0}
+                title="Chiste anterior"
+              >
+                <i className="icon-arrow-left" aria-hidden="true"></i> Anterior
+              </button>
+              <button 
+                className="btn-nav-next" 
+                onClick={() => {
+                  const idx = contentIds.indexOf(id);
+                  if (idx >= 0 && idx < contentIds.length - 1) {
+                    navigate(`/content/${contentIds[idx + 1]}`, { state: { contentIds, returnPath } });
+                  }
+                }}
+                disabled={contentIds.indexOf(id) < 0 || contentIds.indexOf(id) >= contentIds.length - 1}
+                title="Siguiente chiste"
+              >
+                Siguiente <span aria-hidden="true">→</span>
+              </button>
+            </>
+          ) : (
+            <button className="btn-back-top" onClick={() => navigate(returnPath)}>
+              <i className="icon-arrow-left me-2" aria-hidden="true"></i> Volver
+            </button>
+          )}
+        </div>
 
         <div className="row">
           

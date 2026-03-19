@@ -38,3 +38,6 @@ coverage/
 # Temporary files
 backend/qa/results/*.log
 backend/-p/
+
+# Large local data (use import-jokes for seeding)
+backend/data/chistes_aprobados.json

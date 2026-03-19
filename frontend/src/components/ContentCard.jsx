@@ -7,7 +7,7 @@ import './ContentCard.css';
 
 const CHISTE_GRADIENT_COUNT = 8;
 
-const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = false }) => {
+const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = false, contentIds, currentIndex, returnPath }) => {
   const { isAuthenticated, user } = useAuthStore();
   const currentUserId = user?._id || user?.id;
   const authorId = content.author?._id || null;
@@ -94,12 +94,19 @@ const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = fa
 
   const renderContent = () => {
     switch (content.type) {
-      case 'chiste':
+      case 'chiste': {
+        const text = content.text || '';
+        const truncated = text.length > 50 ? text.substring(0, 50) : text;
+        const hasMore = text.length > 50;
         return (
           <div className={`card-chiste-preview ${getChisteGradientClass()}`}>
-            <p>{content.text?.substring(0, 150)}{content.text?.length > 150 ? '...' : ''}</p>
+            <p>
+              {truncated}
+              {hasMore && <span className="card-chiste-cta">CLICK PARA VERLO</span>}
+            </p>
           </div>
         );
+      }
       
       case 'image':
         return (
@@ -134,8 +141,12 @@ const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = fa
       <div className="card-inner">
 
         {/* Imagen/Contenido */}
-        <div className="card-image-wrapper rounded">
-          <Link to={`/content/${content._id}`} className="card-link">
+        <div className={`card-image-wrapper rounded ${content.type === 'chiste' ? 'card-image-wrapper--chiste' : ''}`}>
+          <Link 
+            to={`/content/${content._id}`} 
+            state={contentIds && currentIndex != null ? { contentIds, returnPath: returnPath || '/' } : undefined}
+            className="card-link"
+          >
             {renderContent()}
           </Link>
         </div>
@@ -194,6 +205,7 @@ const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = fa
               
               <Link 
                 to={`/content/${content._id}#comments`} 
+                state={contentIds && currentIndex != null ? { contentIds, returnPath: returnPath || '/' } : undefined}
                 className="action-btn"
                 title="Comentar"
               >

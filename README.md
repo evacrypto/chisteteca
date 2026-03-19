@@ -327,4 +327,4 @@ cd frontend && npm run dev
 
 ## Nota sobre documentación adicional
 
-El documento `PUNTO_INICIAL_1.md` se mantiene solo como referencia histórica breve. La documentación vigente para trabajar y testear el proyecto es este `README.md`.
+La documentación vigente para trabajar y testear el proyecto es este `README.md`.

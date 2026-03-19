@@ -13,8 +13,18 @@
   scroll-margin-top: 120px;
 }
 
-/* Back Button */
-.btn-back-top {
+/* Navigation Buttons */
+.detail-nav-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.btn-back-top,
+.btn-nav-prev,
+.btn-nav-next {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -26,14 +36,29 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 30px;
 }
 
-.btn-back-top:hover {
+.btn-back-top:hover:not(:disabled),
+.btn-nav-prev:hover:not(:disabled),
+.btn-nav-next:hover:not(:disabled) {
   background: #ffc107;
   border-color: #ffc107;
   color: #1a1a2e;
-  transform: translateX(-5px);
+  transform: translateY(-2px);
+}
+
+.btn-nav-prev:hover:not(:disabled) {
+  transform: translateX(-3px) translateY(-2px);
+}
+
+.btn-nav-next:hover:not(:disabled) {
+  transform: translateX(3px) translateY(-2px);
+}
+
+.btn-nav-prev:disabled,
+.btn-nav-next:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* ============================================

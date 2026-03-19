@@ -56,9 +56,14 @@ const RandomPage = () => {
           </div>
         ) : (
           <Row xs={1} md={2} lg={3} className="g-4">
-            {content.map((item) => (
+            {content.map((item, idx) => (
               <Col key={item._id} className="h-auto">
-                <ContentCard content={item} />
+                <ContentCard 
+                  content={item} 
+                  contentIds={content.map(c => c._id)}
+                  currentIndex={idx}
+                  returnPath="/random"
+                />
               </Col>
             ))}
           </Row>
