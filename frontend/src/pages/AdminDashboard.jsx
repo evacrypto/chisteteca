@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Card, Row, Col, Table, Button, Badge } from 'react-bootstrap';
+import { Container, Card, Row, Col, Table, Button, Badge, Pagination } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { adminAPI, categoriesAPI, getUploadUrl } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   const [allCategories, setAllCategories] = useState([]);
   const [users, setUsers] = useState([]);
   const [allContent, setAllContent] = useState([]);
+  const [contentPagination, setContentPagination] = useState({ page: 1, total: 0, pages: 1, limit: 100 });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -56,9 +57,18 @@ const AdminDashboard = () => {
     setUsers(usersRes.data.data || []);
   };
 
-  const loadAllContent = async () => {
-    const contentRes = await adminAPI.getAllContent({ limit: 50 });
+  const loadAllContent = async (page = 1) => {
+    const contentRes = await adminAPI.getAllContent({ limit: 100, page });
     setAllContent(contentRes.data.data || []);
+    if (contentRes.data.pagination) {
+      setContentPagination(prev => ({
+        ...prev,
+        page: contentRes.data.pagination.page,
+        total: contentRes.data.pagination.total,
+        pages: contentRes.data.pagination.pages,
+        limit: contentRes.data.pagination.limit
+      }));
+    }
   };
 
   const handleApprove = async (id) => {
@@ -98,7 +108,7 @@ const AdminDashboard = () => {
     try {
       await adminAPI.deleteContent(id);
       toast.success('Contenido eliminado');
-      await Promise.all([fetchData(), loadAllContent()]);
+      await fetchData();
     } catch (error) {
       toast.error('No se pudo eliminar el contenido');
     }
@@ -235,7 +245,7 @@ const AdminDashboard = () => {
           onClick={() => setActiveTab('content')}
           aria-pressed={activeTab === 'content'}
         >
-          Contenidos ({allContent.length})
+          Contenidos ({contentPagination.total || allContent.length})
         </button>
       </div>
 
@@ -636,9 +646,14 @@ const AdminDashboard = () => {
 
       {activeTab === 'content' && (
         <Card className="card-custom">
-          <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center">
+          <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h4 className="mb-0">Gestión de Contenidos</h4>
-            <Button variant="outline-secondary" size="sm" onClick={loadAllContent}>🔄 Actualizar</Button>
+            <div className="d-flex align-items-center gap-2">
+              <span className="text-muted small">
+                {contentPagination.total} en total · Página {contentPagination.page} de {contentPagination.pages}
+              </span>
+              <Button variant="outline-secondary" size="sm" onClick={() => loadAllContent(contentPagination.page)}>🔄 Actualizar</Button>
+            </div>
           </Card.Header>
           <Card.Body>
             <Table responsive hover className="align-middle">
@@ -682,6 +697,36 @@ const AdminDashboard = () => {
                 ))}
               </tbody>
             </Table>
+            {contentPagination.pages > 1 && (
+              <div className="d-flex justify-content-center mt-3">
+                <Pagination>
+                  <Pagination.Prev
+                    disabled={contentPagination.page <= 1}
+                    onClick={(e) => { e.preventDefault(); if (contentPagination.page > 1) loadAllContent(contentPagination.page - 1); }}
+                  />
+                  {Array.from({ length: Math.min(5, contentPagination.pages) }, (_, i) => {
+                    let pageNum;
+                    if (contentPagination.pages <= 5) pageNum = i + 1;
+                    else if (contentPagination.page <= 3) pageNum = i + 1;
+                    else if (contentPagination.page >= contentPagination.pages - 2) pageNum = contentPagination.pages - 4 + i;
+                    else pageNum = contentPagination.page - 2 + i;
+                    return (
+                      <Pagination.Item
+                        key={pageNum}
+                        active={pageNum === contentPagination.page}
+                        onClick={(e) => { e.preventDefault(); loadAllContent(pageNum); }}
+                      >
+                        {pageNum}
+                      </Pagination.Item>
+                    );
+                  })}
+                  <Pagination.Next
+                    disabled={contentPagination.page >= contentPagination.pages}
+                    onClick={(e) => { e.preventDefault(); if (contentPagination.page < contentPagination.pages) loadAllContent(contentPagination.page + 1); }}
+                  />
+                </Pagination>
+              </div>
+            )}
           </Card.Body>
         </Card>
       )}

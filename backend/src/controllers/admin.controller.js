@@ -12,7 +12,7 @@ export const getDashboardStats = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
     const totalContent = await Content.countDocuments();
-    const pendingContent = await Content.countDocuments({ isApproved: false });
+    const pendingContent = await Content.countDocuments({ isApproved: false, isRejected: { $ne: true } });
     const totalCategories = await Category.countDocuments();
 
     // Recent activity
@@ -57,14 +57,14 @@ export const getPendingContent = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
-    const content = await Content.find({ isApproved: false })
+    const content = await Content.find({ isApproved: false, isRejected: { $ne: true } })
       .populate('author', 'username avatar')
       .populate('categories', 'name slug emoji')
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip(skip);
 
-    const total = await Content.countDocuments({ isApproved: false });
+    const total = await Content.countDocuments({ isApproved: false, isRejected: { $ne: true } });
 
     res.json({
       success: true,
@@ -143,6 +143,7 @@ export const approveContent = async (req, res) => {
     }
 
     content.isApproved = true;
+    content.isRejected = false;
     content.approvalReason = '';
     await content.save();
 
@@ -179,6 +180,7 @@ export const rejectContent = async (req, res) => {
     }
 
     content.isApproved = false;
+    content.isRejected = true;
     content.approvalReason = reason || 'No cumple con las normas de la comunidad';
     await content.save();
 

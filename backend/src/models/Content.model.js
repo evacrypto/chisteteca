@@ -68,6 +68,10 @@ const contentSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isRejected: {
+    type: Boolean,
+    default: false
+  },
   approvalReason: {
     type: String,
     default: ''
