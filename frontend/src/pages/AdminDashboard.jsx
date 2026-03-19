@@ -658,6 +658,79 @@ const AdminDashboard = () => {
       {activeTab === 'categories' && (
         <>
           <Card className="card-custom mb-4">
+            <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center">
+              <h4 className="mb-0">Categorías Pendientes de Aprobación</h4>
+              <Button variant="outline-secondary" size="sm" onClick={fetchData}>
+                🔄 Actualizar
+              </Button>
+            </Card.Header>
+            <Card.Body>
+              {pendingCategories.length === 0 ? (
+                <div className="text-center py-5">
+                  <i className="icon-check-circle text-success mb-3" style={{ fontSize: '50px' }} aria-hidden="true"></i>
+                  <p className="text-muted">¡No hay categorías pendientes!</p>
+                </div>
+              ) : (
+                <Table responsive hover className="align-middle">
+                  <thead>
+                    <tr>
+                      <th>Categoría</th>
+                      <th>Emoji</th>
+                      <th>Sugerida por</th>
+                      <th>Fecha</th>
+                      <th className="text-end">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingCategories.map((cat) => (
+                      <tr key={cat._id}>
+                        <td>
+                          <strong>{cat.name}</strong>
+                        </td>
+                        <td className="fs-3">{cat.emoji}</td>
+                        <td>{cat.createdBy?.username || 'Desconocido'}</td>
+                        <td className="text-muted">
+                          {new Date(cat.createdAt).toLocaleDateString('es-ES')}
+                        </td>
+                        <td className="text-end admin-actions-cell">
+                          <Button
+                            variant="success"
+                            size="sm"
+                            onClick={() => handleApproveCategory(cat._id)}
+                          >
+                            <i className="icon-check-circle" aria-hidden="true"></i> Aprobar
+                          </Button>
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => handleEditCategory(cat)}
+                          >
+                            <i className="icon-edit" aria-hidden="true"></i> Editar
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleRejectCategory(cat._id, cat.name)}
+                          >
+                            <i className="icon-times-circle" aria-hidden="true"></i> Rechazar
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => handleDeleteCategory(cat)}
+                          >
+                            <i className="icon-trash" aria-hidden="true"></i> Eliminar
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              )}
+            </Card.Body>
+          </Card>
+
+          <Card className="card-custom mb-4">
             <Card.Header className="bg-transparent border-0">
               <h4 className="mb-0">Nueva categoría</h4>
             </Card.Header>
@@ -731,79 +804,6 @@ const AdminDashboard = () => {
                   </Button>
                 </Form.Group>
               </Form>
-            </Card.Body>
-          </Card>
-
-          <Card className="card-custom mb-4">
-            <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center">
-              <h4 className="mb-0">Categorías Pendientes de Aprobación</h4>
-              <Button variant="outline-secondary" size="sm" onClick={fetchData}>
-                🔄 Actualizar
-              </Button>
-            </Card.Header>
-            <Card.Body>
-              {pendingCategories.length === 0 ? (
-                <div className="text-center py-5">
-                  <i className="icon-check-circle text-success mb-3" style={{ fontSize: '50px' }} aria-hidden="true"></i>
-                  <p className="text-muted">¡No hay categorías pendientes!</p>
-                </div>
-              ) : (
-                <Table responsive hover className="align-middle">
-                  <thead>
-                    <tr>
-                      <th>Categoría</th>
-                      <th>Emoji</th>
-                      <th>Sugerida por</th>
-                      <th>Fecha</th>
-                      <th className="text-end">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pendingCategories.map((cat) => (
-                      <tr key={cat._id}>
-                        <td>
-                          <strong>{cat.name}</strong>
-                        </td>
-                        <td className="fs-3">{cat.emoji}</td>
-                        <td>{cat.createdBy?.username || 'Desconocido'}</td>
-                        <td className="text-muted">
-                          {new Date(cat.createdAt).toLocaleDateString('es-ES')}
-                        </td>
-                        <td className="text-end admin-actions-cell">
-                          <Button
-                            variant="success"
-                            size="sm"
-                            onClick={() => handleApproveCategory(cat._id)}
-                          >
-                            <i className="icon-check-circle" aria-hidden="true"></i> Aprobar
-                          </Button>
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            onClick={() => handleEditCategory(cat)}
-                          >
-                            <i className="icon-edit" aria-hidden="true"></i> Editar
-                          </Button>
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => handleRejectCategory(cat._id, cat.name)}
-                          >
-                            <i className="icon-times-circle" aria-hidden="true"></i> Rechazar
-                          </Button>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() => handleDeleteCategory(cat)}
-                          >
-                            <i className="icon-trash" aria-hidden="true"></i> Eliminar
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              )}
             </Card.Body>
           </Card>
 
