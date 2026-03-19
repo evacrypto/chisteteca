@@ -31,12 +31,11 @@ const RegisterPage = () => {
 
     if (result.success) {
       toast.success('¡Bienvenido de nuevo!');
-      // Redirigir según rol
-      const { user } = useAuthStore.getState();
+      const user = result.user || useAuthStore.getState().user;
       if (user?.role === 'admin') {
         navigate('/admin');
       } else {
-        navigate(`/profile/${user._id}`);
+        navigate('/profile/me');
       }
     } else {
       toast.error(result.message);
@@ -71,13 +70,10 @@ const RegisterPage = () => {
     if (result.success) {
       toast.success('¡Cuenta creada exitosamente!');
       const user = result.user || useAuthStore.getState().user;
-      const userId = user?.id ?? user?._id;
       if (user?.role === 'admin') {
         navigate('/admin');
-      } else if (userId) {
-        navigate(`/profile/${userId}`);
       } else {
-        navigate('/');
+        navigate('/profile/me');
       }
     } else {
       toast.error(result.message);

@@ -1,8 +1,19 @@
 import { create } from 'zustand';
 import { authAPI, usersAPI } from '../services/api';
 
+const safeParseUser = () => {
+  try {
+    const raw = localStorage.getItem('user');
+    if (!raw || raw === 'undefined' || raw === 'null') return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
 const useAuthStore = create((set, get) => ({
-  user: JSON.parse(localStorage.getItem('user')) || null,
+  user: safeParseUser(),
   token: localStorage.getItem('token') || null,
   isAuthenticated: !!localStorage.getItem('token'),
   isLoading: false,
@@ -25,9 +36,12 @@ const useAuthStore = create((set, get) => ({
       });
       return { success: true, user };
     } catch (error) {
-      const message = error.response?.data?.message || 'Login failed';
-      set({ error: message, isLoading: false });
-      return { success: false, message };
+      const msg = error.response?.data?.message || error.response?.data?.error || 
+        (error.response?.status === 401 ? 'Email o contraseña incorrectos' : null) ||
+        (error.code === 'ERR_NETWORK' ? 'No se pudo conectar. Revisa tu conexión.' : null) ||
+        'Error al iniciar sesión';
+      set({ error: msg, isLoading: false });
+      return { success: false, message: msg };
     }
   },
 
@@ -48,9 +62,11 @@ const useAuthStore = create((set, get) => ({
       });
       return { success: true, user };
     } catch (error) {
-      const message = error.response?.data?.message || 'Registration failed';
-      set({ error: message, isLoading: false });
-      return { success: false, message };
+      const msg = error.response?.data?.message || error.response?.data?.error ||
+        (error.code === 'ERR_NETWORK' ? 'No se pudo conectar. Revisa tu conexión.' : null) ||
+        'Error al crear la cuenta';
+      set({ error: msg, isLoading: false });
+      return { success: false, message: msg };
     }
   },
 

@@ -20,10 +20,7 @@ const Navbar = () => {
 
   const handleAvatarClick = () => {
     if (isAuthenticated && user) {
-      const userId = user.id ?? user._id;
-      if (userId) {
-        navigate(`/profile/${userId}`);
-      }
+      navigate('/profile/me');
     }
   };
 

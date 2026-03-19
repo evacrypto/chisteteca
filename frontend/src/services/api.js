@@ -55,7 +55,13 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      clearAuthAndRedirect();
+      const url = String(error.config?.url || error.config?.baseURL || '');
+      const isAuthRequest = /\/auth\/(login|register)/.test(url);
+      const isOnAuthPage = typeof window !== 'undefined' && 
+        (window.location.pathname === '/login' || window.location.pathname === '/register');
+      if (!isAuthRequest && !isOnAuthPage) {
+        clearAuthAndRedirect();
+      }
     }
     
     // Handle connection errors

@@ -57,7 +57,7 @@ const ProfilePage = () => {
         localStorage.setItem('user', JSON.stringify(updated));
       }
 
-      const userId = id || currentUser?.id ?? currentUser?._id;
+      const userId = id || (currentUser?.id ?? currentUser?._id);
       
       if (userId) {
         try {

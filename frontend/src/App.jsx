@@ -42,6 +42,14 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   return children;
 };
 
+// Redirige /profile/me al perfil del usuario actual (evita problemas de timing en móvil)
+const ProfileMeRedirect = () => {
+  const { user } = useAuthStore();
+  const userId = user?.id ?? user?._id;
+  if (!userId) return <Navigate to="/" replace />;
+  return <Navigate to={`/profile/${userId}`} replace />;
+};
+
 function App() {
   return (
     <Router>
@@ -77,6 +85,14 @@ function App() {
             <Route path="/trending" element={<Navigate to="/popular" replace />} />
             <Route path="/random" element={<RandomPage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route
+              path="/profile/me"
+              element={
+                <ProtectedRoute>
+                  <ProfileMeRedirect />
+                </ProtectedRoute>
+              }
+            />
             <Route 
               path="/profile/:id" 
               element={

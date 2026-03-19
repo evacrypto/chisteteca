@@ -30,13 +30,10 @@ const LoginPage = () => {
     if (result.success) {
       toast.success('¡Bienvenido de nuevo!');
       const user = result.user || useAuthStore.getState().user;
-      const userId = user?.id ?? user?._id;
       if (user?.role === 'admin') {
         navigate('/admin');
-      } else if (userId) {
-        navigate(`/profile/${userId}`);
       } else {
-        navigate('/');
+        navigate('/profile/me');
       }
     } else {
       toast.error(result.message);
@@ -67,12 +64,11 @@ const LoginPage = () => {
     
     if (result.success) {
       toast.success('¡Cuenta creada exitosamente!');
-      // Redirigir según rol
-      const { user } = useAuthStore.getState();
+      const user = result.user || useAuthStore.getState().user;
       if (user?.role === 'admin') {
         navigate('/admin');
       } else {
-        navigate(`/profile/${user?.id || user?._id}`);
+        navigate('/profile/me');
       }
     } else {
       toast.error(result.message);
