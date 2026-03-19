@@ -17,7 +17,8 @@ const AdminDashboard = () => {
   const [allCategories, setAllCategories] = useState([]);
   const [users, setUsers] = useState([]);
   const [allContent, setAllContent] = useState([]);
-  const [contentPagination, setContentPagination] = useState({ page: 1, total: 0, pages: 1, limit: 100 });
+  const [contentPagination, setContentPagination] = useState({ page: 1, total: 0, pages: 1, limit: 50 });
+  const [pendingPagination, setPendingPagination] = useState({ page: 1, total: 0, pages: 1, limit: 50 });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [editingCategory, setEditingCategory] = useState(null);
@@ -41,12 +42,21 @@ const AdminDashboard = () => {
     try {
       const [statsRes, pendingRes, categoriesRes, allCategoriesRes] = await Promise.all([
         adminAPI.getStats(),
-        adminAPI.getPendingContent({ limit: 20 }),
+        adminAPI.getPendingContent({ limit: 50, page: 1 }),
         adminAPI.getPendingCategories(),
         categoriesAPI.getAll()
       ]);
       setStats(statsRes.data.data);
       setPendingContent(pendingRes.data.data);
+      if (pendingRes.data.pagination) {
+        setPendingPagination(prev => ({
+          ...prev,
+          page: pendingRes.data.pagination.page,
+          total: pendingRes.data.pagination.total,
+          pages: pendingRes.data.pagination.pages,
+          limit: pendingRes.data.pagination.limit
+        }));
+      }
       setPendingCategories(categoriesRes.data.data);
       setAllCategories(allCategoriesRes.data.data || []);
       await Promise.all([loadUsers(), loadAllContent()]);
@@ -65,7 +75,7 @@ const AdminDashboard = () => {
   };
 
   const loadAllContent = async (page = 1) => {
-    const contentRes = await adminAPI.getAllContent({ limit: 100, page });
+    const contentRes = await adminAPI.getAllContent({ limit: 50, page });
     setAllContent(contentRes.data.data || []);
     if (contentRes.data.pagination) {
       setContentPagination(prev => ({
@@ -99,13 +109,45 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleRefreshPending = async () => {
+  const loadPendingContent = async (page = 1) => {
     try {
-      const pendingRes = await adminAPI.getPendingContent({ limit: 20 });
+      const pendingRes = await adminAPI.getPendingContent({ limit: 50, page });
       setPendingContent(pendingRes.data.data);
-      toast.success('Lista actualizada');
+      if (pendingRes.data.pagination) {
+        setPendingPagination(prev => ({
+          ...prev,
+          page: pendingRes.data.pagination.page,
+          total: pendingRes.data.pagination.total,
+          pages: pendingRes.data.pagination.pages,
+          limit: pendingRes.data.pagination.limit
+        }));
+      }
     } catch (error) {
-      toast.error('Error al actualizar');
+      toast.error('Error al cargar pendientes');
+    }
+  };
+
+  const handleRefreshPending = async () => {
+    await loadPendingContent(pendingPagination.page);
+    toast.success('Lista actualizada');
+  };
+
+  const handleApproveAll = async () => {
+    const count = stats?.overview?.pendingContent ?? pendingPagination.total;
+    if (count === 0) {
+      toast.info('No hay contenido pendiente');
+      return;
+    }
+    const confirmed = window.confirm(`¿Aprobar los ${count} contenidos pendientes de una vez?`);
+    if (!confirmed) return;
+    try {
+      const res = await adminAPI.approveAllPendingContent();
+      const approved = res.data?.data?.approved ?? 0;
+      toast.success(`✅ ${approved} contenidos aprobados`);
+      await fetchData();
+      await loadPendingContent(1);
+    } catch (error) {
+      toast.error('Error al aprobar todo');
     }
   };
 
@@ -272,7 +314,7 @@ const AdminDashboard = () => {
           onClick={() => setActiveTab('pending')}
           aria-pressed={activeTab === 'pending'}
         >
-          Pendientes ({pendingContent.length})
+          Pendientes ({stats?.overview?.pendingContent ?? pendingPagination.total})
         </button>
         <button
           type="button"
@@ -397,11 +439,16 @@ const AdminDashboard = () => {
 
       {activeTab === 'pending' && (
           <Card className="card-custom">
-            <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center">
+            <Card.Header className="bg-transparent border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
               <h4 className="mb-0">Contenido Pendiente de Aprobación</h4>
-              <Button variant="outline-secondary" size="sm" onClick={handleRefreshPending}>
-                🔄 Actualizar
-              </Button>
+              <div className="d-flex gap-2">
+                <Button variant="success" size="sm" onClick={handleApproveAll} disabled={(stats?.overview?.pendingContent ?? pendingPagination.total) === 0}>
+                  <i className="icon-check-circle" aria-hidden="true"></i> Aprobar todo
+                </Button>
+                <Button variant="outline-secondary" size="sm" onClick={handleRefreshPending}>
+                  🔄 Actualizar
+                </Button>
+              </div>
             </Card.Header>
             <Card.Body>
               {pendingContent.length === 0 ? (
@@ -461,11 +508,11 @@ const AdminDashboard = () => {
                               <span className="admin-avatar-wrap">
                                 <img
                                   src={getUploadUrl(item.author.avatar)}
-                                  alt={item.author.username}
+                                  alt={item.authorName || item.author?.username || 'Autor'}
                                 />
                               </span>
                             )}
-                            <span>{item.author?.username || 'Desconocido'}</span>
+                            <span>{item.authorName || item.author?.username || 'Desconocido'}</span>
                           </div>
                         </td>
                         <td className="text-muted">
@@ -501,6 +548,39 @@ const AdminDashboard = () => {
                 </Table>
               )}
             </Card.Body>
+            {pendingContent.length > 0 && pendingPagination.pages > 1 && (
+              <Card.Footer className="bg-transparent border-0 d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
+                <span className="text-muted small">
+                  {pendingPagination.total} en total · Página {pendingPagination.page} de {pendingPagination.pages}
+                </span>
+                <Pagination className="mb-0">
+                  <Pagination.Prev
+                    disabled={pendingPagination.page <= 1}
+                    onClick={(e) => { e.preventDefault(); if (pendingPagination.page > 1) loadPendingContent(pendingPagination.page - 1); }}
+                  />
+                  {Array.from({ length: Math.min(5, pendingPagination.pages) }, (_, i) => {
+                    let pageNum;
+                    if (pendingPagination.pages <= 5) pageNum = i + 1;
+                    else if (pendingPagination.page <= 3) pageNum = i + 1;
+                    else if (pendingPagination.page >= pendingPagination.pages - 2) pageNum = pendingPagination.pages - 4 + i;
+                    else pageNum = pendingPagination.page - 2 + i;
+                    return (
+                      <Pagination.Item
+                        key={pageNum}
+                        active={pageNum === pendingPagination.page}
+                        onClick={(e) => { e.preventDefault(); loadPendingContent(pageNum); }}
+                      >
+                        {pageNum}
+                      </Pagination.Item>
+                    );
+                  })}
+                  <Pagination.Next
+                    disabled={pendingPagination.page >= pendingPagination.pages}
+                    onClick={(e) => { e.preventDefault(); if (pendingPagination.page < pendingPagination.pages) loadPendingContent(pendingPagination.page + 1); }}
+                  />
+                </Pagination>
+              </Card.Footer>
+            )}
           </Card>
       )}
 
@@ -738,7 +818,7 @@ const AdminDashboard = () => {
                         })()}
                       </Link>
                     </td>
-                    <td>{item.author?.username || item.authorName || 'Desconocido'}</td>
+                    <td>{item.authorName || item.author?.username || 'Desconocido'}</td>
                     <td>
                       <Badge bg={item.isApproved ? 'success' : 'warning'}>
                         {item.isApproved ? 'Aprobado' : 'Pendiente'}

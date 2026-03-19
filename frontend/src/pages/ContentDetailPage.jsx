@@ -23,7 +23,7 @@ const ContentDetailPage = () => {
 
   const currentUserId = user?._id || user?.id;
   const authorId = content?.author?._id || null;
-  const authorName = content?.author?.name || content?.author?.username || content?.authorName || 'Autor desconocido';
+  const authorName = content?.authorName || content?.author?.name || content?.author?.username || 'Autor desconocido';
   const authorAvatar = getUploadUrl(content?.author?.avatar || content?.authorAvatar) || '/logo_chisteteca.png';
 
   useEffect(() => {

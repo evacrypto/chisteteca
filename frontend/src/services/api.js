@@ -138,6 +138,7 @@ export const adminAPI = {
   getUsers: (params) => api.get('/users', { params }),
   getPendingContent: (params) => api.get('/admin/content/pending', { params }),
   getAllContent: (params) => api.get('/admin/content/all', { params }),
+  approveAllPendingContent: () => api.put('/admin/content/approve-all'),
   approveContent: (id) => api.put(`/admin/content/${id}/approve`),
   rejectContent: (id, reason) => api.put(`/admin/content/${id}/reject`, { reason }),
   deleteContent: (id) => api.delete(`/admin/content/${id}`),

@@ -127,6 +127,37 @@ export const getAllContentForAdmin = async (req, res) => {
   }
 };
 
+// @desc    Approve all pending content
+// @route   PUT /api/admin/content/approve-all
+// @access  Private/Admin
+export const approveAllPendingContent = async (req, res) => {
+  try {
+    const pending = await Content.find(
+      { isApproved: false, isRejected: { $ne: true } },
+      'author'
+    ).lean();
+    const authorIds = [...new Set(pending.map((c) => c.author?.toString()).filter(Boolean))];
+
+    const result = await Content.updateMany(
+      { isApproved: false, isRejected: { $ne: true } },
+      { $set: { isApproved: true, isRejected: false, approvalReason: '' } }
+    );
+
+    for (const authorId of authorIds) {
+      const creator = await User.findById(authorId);
+      if (creator) await creator.updateStats();
+    }
+
+    res.json({
+      success: true,
+      data: { approved: result.modifiedCount }
+    });
+  } catch (error) {
+    console.error('Approve all content error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 // @desc    Approve content
 // @route   PUT /api/admin/content/:id/approve
 // @access  Private/Admin

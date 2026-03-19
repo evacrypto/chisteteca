@@ -3,6 +3,7 @@ import {
   getDashboardStats,
   getPendingContent,
   getAllContentForAdmin,
+  approveAllPendingContent,
   approveContent,
   rejectContent,
   deleteContent,
@@ -27,6 +28,7 @@ router.get('/analytics', getAnalytics);
 router.get('/content/pending', getPendingContent);
 router.get('/content/all', getAllContentForAdmin);
 router.get('/content/reported', getReportedContent);
+router.put('/content/approve-all', approveAllPendingContent);
 router.put('/content/:id/approve', approveContent);
 router.put('/content/:id/reject', rejectContent);
 router.delete('/content/:id', deleteContent);

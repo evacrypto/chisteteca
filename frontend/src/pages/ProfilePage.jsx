@@ -41,15 +41,18 @@ const ProfilePage = () => {
   const fetchProfileData = async () => {
     setLoading(true);
     try {
-      // Si es mi propio perfil, usar datos del store (siempre frescos)
+      // Siempre obtener perfil desde la API para tener datos frescos de la BD (p. ej. username con espacios)
+      const userRes = await usersAPI.getProfile(id);
+      const userData = userRes.data.data.user;
+      setProfileUser(userData);
+      setEditData({ username: userData?.username || '', bio: userData?.bio || '' });
+
+      // Si es mi perfil, actualizar el store para que Navbar y otros componentes muestren el username correcto
       if (isOwnProfile) {
-        const user = useAuthStore.getState().user;
-        setProfileUser(user);
-        setEditData({ username: user?.username || '', bio: user?.bio || '' });
-      } else {
-        // Si es otro perfil, obtener datos de la API
-        const userRes = await usersAPI.getProfile(id);
-        setProfileUser(userRes.data.data.user);
+        const current = useAuthStore.getState().user;
+        const updated = { ...current, username: userData.username, bio: userData.bio };
+        useAuthStore.setState({ user: updated });
+        localStorage.setItem('user', JSON.stringify(updated));
       }
 
       const userId = id || currentUser?.id;

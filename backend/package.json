@@ -9,6 +9,8 @@
     "dev": "nodemon src/server.js",
     "seed": "node src/utils/seed.js",
     "backfill:content-creators": "node src/utils/backfill-content-creators.js",
+    "fix:usernames": "node src/utils/fix-usernames-with-spaces.js",
+    "list:usernames": "node src/utils/list-usernames.js",
     "clean:orphan-content": "node src/utils/clean-orphan-content.js",
     "qa:handoff": "npm run seed && npm run qa:scan-legacy && npm run qa:e2e",
     "qa:e2e": "powershell -ExecutionPolicy Bypass -File qa/e2e-user-admin.ps1",
