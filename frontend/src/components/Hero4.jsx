@@ -1,9 +1,25 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
+import { contentAPI, categoriesAPI } from '../services/api';
 import './Hero4.css';
 
 const Hero4 = () => {
   const { isAuthenticated } = useAuthStore();
+  const [stats, setStats] = useState({ content: null, categories: null });
+
+  useEffect(() => {
+    Promise.all([
+      contentAPI.getAll({ limit: 1 }),
+      categoriesAPI.getAll()
+    ])
+      .then(([contentRes, categoriesRes]) => {
+        const totalContent = contentRes.data?.pagination?.total ?? null;
+        const totalCategories = categoriesRes.data?.data?.length ?? null;
+        setStats({ content: totalContent, categories: totalCategories });
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <section className="hero4-section">
@@ -60,7 +76,11 @@ const Hero4 = () => {
         {/* Stats rápidas */}
         <div className="hero4-stats">
           <div className="hero4-stat">
-            <span className="stat-number">10+</span>
+            <span className="stat-number">{stats.content ?? '—'}</span>
+            <span className="stat-label">Chistes</span>
+          </div>
+          <div className="hero4-stat">
+            <span className="stat-number">{stats.categories ?? '—'}</span>
             <span className="stat-label">Categorías</span>
           </div>
           <div className="hero4-stat">

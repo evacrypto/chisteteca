@@ -78,6 +78,62 @@ export const getAllContent = async (req, res) => {
   }
 };
 
+// @desc    Get adjacent content IDs (prev/next by createdAt desc)
+// @route   GET /api/content/:id/adjacent
+// @access  Public
+export const getAdjacentContent = async (req, res) => {
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid content ID' });
+    }
+
+    const current = await Content.findOne({ _id: req.params.id, isApproved: true }).select('createdAt');
+    if (!current) {
+      return res.status(404).json({ success: false, message: 'Content not found' });
+    }
+
+    const [prevDoc, nextDoc] = await Promise.all([
+      Content.findOne(
+        {
+          isApproved: true,
+          $or: [
+            { createdAt: { $gt: current.createdAt } },
+            { createdAt: current.createdAt, _id: { $gt: current._id } }
+          ]
+        },
+        '_id'
+      )
+        .sort({ createdAt: 1, _id: 1 })
+        .limit(1)
+        .lean(),
+      Content.findOne(
+        {
+          isApproved: true,
+          $or: [
+            { createdAt: { $lt: current.createdAt } },
+            { createdAt: current.createdAt, _id: { $lt: current._id } }
+          ]
+        },
+        '_id'
+      )
+        .sort({ createdAt: -1, _id: -1 })
+        .limit(1)
+        .lean()
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        prev: prevDoc?._id?.toString() || null,
+        next: nextDoc?._id?.toString() || null
+      }
+    });
+  } catch (error) {
+    console.error('Get adjacent content error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 // @desc    Get single content
 // @route   GET /api/content/:id
 // @access  Public
@@ -290,14 +346,11 @@ export const deleteContent = async (req, res) => {
 // @desc    Get trending content
 // @route   GET /api/content/trending
 // @access  Public
-const POPULAR_MAX_LIMIT = 50;
-const POPULAR_PAGE_SIZE = 15;
+const POPULAR_LIMIT = 20;
 
 export const getTrendingContent = async (req, res) => {
   try {
-    const page = parsePositiveInt(req.query.page, 1);
-    const limit = Math.min(parsePositiveInt(req.query.limit, POPULAR_PAGE_SIZE), POPULAR_PAGE_SIZE);
-    const skip = Math.min((page - 1) * limit, POPULAR_MAX_LIMIT); // No saltar más allá de 50
+    const limit = Math.min(parsePositiveInt(req.query.limit, POPULAR_LIMIT), POPULAR_LIMIT);
 
     // Weekly popularity is determined by number of likes.
     const sevenDaysAgo = new Date(Date.now() - WEEK_IN_MS);
@@ -314,14 +367,12 @@ export const getTrendingContent = async (req, res) => {
         matchStage,
         { $addFields: { likesCount: { $size: { $ifNull: ['$likes', []] } } } },
         { $count: 'total' }
-      ]).then(r => [{ total: Math.min((r[0]?.total ?? 0), POPULAR_MAX_LIMIT) }]),
+      ]).then(r => [{ total: Math.min((r[0]?.total ?? 0), POPULAR_LIMIT) }]),
       Content.aggregate([
         matchStage,
         { $addFields: { likesCount: { $size: { $ifNull: ['$likes', []] } } } },
         { $sort: { likesCount: -1, createdAt: -1 } },
-        { $limit: POPULAR_MAX_LIMIT },
-        { $skip: skip },
-        { $limit: limit },
+        { $limit: POPULAR_LIMIT },
         {
           $lookup: {
             from: 'users',
@@ -353,10 +404,10 @@ export const getTrendingContent = async (req, res) => {
       success: true,
       data: content,
       pagination: {
-        page,
+        page: 1,
         limit,
         total,
-        pages: Math.ceil(total / limit) || 1
+        pages: 1
       }
     });
   } catch (error) {

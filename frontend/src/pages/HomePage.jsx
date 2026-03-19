@@ -40,9 +40,9 @@ const HomePage = () => {
     if (replace) setLoading(true);
     else setLoadingMore(true);
     try {
-      // Inicio y populares: 15 por página. Populares cap 50 total en backend.
+      // Populares: 20 fijos, sin paginación. Inicio/categorías: 15 por página.
       const contentRes = isPopularPage
-        ? await contentAPI.getPopular({ limit: PAGE_SIZE, page: pageNum })
+        ? await contentAPI.getPopular({ limit: 20 })
         : await contentAPI.getAll({
             limit: PAGE_SIZE,
             page: pageNum,
@@ -54,9 +54,9 @@ const HomePage = () => {
       setContent(prev => replace ? newData : [...prev, ...newData]);
       setPage(pageNum);
       pageRef.current = pageNum;
-      // Populares: solo hasta 50. Inicio/categorías: paginación normal.
-      const moreFromPagination = pagination && pageNum < pagination.pages;
-      const moreFromFullPage = newData.length >= PAGE_SIZE;
+      // Populares: sin "Cargar más" (solo 20). Inicio/categorías: paginación normal.
+      const moreFromPagination = !isPopularPage && pagination && pageNum < pagination.pages;
+      const moreFromFullPage = !isPopularPage && newData.length >= PAGE_SIZE;
       setHasMore(newData.length > 0 && (moreFromPagination || moreFromFullPage));
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -78,7 +78,7 @@ const HomePage = () => {
       return (
         <>
           <i className="icon-fire text-warning me-2" aria-hidden="true"></i>
-          Los 50 chistes más populares de esta semana
+          Los 20 chistes más populares de esta semana
         </>
       );
     }

@@ -1,0 +1,200 @@
+/* Hero Search - mismo aspecto que Hero4 / Inicio */
+
+.hero-search-section {
+  position: relative;
+  min-height: 70vh;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 50px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  overflow: hidden;
+}
+
+.hero-search-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(255, 193, 7, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-search-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 20px 20px 80px !important;
+  max-width: 700px;
+  margin: 0 auto !important;
+}
+
+.hero-search-logo {
+  margin-bottom: 25px;
+  display: inline-block;
+}
+
+.hero-search-logo-image {
+  height: 140px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 30px rgba(255, 193, 7, 0.3));
+  transition: all 0.5s ease;
+}
+
+.hero-search-logo-image:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 15px 40px rgba(255, 193, 7, 0.4));
+}
+
+.hero-search-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 35px;
+}
+
+.hero-search-title span {
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Caja de búsqueda */
+.hero-search-form {
+  margin-bottom: 45px;
+}
+
+.hero-search-input-wrap {
+  display: flex;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50px;
+  padding: 6px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 193, 7, 0.3);
+}
+
+.hero-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 18px 28px;
+  font-size: 1.1rem;
+  color: #1a1a2e;
+  outline: none;
+  border-radius: 50px 0 0 50px;
+}
+
+.hero-search-input::placeholder {
+  color: #888;
+}
+
+.hero-search-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  color: #1a1a2e;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+}
+
+.hero-search-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 193, 7, 0.5);
+}
+
+.hero-search-btn:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* Stats */
+.hero-search-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-search-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-search-stat .stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.hero-search-stat .stat-label {
+  font-size: 13px;
+  color: #ffffff;
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Shape Divider */
+.hero-search-shape-divider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  line-height: 0;
+}
+
+.hero-search-shape-divider svg {
+  width: 100%;
+  height: 80px;
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .hero-search-section {
+    min-height: 60vh;
+    padding-top: 40px;
+  }
+
+  .hero-search-content {
+    padding: 15px 15px 60px !important;
+  }
+
+  .hero-search-logo-image {
+    height: 100px;
+  }
+
+  .hero-search-input-wrap {
+    flex-direction: column;
+    border-radius: 20px;
+    padding: 8px;
+  }
+
+  .hero-search-input {
+    border-radius: 12px 12px 0 0;
+    padding: 16px 20px;
+  }
+
+  .hero-search-btn {
+    border-radius: 0 0 12px 12px;
+    justify-content: center;
+  }
+
+  .hero-search-stats {
+    gap: 25px;
+  }
+
+  .hero-search-stat .stat-number {
+    font-size: 1.5rem;
+  }
+}

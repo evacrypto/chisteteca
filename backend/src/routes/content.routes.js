@@ -2,6 +2,7 @@ import express from 'express';
 import { 
   getAllContent, 
   getContent, 
+  getAdjacentContent,
   createContent, 
   updateContent, 
   deleteContent,
@@ -35,6 +36,7 @@ router.get('/', getAllContent);
 router.get('/popular', getTrendingContent);
 router.get('/trending', getTrendingContent);
 router.get('/random', getRandomContent);
+router.get('/:id/adjacent', getAdjacentContent);
 router.get('/:id', getContent);
 
 router.post('/', 

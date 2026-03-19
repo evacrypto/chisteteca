@@ -15,6 +15,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ContentDetailPage from './pages/ContentDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
 import RandomPage from './pages/RandomPage';
+import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
 import useAuthStore from './store/authStore';
 
@@ -67,6 +68,7 @@ function App() {
             <Route path="/popular" element={<HomePage />} />
             <Route path="/trending" element={<Navigate to="/popular" replace />} />
             <Route path="/random" element={<RandomPage />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route 
               path="/profile/:id" 
               element={

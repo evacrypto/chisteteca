@@ -17,6 +17,7 @@ const ContentDetailPage = () => {
   const [content, setContent] = useState(null);
   const [comments, setComments] = useState([]);
   const [related, setRelated] = useState([]);
+  const [adjacent, setAdjacent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
   const [isLiked, setIsLiked] = useState(false);
@@ -28,9 +29,21 @@ const ContentDetailPage = () => {
   const authorName = content?.authorName || content?.author?.name || content?.author?.username || 'Autor desconocido';
   const authorAvatar = getUploadUrl(content?.author?.avatar || content?.authorAvatar) || '/logo_chisteteca.png';
 
+  const useAdjacentNav = returnPath === '/' || returnPath === '/random';
+
   useEffect(() => {
     fetchData();
   }, [id]);
+
+  useEffect(() => {
+    if (useAdjacentNav && id) {
+      contentAPI.getAdjacent(id)
+        .then((res) => setAdjacent(res.data.data))
+        .catch(() => setAdjacent(null));
+    } else {
+      setAdjacent(null);
+    }
+  }, [id, useAdjacentNav]);
 
   // Scroll to top when entering the page (fixes footer visible on mobile when coming from list)
   useEffect(() => {
@@ -201,37 +214,40 @@ const ContentDetailPage = () => {
         
         {/* Navigation: Anterior | Volver | Siguiente */}
         <div className="detail-nav-buttons">
-          {contentIds.length > 0 ? (
+          {(contentIds.length > 0 || useAdjacentNav) ? (
             <>
               <button className="btn-back-top" onClick={() => navigate(returnPath)} title="Volver">
                 <i className="icon-home" aria-hidden="true"></i>
               </button>
-              <button 
-                className="btn-nav-prev" 
-                onClick={() => {
-                  const idx = contentIds.indexOf(id);
-                  if (idx > 0) {
-                    navigate(`/content/${contentIds[idx - 1]}`, { state: { contentIds, returnPath } });
-                  }
-                }}
-                disabled={contentIds.indexOf(id) <= 0}
-                title="Chiste anterior"
-              >
-                <i className="icon-arrow-left" aria-hidden="true"></i> Anterior
-              </button>
-              <button 
-                className="btn-nav-next" 
-                onClick={() => {
-                  const idx = contentIds.indexOf(id);
-                  if (idx >= 0 && idx < contentIds.length - 1) {
-                    navigate(`/content/${contentIds[idx + 1]}`, { state: { contentIds, returnPath } });
-                  }
-                }}
-                disabled={contentIds.indexOf(id) < 0 || contentIds.indexOf(id) >= contentIds.length - 1}
-                title="Siguiente chiste"
-              >
-                Siguiente <i className="icon-arrow-left icon-arrow-right" aria-hidden="true"></i>
-              </button>
+              {(() => {
+                const idx = contentIds.indexOf(id);
+                const prevId = contentIds.length > 0 && idx > 0
+                  ? contentIds[idx - 1]
+                  : (useAdjacentNav ? adjacent?.prev : null);
+                const nextId = contentIds.length > 0 && idx >= 0 && idx < contentIds.length - 1
+                  ? contentIds[idx + 1]
+                  : (useAdjacentNav ? adjacent?.next : null);
+                return (
+                  <>
+                    <button 
+                      className="btn-nav-prev" 
+                      onClick={() => prevId && navigate(`/content/${prevId}`, { state: { contentIds, returnPath } })}
+                      disabled={!prevId}
+                      title="Chiste anterior"
+                    >
+                      <i className="icon-arrow-left" aria-hidden="true"></i> Anterior
+                    </button>
+                    <button 
+                      className="btn-nav-next" 
+                      onClick={() => nextId && navigate(`/content/${nextId}`, { state: { contentIds, returnPath } })}
+                      disabled={!nextId}
+                      title="Siguiente chiste"
+                    >
+                      Siguiente <i className="icon-arrow-left icon-arrow-right" aria-hidden="true"></i>
+                    </button>
+                  </>
+                );
+              })()}
             </>
           ) : (
             <button className="btn-back-top" onClick={() => navigate(returnPath)} title="Volver">
@@ -327,32 +343,7 @@ const ContentDetailPage = () => {
 
             </article>
 
-            {/* Author Info */}
-            <div className="author-info-card">
-              <div className="author-info-header">
-                <strong>Publicado por {authorName}</strong>
-              </div>
-              <div className="author-info-body">
-                <span className="author-avatar-lg-wrap">
-                  <img src={authorAvatar} alt={authorName} className="author-avatar-lg" />
-                </span>
-                <p>{content.author?.bio || 'Usuario de Chisteteca'}</p>
-              </div>
-            </div>
-
-            {/* Related Content */}
-            {related.length > 0 && (
-              <div className="related-section">
-                <h3>Contenido Relacionado</h3>
-                <div className="related-grid">
-                  {related.map((item) => (
-                    <ContentCard key={item._id} content={item} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Comments */}
+            {/* Comments - right after the joke (author already shown in header) */}
             <div id="comments" className="comments-section">
               <h3 className="comments-title">
                 <i className="icon-comment me-2" aria-hidden="true"></i>
@@ -418,6 +409,18 @@ const ContentDetailPage = () => {
                 <p className="no-comments">Sé el primero en comentar</p>
               )}
             </div>
+
+            {/* Related Content */}
+            {related.length > 0 && (
+              <div className="related-section">
+                <h3>Contenido Relacionado</h3>
+                <div className="related-grid">
+                  {related.map((item) => (
+                    <ContentCard key={item._id} content={item} />
+                  ))}
+                </div>
+              </div>
+            )}
 
           </div>
 

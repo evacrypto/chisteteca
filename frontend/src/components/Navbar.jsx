@@ -7,7 +7,8 @@ import './Navbar.css';
 const BASE_NAV_ITEMS = [
   { to: '/', icon: 'icon-home', label: 'Inicio' },
   { to: '/popular', icon: 'icon-fire', label: 'Populares' },
-  { to: '/random', icon: 'icon-random', label: 'Aleatorio' }
+  { to: '/random', icon: 'icon-random', label: 'Aleatorio' },
+  { to: '/search', icon: 'icon-search', label: 'Buscar' }
 ];
 
 const Navbar = () => {

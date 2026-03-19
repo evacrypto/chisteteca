@@ -102,6 +102,7 @@ export const usersAPI = {
 export const contentAPI = {
   getAll: (params) => api.get('/content', { params }),
   getOne: (id) => api.get(`/content/${id}`),
+  getAdjacent: (id) => api.get(`/content/${id}/adjacent`),
   create: (data) => api.post('/content', data),
   update: (id, data) => api.put(`/content/${id}`, data),
   delete: (id) => api.delete(`/content/${id}`),
