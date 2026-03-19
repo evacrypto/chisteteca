@@ -67,7 +67,7 @@
 
 @media (max-width: 767px) {
   .detail-nav-buttons {
-    gap: 6px;
+    gap: 8px;
     margin-bottom: 20px;
     flex-wrap: nowrap;
     justify-content: flex-start;
@@ -75,13 +75,13 @@
   .btn-back-top,
   .btn-nav-prev,
   .btn-nav-next {
-    padding: 6px 10px;
-    gap: 4px;
-    font-size: 0.8rem;
+    padding: 8px 14px;
+    gap: 6px;
+    font-size: 0.9rem;
     flex-shrink: 0;
   }
   .btn-back-top {
-    padding: 6px;
+    padding: 8px;
   }
 }
 
