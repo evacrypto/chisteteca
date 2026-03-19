@@ -448,11 +448,10 @@ const AdminDashboard = () => {
                             minute: '2-digit'
                           })}
                         </td>
-                        <td className="text-end">
+                        <td className="text-end admin-actions-cell">
                           <Button
                             variant="success"
                             size="sm"
-                            className="me-2"
                             onClick={() => handleApprove(item._id)}
                             title="Aprobar contenido"
                           >
@@ -513,11 +512,10 @@ const AdminDashboard = () => {
                         <td className="text-muted">
                           {new Date(cat.createdAt).toLocaleDateString('es-ES')}
                         </td>
-                        <td className="text-end">
+                        <td className="text-end admin-actions-cell">
                           <Button
                             variant="success"
                             size="sm"
-                            className="me-2"
                             onClick={() => handleApproveCategory(cat._id)}
                           >
                             <i className="icon-check-circle" aria-hidden="true"></i> Aprobar
@@ -525,7 +523,6 @@ const AdminDashboard = () => {
                           <Button
                             variant="outline-primary"
                             size="sm"
-                            className="me-2"
                             onClick={() => handleEditCategory(cat)}
                           >
                             <i className="icon-edit" aria-hidden="true"></i> Editar
@@ -533,7 +530,6 @@ const AdminDashboard = () => {
                           <Button
                             variant="danger"
                             size="sm"
-                            className="me-2"
                             onClick={() => handleRejectCategory(cat._id, cat.name)}
                           >
                             <i className="icon-times-circle" aria-hidden="true"></i> Rechazar
@@ -597,11 +593,10 @@ const AdminDashboard = () => {
                             <span className="text-muted">{cat.color || '#ffc107'}</span>
                           </span>
                         </td>
-                        <td className="text-end">
+                        <td className="text-end admin-actions-cell">
                           <Button
                             variant="outline-primary"
                             size="sm"
-                            className="me-2"
                             onClick={() => handleEditCategory(cat)}
                           >
                             <i className="icon-edit" aria-hidden="true"></i> Editar
@@ -656,11 +651,10 @@ const AdminDashboard = () => {
                       </Badge>
                     </td>
                     <td>{u.stats?.totalPosts || 0}</td>
-                    <td className="text-end">
+                    <td className="text-end admin-actions-cell">
                       <Button
                         size="sm"
                         variant={u.isSuspended ? 'success' : 'outline-warning'}
-                        className="me-2"
                         onClick={() => handleToggleSuspendUser(u)}
                       >
                         {u.isSuspended ? 'Reactivar' : 'Suspender'}
@@ -722,7 +716,7 @@ const AdminDashboard = () => {
                       </Badge>
                     </td>
                     <td className="text-muted">{new Date(item.createdAt).toLocaleDateString('es-ES')}</td>
-                    <td className="text-end">
+                    <td className="text-end admin-actions-cell">
                       <Button
                         size="sm"
                         variant="danger"

@@ -7,3 +7,18 @@
 .emoji-picker-wrapper .EmojiPickerReact {
   --epr-emoji-size: 28px;
 }
+
+/* Acciones en tablas: botones en fila en móvil (evitar uno encima de otro) */
+.admin-actions-cell {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  justify-content: flex-end;
+  align-items: center;
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+.admin-actions-cell .btn {
+  flex-shrink: 0;
+}
