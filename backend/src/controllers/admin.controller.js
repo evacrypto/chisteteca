@@ -19,10 +19,10 @@ export const getDashboardStats = async (req, res) => {
     const recentUsers = await User.find().sort({ createdAt: -1 }).limit(5).select('username email createdAt');
     const recentContent = await Content.find().sort({ createdAt: -1 }).limit(5).select('title type createdAt');
 
-    // Top content by likes
+    // Top content by views (most viewed first)
     const topContent = await Content.find({ isApproved: true })
-      .sort({ likes: -1 })
-      .limit(5)
+      .sort({ views: -1 })
+      .limit(30)
       .select('title text type likes views')
       .populate('author', 'username avatar');
 
@@ -103,11 +103,57 @@ export const getAllContentForAdmin = async (req, res) => {
     if (req.query.approved === 'true') query.isApproved = true;
     if (req.query.approved === 'false') query.isApproved = false;
 
-    const content = await Content.find(query)
-      .populate('author', 'username avatar')
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .skip(skip);
+    const sortByMap = {
+      author: 'authorName',
+      createdAt: 'createdAt',
+      likes: 'likesCount',
+      views: 'views',
+      comments: 'commentsCount'
+    };
+    const sortBy = sortByMap[req.query.sortBy] || 'createdAt';
+    const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
+    const sort = { [sortBy]: sortOrder };
+
+    const needsAggregation = sortBy === 'likesCount';
+
+    let content;
+    if (needsAggregation) {
+      const pipeline = [
+        { $match: query },
+        { $addFields: { likesCount: { $size: { $ifNull: ['$likes', []] } } } },
+        { $sort: sort },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'author',
+            foreignField: '_id',
+            as: 'author',
+            pipeline: [{ $project: { username: 1, avatar: 1 } }]
+          }
+        },
+        { $unwind: { path: '$author', preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'categories',
+            foreignField: '_id',
+            as: 'categories',
+            pipeline: [{ $project: { name: 1, slug: 1, emoji: 1, color: 1 } }]
+          }
+        }
+      ];
+      content = await Content.aggregate(pipeline);
+    } else {
+      content = await Content.find(query)
+        .populate('author', 'username avatar')
+        .populate('categories', 'name slug emoji color')
+        .sort(sort)
+        .limit(limit)
+        .skip(skip)
+        .lean();
+    }
 
     const total = await Content.countDocuments(query);
 

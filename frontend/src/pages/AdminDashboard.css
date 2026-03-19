@@ -1,3 +1,132 @@
+/* Categorías en modal editar chiste */
+.admin-cat-dropdown .cat-dropdown-wrapper { position: relative; }
+.admin-cat-dropdown .cat-dropdown-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  color: #444;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  text-align: left;
+}
+.admin-cat-dropdown .cat-dropdown-trigger:hover,
+.admin-cat-dropdown .cat-dropdown-trigger:focus {
+  border-color: #ffc107;
+  background: #fff;
+  outline: none;
+}
+.admin-cat-dropdown .cat-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 2050;
+  background: #fff;
+  border: 1.5px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+.admin-cat-dropdown .cat-search-wrapper {
+  position: relative;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.admin-cat-dropdown .cat-search-icon {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 13px;
+}
+.admin-cat-dropdown .cat-search {
+  width: 100%;
+  padding: 8px 10px 8px 32px;
+  background: #f8f9fa;
+  border: 1.5px solid #e9ecef;
+  border-radius: 8px;
+  color: #333;
+  font-size: 13px;
+  outline: none;
+}
+.admin-cat-dropdown .cat-option-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.admin-cat-dropdown .cat-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+.admin-cat-dropdown .cat-option:hover { background: #f8f9fa; }
+.admin-cat-dropdown .cat-option.selected { background: rgba(255, 193, 7, 0.08); }
+.admin-cat-dropdown .cat-option-check {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #ccc;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #ffc107;
+}
+.admin-cat-dropdown .cat-option.selected .cat-option-check {
+  background: rgba(255, 193, 7, 0.15);
+  border-color: #ffc107;
+}
+.admin-cat-dropdown .cat-option-emoji { font-size: 16px; }
+.admin-cat-dropdown .cat-option-name { color: #333; font-weight: 500; }
+.admin-cat-dropdown .cat-option-empty {
+  padding: 16px 14px;
+  color: #aaa;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.admin-edit-categories .cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.admin-edit-categories .cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 12px;
+  border-radius: 50px;
+  border: 1.5px solid;
+  font-size: 13px;
+  font-weight: 600;
+}
+.admin-edit-categories .cat-chip-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 0 0 2px;
+  color: inherit;
+  opacity: 0.7;
+}
+.admin-edit-categories .cat-chip-remove:hover { opacity: 1; }
+
 /* Emoji picker en modal de editar categoría */
 .emoji-picker-wrapper {
   max-width: 100%;
@@ -21,4 +150,34 @@
 
 .admin-actions-cell .btn {
   flex-shrink: 0;
+}
+
+/* Ordenar columnas en tabla de contenidos */
+.admin-sort-th {
+  background: none;
+  border: none;
+  padding: 0;
+  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+.admin-sort-th:hover {
+  color: #ffc107;
+}
+
+.admin-sort-icon {
+  opacity: 1;
+}
+.admin-sort-icon-inactive {
+  opacity: 0.4;
+}
+.admin-sort-th:hover .admin-sort-icon-inactive {
+  opacity: 0.7;
+}
+
+.admin-sort-th-center {
+  justify-content: center;
+  width: 100%;
 }

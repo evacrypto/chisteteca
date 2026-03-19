@@ -18,6 +18,8 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [allContent, setAllContent] = useState([]);
   const [contentPagination, setContentPagination] = useState({ page: 1, total: 0, pages: 1, limit: 50 });
+  const [contentSortBy, setContentSortBy] = useState('date');
+  const [contentSortOrder, setContentSortOrder] = useState('desc');
   const [pendingPagination, setPendingPagination] = useState({ page: 1, total: 0, pages: 1, limit: 50 });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
@@ -25,6 +27,12 @@ const AdminDashboard = () => {
   const [editForm, setEditForm] = useState({ emoji: '', color: '#ffc107' });
   const [editingContent, setEditingContent] = useState(null);
   const [editContentText, setEditContentText] = useState('');
+  const [editContentCategories, setEditContentCategories] = useState([]);
+  const [editCatDropdownOpen, setEditCatDropdownOpen] = useState(false);
+  const [editCatSearch, setEditCatSearch] = useState('');
+  const [newCategoryForm, setNewCategoryForm] = useState({ name: '', emoji: '😂', color: '#ffc107' });
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [newCategoryEmojiModalOpen, setNewCategoryEmojiModalOpen] = useState(false);
 
   // Check if user is admin
   useEffect(() => {
@@ -74,8 +82,16 @@ const AdminDashboard = () => {
     setUsers(usersRes.data.data || []);
   };
 
-  const loadAllContent = async (page = 1) => {
-    const contentRes = await adminAPI.getAllContent({ limit: 50, page });
+  const loadAllContent = async (page = 1, sortOverride) => {
+    const sortBy = sortOverride?.sortBy ?? contentSortBy;
+    const sortOrder = sortOverride?.sortOrder ?? contentSortOrder;
+    const sortByParam = { date: 'createdAt', author: 'author', likes: 'likes', views: 'views', comments: 'comments' }[sortBy] || 'createdAt';
+    const contentRes = await adminAPI.getAllContent({
+      limit: 50,
+      page,
+      sortBy: sortByParam,
+      sortOrder
+    });
     setAllContent(contentRes.data.data || []);
     if (contentRes.data.pagination) {
       setContentPagination(prev => ({
@@ -86,6 +102,18 @@ const AdminDashboard = () => {
         limit: contentRes.data.pagination.limit
       }));
     }
+  };
+
+  const handleContentSort = (field) => {
+    let newOrder;
+    if (contentSortBy === field) {
+      newOrder = contentSortOrder === 'desc' ? 'asc' : 'desc';
+    } else {
+      newOrder = ['author', 'likes', 'views', 'comments'].includes(field) ? 'asc' : 'desc';
+    }
+    setContentSortBy(field);
+    setContentSortOrder(newOrder);
+    loadAllContent(1, { sortBy: field, sortOrder: newOrder });
   };
 
   const handleApprove = async (id) => {
@@ -154,6 +182,15 @@ const AdminDashboard = () => {
   const handleEditContent = (item) => {
     setEditingContent(item);
     setEditContentText(item.type === 'chiste' ? (item.text || '') : (item.title || item.text || ''));
+    setEditContentCategories((item.categories || []).map(c => c._id || c));
+    setEditCatDropdownOpen(false);
+    setEditCatSearch('');
+  };
+
+  const handleEditCategoryToggle = (catId) => {
+    setEditContentCategories(prev =>
+      prev.includes(catId) ? prev.filter(id => id !== catId) : [...prev, catId]
+    );
   };
 
   const handleSaveContentEdit = async () => {
@@ -168,9 +205,11 @@ const AdminDashboard = () => {
       if (editingContent.type === 'chiste') {
         updateData.title = text.substring(0, 50);
       }
+      updateData.categories = editContentCategories;
       await contentAPI.update(editingContent._id, updateData);
       toast.success('Contenido actualizado');
       setEditingContent(null);
+      setEditContentCategories([]);
       await fetchData();
       await loadAllContent(contentPagination.page);
     } catch (error) {
@@ -259,6 +298,30 @@ const AdminDashboard = () => {
       await fetchData();
     } catch (error) {
       toast.error(error.response?.data?.message || 'No se pudo actualizar la categoría');
+    }
+  };
+
+  const handleCreateCategory = async (e) => {
+    e?.preventDefault();
+    const name = newCategoryForm.name.trim();
+    if (!name) {
+      toast.error('El nombre de la categoría es obligatorio');
+      return;
+    }
+    setIsCreatingCategory(true);
+    try {
+      await categoriesAPI.create({
+        name,
+        emoji: newCategoryForm.emoji || '😂',
+        color: newCategoryForm.color || '#ffc107'
+      });
+      toast.success(`Categoría "${name}" creada`);
+      setNewCategoryForm({ name: '', emoji: '😂', color: '#ffc107' });
+      await fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'No se pudo crear la categoría');
+    } finally {
+      setIsCreatingCategory(false);
     }
   };
 
@@ -395,8 +458,8 @@ const AdminDashboard = () => {
                   <tr>
                     <th>Contenido</th>
                     <th>Autor</th>
-                    <th>Likes</th>
                     <th>Vistas</th>
+                    <th>Likes</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -410,9 +473,17 @@ const AdminDashboard = () => {
                           })()}
                         </Link>
                       </td>
-                      <td>{item.author?.username || 'Desconocido'}</td>
-                      <td>{item.likes?.length || 0}</td>
+                      <td>
+                        {item.author?._id ? (
+                          <Link to={`/profile/${item.author._id}`} className="text-decoration-none">
+                            {item.author?.username || item.authorName || 'Desconocido'}
+                          </Link>
+                        ) : (
+                          item.author?.username || item.authorName || 'Desconocido'
+                        )}
+                      </td>
                       <td>{item.views || 0}</td>
+                      <td>{item.likes?.length || 0}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -586,6 +657,83 @@ const AdminDashboard = () => {
 
       {activeTab === 'categories' && (
         <>
+          <Card className="card-custom mb-4">
+            <Card.Header className="bg-transparent border-0">
+              <h4 className="mb-0">Nueva categoría</h4>
+            </Card.Header>
+            <Card.Body>
+              <Form onSubmit={handleCreateCategory} className="row g-3">
+                <Form.Group as={Col} md={4}>
+                  <Form.Label>Nombre</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Ej: Chistes de programadores"
+                    value={newCategoryForm.name}
+                    onChange={(e) => setNewCategoryForm(f => ({ ...f, name: e.target.value }))}
+                    maxLength={50}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group as={Col} md={2}>
+                  <Form.Label>Emoji</Form.Label>
+                  <div className="d-flex align-items-center gap-2">
+                    <span className="fs-4">{newCategoryForm.emoji || '—'}</span>
+                    <Button
+                      type="button"
+                      variant="outline-secondary"
+                      size="sm"
+                      onClick={() => setNewCategoryEmojiModalOpen(true)}
+                      title="Elegir emoji"
+                    >
+                      Elegir emoji
+                    </Button>
+                  </div>
+                </Form.Group>
+                <Form.Group as={Col} md={2}>
+                  <Form.Label>Color</Form.Label>
+                  <div className="d-flex align-items-center gap-2 flex-wrap">
+                    <Form.Control
+                      type="color"
+                      value={newCategoryForm.color}
+                      onChange={(e) => setNewCategoryForm(f => ({ ...f, color: e.target.value }))}
+                      style={{ width: 50, height: 38, padding: 4, cursor: 'pointer' }}
+                    />
+                    <Form.Control
+                      type="text"
+                      value={newCategoryForm.color}
+                      onChange={(e) => setNewCategoryForm(f => ({ ...f, color: e.target.value }))}
+                      placeholder="#ffc107"
+                      style={{ flex: 1, minWidth: 90 }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline-secondary"
+                      size="sm"
+                      onClick={() => setNewCategoryForm(f => ({ ...f, color: '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0') }))}
+                    >
+                      🎲
+                    </Button>
+                  </div>
+                </Form.Group>
+                <Form.Group as={Col} md={4} className="d-flex align-items-end">
+                  <Button type="submit" variant="primary" disabled={isCreatingCategory}>
+                    {isCreatingCategory ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                        Creando...
+                      </>
+                    ) : (
+                      <>
+                        <i className="icon-plus me-1" aria-hidden="true"></i>
+                        Crear categoría
+                      </>
+                    )}
+                  </Button>
+                </Form.Group>
+              </Form>
+            </Card.Body>
+          </Card>
+
           <Card className="card-custom mb-4">
             <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center">
               <h4 className="mb-0">Categorías Pendientes de Aprobación</h4>
@@ -788,7 +936,7 @@ const AdminDashboard = () => {
       {activeTab === 'content' && (
         <Card className="card-custom">
           <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <h4 className="mb-0">Gestión de Contenidos</h4>
+            <h4 className="mb-0">Gestión de chistes</h4>
             <div className="d-flex align-items-center gap-2">
               <span className="text-muted small">
                 {contentPagination.total} en total · Página {contentPagination.page} de {contentPagination.pages}
@@ -800,10 +948,63 @@ const AdminDashboard = () => {
             <Table responsive hover className="align-middle">
               <thead>
                 <tr>
-                  <th>Contenido</th>
-                  <th>Autor</th>
-                  <th>Estado</th>
-                  <th>Fecha</th>
+                  <th>Chiste</th>
+                  <th>
+                    <button
+                      type="button"
+                      className="admin-sort-th admin-sort-th-center"
+                      onClick={() => handleContentSort('views')}
+                      title="Ordenar por vistas (menos a más / más a menos)"
+                    >
+                      <i className="icon-line-eye" aria-hidden="true"></i>
+                      <i className={`icon-chevron-${contentSortBy === 'views' ? (contentSortOrder === 'asc' ? 'up' : 'down') : 'down'} ms-1 admin-sort-icon ${contentSortBy !== 'views' ? 'admin-sort-icon-inactive' : ''}`} aria-hidden="true"></i>
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      className="admin-sort-th admin-sort-th-center"
+                      onClick={() => handleContentSort('likes')}
+                      title="Ordenar por risas (menos a más / más a menos)"
+                    >
+                      <i className="icon-heart" aria-hidden="true"></i>
+                      <i className={`icon-chevron-${contentSortBy === 'likes' ? (contentSortOrder === 'asc' ? 'up' : 'down') : 'down'} ms-1 admin-sort-icon ${contentSortBy !== 'likes' ? 'admin-sort-icon-inactive' : ''}`} aria-hidden="true"></i>
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      className="admin-sort-th admin-sort-th-center"
+                      onClick={() => handleContentSort('comments')}
+                      title="Ordenar por comentarios (menos a más / más a menos)"
+                    >
+                      <i className="icon-comment" aria-hidden="true"></i>
+                      <i className={`icon-chevron-${contentSortBy === 'comments' ? (contentSortOrder === 'asc' ? 'up' : 'down') : 'down'} ms-1 admin-sort-icon ${contentSortBy !== 'comments' ? 'admin-sort-icon-inactive' : ''}`} aria-hidden="true"></i>
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      className="admin-sort-th"
+                      onClick={() => handleContentSort('author')}
+                      title="Ordenar por autor (A-Z / Z-A)"
+                    >
+                      Autor
+                      <i className={`icon-chevron-${contentSortBy === 'author' ? (contentSortOrder === 'asc' ? 'up' : 'down') : 'down'} ms-1 admin-sort-icon ${contentSortBy !== 'author' ? 'admin-sort-icon-inactive' : ''}`} aria-hidden="true"></i>
+                    </button>
+                  </th>
+                  <th>Categorías</th>
+                  <th>
+                    <button
+                      type="button"
+                      className="admin-sort-th"
+                      onClick={() => handleContentSort('date')}
+                      title="Ordenar por fecha"
+                    >
+                      Fecha
+                      <i className={`icon-chevron-${contentSortBy === 'date' ? (contentSortOrder === 'asc' ? 'up' : 'down') : 'down'} ms-1 admin-sort-icon ${contentSortBy !== 'date' ? 'admin-sort-icon-inactive' : ''}`} aria-hidden="true"></i>
+                    </button>
+                  </th>
                   <th className="text-end">Acciones</th>
                 </tr>
               </thead>
@@ -814,15 +1015,41 @@ const AdminDashboard = () => {
                       <Link to={`/content/${item._id}`} className="text-gradient">
                         {(() => {
                           const t = (item.type === 'chiste' ? item.text : item.title) || item.title || item.text || 'Sin título';
-                          return t.length > 60 ? t.substring(0, 60) + '...' : t;
+                          return t.length > 30 ? t.substring(0, 30) + '...' : t;
                         })()}
                       </Link>
                     </td>
-                    <td>{item.authorName || item.author?.username || 'Desconocido'}</td>
+                    <td className="text-center">{item.views ?? 0}</td>
+                    <td className="text-center">{item.likes?.length ?? 0}</td>
+                    <td className="text-center">{item.commentsCount ?? 0}</td>
                     <td>
-                      <Badge bg={item.isApproved ? 'success' : 'warning'}>
-                        {item.isApproved ? 'Aprobado' : 'Pendiente'}
-                      </Badge>
+                      {(item.author?._id || item.author) ? (
+                        <Link to={`/profile/${item.author?._id || item.author}`} className="text-decoration-none">
+                          {item.authorName || item.author?.username || 'Desconocido'}
+                        </Link>
+                      ) : (
+                        item.authorName || 'Desconocido'
+                      )}
+                    </td>
+                    <td>
+                      {item.categories?.length > 0 ? (
+                        <span className="d-flex flex-wrap gap-1">
+                          {item.categories.slice(0, 3).map((cat) => (
+                            <span
+                              key={cat._id}
+                              className="badge"
+                              style={{ backgroundColor: (cat.color || '#6c757d') + '30', color: cat.color || '#6c757d', fontSize: '0.7rem' }}
+                            >
+                              {cat.emoji} {cat.name}
+                            </span>
+                          ))}
+                          {item.categories.length > 3 && (
+                            <span className="text-muted small">+{item.categories.length - 3}</span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className="text-muted small">—</span>
+                      )}
                     </td>
                     <td className="text-muted">{new Date(item.createdAt).toLocaleDateString('es-ES')}</td>
                     <td className="text-end admin-actions-cell">
@@ -880,6 +1107,29 @@ const AdminDashboard = () => {
           </Card.Body>
         </Card>
       )}
+
+      {/* Modal Emoji para nueva categoría */}
+      <Modal show={newCategoryEmojiModalOpen} onHide={() => setNewCategoryEmojiModalOpen(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Elegir emoji</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-muted small mb-3">Busca y elige un emoji para la categoría</p>
+          <div className="emoji-picker-wrapper">
+            <EmojiPicker
+              emojiData={es}
+              onEmojiClick={(data) => {
+                setNewCategoryForm(f => ({ ...f, emoji: data.emoji }));
+                setNewCategoryEmojiModalOpen(false);
+              }}
+              searchPlaceholder="Buscar emoji..."
+              width={320}
+              height={320}
+              previewConfig={{ showPreview: false }}
+            />
+          </div>
+        </Modal.Body>
+      </Modal>
 
       {/* Modal Editar Categoría */}
       <Modal show={!!editingCategory} onHide={() => setEditingCategory(null)} centered>
@@ -944,22 +1194,106 @@ const AdminDashboard = () => {
       </Modal>
 
       {/* Modal Editar texto del chiste */}
-      <Modal show={!!editingContent} onHide={() => setEditingContent(null)} centered size="lg">
+      <Modal show={!!editingContent} onHide={() => { setEditingContent(null); setEditContentCategories([]); }} centered size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Editar texto del chiste</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {editingContent && (
-            <Form.Group>
-              <Form.Label>Texto del chiste</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={6}
-                value={editContentText}
-                onChange={(e) => setEditContentText(e.target.value)}
-                placeholder="Escribe el texto del chiste..."
-              />
-            </Form.Group>
+            <>
+              <Form.Group className="mb-4">
+                <Form.Label>Texto del chiste</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={6}
+                  value={editContentText}
+                  onChange={(e) => setEditContentText(e.target.value)}
+                  placeholder="Escribe el texto del chiste..."
+                />
+              </Form.Group>
+
+              <Form.Group className="admin-edit-categories">
+                <Form.Label><i className="icon-tag me-2" aria-hidden="true"></i>Categorías</Form.Label>
+                <div className="cat-dropdown-wrapper admin-cat-dropdown">
+                  <button
+                    type="button"
+                    className="cat-dropdown-trigger"
+                    onClick={() => { setEditCatDropdownOpen(o => !o); setEditCatSearch(''); }}
+                  >
+                    <span>
+                      {editContentCategories.length === 0
+                        ? 'Selecciona una o más categorías'
+                        : `${editContentCategories.length} categoría${editContentCategories.length > 1 ? 's' : ''} seleccionada${editContentCategories.length > 1 ? 's' : ''}`}
+                    </span>
+                    <i className={editCatDropdownOpen ? 'icon-chevron-up' : 'icon-chevron-down'} aria-hidden="true"></i>
+                  </button>
+
+                  {editCatDropdownOpen && (
+                    <div className="cat-dropdown-panel">
+                      <div className="cat-search-wrapper">
+                        <i className="icon-search cat-search-icon" aria-hidden="true"></i>
+                        <input
+                          type="text"
+                          className="cat-search"
+                          placeholder="Buscar categoría..."
+                          value={editCatSearch}
+                          onChange={e => setEditCatSearch(e.target.value)}
+                          onClick={e => e.stopPropagation()}
+                          autoFocus
+                        />
+                      </div>
+                      <ul className="cat-option-list">
+                        {allCategories
+                          .filter(c => c.name.toLowerCase().includes(editCatSearch.toLowerCase()))
+                          .map(cat => {
+                            const selected = editContentCategories.includes(cat._id);
+                            return (
+                              <li
+                                key={cat._id}
+                                className={`cat-option ${selected ? 'selected' : ''}`}
+                                onClick={() => handleEditCategoryToggle(cat._id)}
+                              >
+                                <span className="cat-option-check">
+                                  {selected && <i className="icon-check" aria-hidden="true"></i>}
+                                </span>
+                                <span className="cat-option-emoji">{cat.emoji}</span>
+                                <span className="cat-option-name">{cat.name}</span>
+                              </li>
+                            );
+                          })}
+                        {allCategories.filter(c => c.name.toLowerCase().includes(editCatSearch.toLowerCase())).length === 0 && (
+                          <li className="cat-option-empty">Sin resultados</li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {editContentCategories.length > 0 && (
+                  <div className="cat-chips mt-2">
+                    {editContentCategories.map(id => {
+                      const cat = allCategories.find(c => c._id === id);
+                      if (!cat) return null;
+                      return (
+                        <span
+                          key={id}
+                          className="cat-chip"
+                          style={{ backgroundColor: (cat.color || '#ffc107') + '25', color: cat.color || '#ffc107', borderColor: (cat.color || '#ffc107') + '55' }}
+                        >
+                          {cat.emoji} {cat.name}
+                          <button
+                            type="button"
+                            className="cat-chip-remove"
+                            onClick={() => handleEditCategoryToggle(id)}
+                            aria-label={`Quitar ${cat.name}`}
+                          >×</button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </Form.Group>
+            </>
           )}
         </Modal.Body>
         <Modal.Footer>

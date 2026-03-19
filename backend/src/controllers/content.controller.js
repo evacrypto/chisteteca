@@ -236,7 +236,7 @@ export const updateContent = async (req, res) => {
     if (title) content.title = title;
     if (description) content.description = description;
     if (text) content.text = text;
-    if (categories) content.categories = categories;
+    if (Array.isArray(req.body.categories)) content.categories = req.body.categories;
 
     await content.save();
 
