@@ -38,6 +38,9 @@ const Footer = () => {
                         ¡Suscribirme!
                       </button>
                     </div>
+                    <p className="subscribe-legal small mt-2 mb-0">
+                      Al suscribirte aceptas nuestra <Link to="/privacidad">Política de Privacidad</Link>
+                    </p>
                   </form>
                 </div>
               </div>
@@ -157,6 +160,7 @@ const Footer = () => {
               </div>
               <div className="col-md-6">
                 <div className="footer-legal">
+                  <Link to="/aviso-legal">Aviso Legal</Link>
                   <Link to="/privacidad">Privacidad</Link>
                   <Link to="/cookies">Cookies</Link>
                   <Link to="/terminos">Términos</Link>

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -6,6 +7,9 @@ import Navbar from './components/Navbar';
 import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
 import Footer from './components/Footer';
+import CookieBanner from './components/CookieBanner';
+import { hasAcceptedCookies } from './store/cookieConsentStore';
+import { loadGoogleAnalytics } from './utils/googleAnalytics';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -17,6 +21,10 @@ import NotFoundPage from './pages/NotFoundPage';
 import RandomPage from './pages/RandomPage';
 import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
+import AvisoLegalPage from './pages/AvisoLegalPage';
+import PrivacidadPage from './pages/PrivacidadPage';
+import CookiesPage from './pages/CookiesPage';
+import TerminosPage from './pages/TerminosPage';
 import useAuthStore from './store/authStore';
 
 // Protected Route Component
@@ -80,10 +88,16 @@ function App() {
             <Route path="/category/:id" element={<HomePage />} />
             <Route path="/content/:id" element={<ContentDetailPage />} />
             <Route path="/settings" element={<HomePage />} />
+            <Route path="/aviso-legal" element={<AvisoLegalPage />} />
+            <Route path="/privacidad" element={<PrivacidadPage />} />
+            <Route path="/cookies" element={<CookiesPage />} />
+            <Route path="/terminos" element={<TerminosPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
         <Footer />
+
+        <CookieBanner onConsentChange={(v) => v === 'accepted' && loadGoogleAnalytics()} />
 
         <BackToTop />
 

@@ -2,6 +2,7 @@ import User from '../models/User.model.js';
 import Content from '../models/Content.model.js';
 import Category from '../models/Category.model.js';
 import mongoose from 'mongoose';
+import { toAccentInsensitiveRegex } from '../utils/searchUtils.js';
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -93,10 +94,11 @@ export const getAllContentForAdmin = async (req, res) => {
 
     const query = {};
     if (req.query.search) {
+      const searchPattern = toAccentInsensitiveRegex(req.query.search);
       query.$or = [
-        { title: { $regex: req.query.search, $options: 'i' } },
-        { text: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } }
+        { title: { $regex: searchPattern, $options: 'i' } },
+        { text: { $regex: searchPattern, $options: 'i' } },
+        { description: { $regex: searchPattern, $options: 'i' } }
       ];
     }
     if (req.query.type) query.type = req.query.type;

@@ -4,6 +4,7 @@ import Category from '../models/Category.model.js';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 import { containsProfanity } from '../utils/commentModeration.js';
+import { toAccentInsensitiveRegex } from '../utils/searchUtils.js';
 
 const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -46,10 +47,11 @@ export const getAllContent = async (req, res) => {
       query.author = req.query.author;
     }
     if (req.query.search) {
+      const searchPattern = toAccentInsensitiveRegex(req.query.search);
       query.$or = [
-        { title: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } },
-        { text: { $regex: req.query.search, $options: 'i' } }
+        { title: { $regex: searchPattern, $options: 'i' } },
+        { description: { $regex: searchPattern, $options: 'i' } },
+        { text: { $regex: searchPattern, $options: 'i' } }
       ];
     }
 

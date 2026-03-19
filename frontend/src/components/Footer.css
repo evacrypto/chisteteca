@@ -88,6 +88,20 @@
   transform: translateX(2px);
 }
 
+.subscribe-legal {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.subscribe-legal a {
+  color: #ffc107;
+  text-decoration: underline;
+}
+
+.subscribe-legal a:hover {
+  color: #ffc107;
+  text-decoration: none;
+}
+
 /* Widgets */
 .widget {
   margin-bottom: 30px;

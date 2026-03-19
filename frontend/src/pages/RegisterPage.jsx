@@ -12,7 +12,8 @@ const RegisterPage = () => {
     email: '',
     password: '',
     username: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    acceptLegal: false
   });
 
   const handleChange = (e) => {
@@ -57,6 +58,11 @@ const RegisterPage = () => {
 
     if (formData.username.length < 3) {
       toast.error('El username debe tener al menos 3 caracteres');
+      return;
+    }
+
+    if (!formData.acceptLegal) {
+      toast.error('Debes aceptar la Política de Privacidad y los Términos');
       return;
     }
 
@@ -248,6 +254,21 @@ const RegisterPage = () => {
                               placeholder="••••••••"
                               required
                             />
+                          </div>
+
+                          <div className="form-group">
+                            <label className="form-check-label d-flex align-items-start gap-2">
+                              <input
+                                type="checkbox"
+                                name="acceptLegal"
+                                checked={formData.acceptLegal}
+                                onChange={(e) => setFormData({ ...formData, acceptLegal: e.target.checked })}
+                                className="form-check-input mt-1"
+                              />
+                              <span>
+                                Acepto la <Link to="/privacidad" target="_blank" rel="noopener noreferrer">Política de Privacidad</Link> y los <Link to="/terminos" target="_blank" rel="noopener noreferrer">Términos y Condiciones</Link>
+                              </span>
+                            </label>
                           </div>
 
                           <div className="form-group">
