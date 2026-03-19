@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { contentAPI, categoriesAPI } from '../services/api';
+import EmojiPicker from 'emoji-picker-react';
+import es from 'emoji-picker-react/dist/data/emojis-es';
+import { Modal } from 'react-bootstrap';
 import './CreateContentPage.css';
 
 const CreateContentPage = () => {
@@ -13,51 +16,19 @@ const CreateContentPage = () => {
     text: '',
     categories: [],
     newCategory: '',
-    newCategoryEmoji: ''
+    newCategoryEmoji: '😂',
+    newCategoryColor: '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')
   });
   const [catDropdownOpen, setCatDropdownOpen] = useState(false);
   const [catSearch, setCatSearch] = useState('');
   const catDropdownRef = useRef(null);
-  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
-  const emojiPickerRef = useRef(null);
+  const [emojiModalOpen, setEmojiModalOpen] = useState(false);
 
-  const EMOJI_PALETTE = [
-    '😀','😃','😄','😁','😆','😅','😂','🤣','🥲','😊',
-    '😇','🙂','🙃','😉','😍','🥰','😘','😗','😋','😛',
-    '😜','🤪','😝','🫠','🫡','🤗','🤭','🫢','🤫','🤔',
-    '🧐','🤓','😎','🤩','🥳','😤','😴','🤤','🤠','😈',
-    '👻','💀','🤡','👽','🤖','🎭','🃏','🎉','🎊','🎈',
-    '🎁','🎂','🍰','🧁','🍩','🍪','🍫','🍬','🍭','🍿',
-    '🍕','🍔','🌭','🍟','🌮','🌯','🥙','🍜','🍝','🍣',
-    '🍤','🥟','🍗','🍖','🥓','🍳','🧀','🥪','🥞','🧇',
-    '☕','🍵','🧃','🥤','🍺','🍻','🍷','🍸','🍹','🧉',
-    '⚽','🏀','🏈','⚾','🎾','🏐','🏓','🏸','🥊','🏆',
-    '🎮','🕹️','🎲','🎯','🎸','🎹','🎤','🎧','🎬','📸',
-    '🚀','🛸','✈️','🚁','🚗','🏍️','🚲','⛵','🗺️','🏝️',
-    '🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯',
-    '🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🐙',
-    '🦄','🐢','🦋','🐝','🐞','🕷️','🦂','🐬','🦀','🦈',
-    '🌞','🌛','⭐','🌟','✨','⚡','🔥','💧','🌊','🌈',
-    '🌵','🌴','🍀','🌷','🌸','🌼','🍁','🍂','❄️','⛄',
-    '❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💖',
-    '💘','💝','💯','💫','💥','🎯','✅','🆗','🆒','🔔',
-    '📢','📣','💡','🧠','📚','✏️','📌','📍','🔗','🧩',
-  ];
+  const randomColor = () => '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
 
   useEffect(() => {
     fetchCategories();
   }, []);
-
-  useEffect(() => {
-    if (!emojiPickerOpen) return;
-    const handler = (e) => {
-      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target)) {
-        setEmojiPickerOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [emojiPickerOpen]);
 
   useEffect(() => {
     if (!catDropdownOpen) return;
@@ -124,7 +95,8 @@ const CreateContentPage = () => {
       // Nueva categoría sugerida
       if (formData.newCategory.trim()) {
         submitData.append('newCategory', formData.newCategory);
-        submitData.append('newCategoryEmoji', formData.newCategoryEmoji || '📁');
+        submitData.append('newCategoryEmoji', formData.newCategoryEmoji || '😂');
+        submitData.append('newCategoryColor', formData.newCategoryColor || randomColor());
       }
 
       await contentAPI.create(submitData);
@@ -325,7 +297,7 @@ const CreateContentPage = () => {
                           <i className="label-icon icon-plus me-1" aria-hidden="true"></i>
                           ¿No encuentras tu categoría? Sugiere una nueva:
                         </label>
-                        <div className="d-flex gap-2 align-items-start">
+                        <div className="d-flex gap-2 align-items-start flex-wrap">
                           <input
                             type="text"
                             name="newCategory"
@@ -334,33 +306,16 @@ const CreateContentPage = () => {
                             className="form-control"
                             placeholder="Nombre de la nueva categoría"
                             maxLength={50}
-                            style={{ height: '52px' }}
+                            style={{ height: '52px', flex: 1, minWidth: 180 }}
                           />
-                          <div className="emoji-picker-wrapper" ref={emojiPickerRef}>
-                            <button
-                              type="button"
-                              className="emoji-picker-trigger"
-                              onClick={() => setEmojiPickerOpen(o => !o)}
-                              title="Elegir emoji"
-                            >
-                              {formData.newCategoryEmoji || '😀'}
-                            </button>
-                            {emojiPickerOpen && (
-                              <div className="emoji-picker-panel">
-                                {EMOJI_PALETTE.map(em => (
-                                  <button
-                                    key={em}
-                                    type="button"
-                                    className={`emoji-option ${formData.newCategoryEmoji === em ? 'selected' : ''}`}
-                                    onClick={() => {
-                                      setFormData(prev => ({ ...prev, newCategoryEmoji: em }));
-                                      setEmojiPickerOpen(false);
-                                    }}
-                                  >{em}</button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
+                          <button
+                            type="button"
+                            className="emoji-picker-trigger create-emoji-btn"
+                            onClick={() => setEmojiModalOpen(true)}
+                            title="Elegir emoji"
+                          >
+                            {formData.newCategoryEmoji || '😂'}
+                          </button>
                         </div>
                         <small className="text-muted">
                           ℹ️ La sugerencia será revisada antes de publicarse
@@ -397,6 +352,33 @@ const CreateContentPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal selector de emoji para nueva categoría */}
+      <Modal show={emojiModalOpen} onHide={() => setEmojiModalOpen(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Elegir emoji para la categoría</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-muted small mb-2">Busca y elige un emoji para tu categoría</p>
+          <div className="create-emoji-picker-wrapper">
+            <EmojiPicker
+              emojiData={es}
+              onEmojiClick={(data) => {
+                setFormData(prev => ({
+                  ...prev,
+                  newCategoryEmoji: data.emoji,
+                  newCategoryColor: randomColor()
+                }));
+                setEmojiModalOpen(false);
+              }}
+              searchPlaceholder="Buscar emoji..."
+              width={320}
+              height={320}
+              previewConfig={{ showPreview: false }}
+            />
+          </div>
+        </Modal.Body>
+      </Modal>
     </section>
   );
 };

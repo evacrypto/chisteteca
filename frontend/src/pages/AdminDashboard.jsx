@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Card, Row, Col, Table, Button, Badge, Pagination, Modal, Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { adminAPI, categoriesAPI, getUploadUrl } from '../services/api';
+import { adminAPI, categoriesAPI, contentAPI, getUploadUrl } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
@@ -22,6 +22,8 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [editingCategory, setEditingCategory] = useState(null);
   const [editForm, setEditForm] = useState({ emoji: '', color: '#ffc107' });
+  const [editingContent, setEditingContent] = useState(null);
+  const [editContentText, setEditContentText] = useState('');
 
   // Check if user is admin
   useEffect(() => {
@@ -104,6 +106,33 @@ const AdminDashboard = () => {
       toast.success('Lista actualizada');
     } catch (error) {
       toast.error('Error al actualizar');
+    }
+  };
+
+  const handleEditContent = (item) => {
+    setEditingContent(item);
+    setEditContentText(item.type === 'chiste' ? (item.text || '') : (item.title || item.text || ''));
+  };
+
+  const handleSaveContentEdit = async () => {
+    if (!editingContent) return;
+    const text = editContentText.trim();
+    if (!text) {
+      toast.error('El texto no puede estar vacío');
+      return;
+    }
+    try {
+      const updateData = { text };
+      if (editingContent.type === 'chiste') {
+        updateData.title = text.substring(0, 50);
+      }
+      await contentAPI.update(editingContent._id, updateData);
+      toast.success('Contenido actualizado');
+      setEditingContent(null);
+      await fetchData();
+      await loadAllContent(contentPagination.page);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'No se pudo actualizar');
     }
   };
 
@@ -717,6 +746,15 @@ const AdminDashboard = () => {
                     </td>
                     <td className="text-muted">{new Date(item.createdAt).toLocaleDateString('es-ES')}</td>
                     <td className="text-end admin-actions-cell">
+                      {item.type === 'chiste' && (
+                        <Button
+                          size="sm"
+                          variant="outline-primary"
+                          onClick={() => handleEditContent(item)}
+                        >
+                          <i className="icon-edit" aria-hidden="true"></i> Editar
+                        </Button>
+                      )}
                       <Button
                         size="sm"
                         variant="danger"
@@ -820,6 +858,33 @@ const AdminDashboard = () => {
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setEditingCategory(null)}>Cancelar</Button>
           <Button variant="primary" onClick={handleSaveCategory}>
+            <i className="icon-check me-1" aria-hidden="true"></i> Guardar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal Editar texto del chiste */}
+      <Modal show={!!editingContent} onHide={() => setEditingContent(null)} centered size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Editar texto del chiste</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {editingContent && (
+            <Form.Group>
+              <Form.Label>Texto del chiste</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={6}
+                value={editContentText}
+                onChange={(e) => setEditContentText(e.target.value)}
+                placeholder="Escribe el texto del chiste..."
+              />
+            </Form.Group>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setEditingContent(null)}>Cancelar</Button>
+          <Button variant="primary" onClick={handleSaveContentEdit}>
             <i className="icon-check me-1" aria-hidden="true"></i> Guardar
           </Button>
         </Modal.Footer>

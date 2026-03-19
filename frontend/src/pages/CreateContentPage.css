@@ -460,6 +460,11 @@
   flex-shrink: 0;
 }
 
+.create-emoji-picker-wrapper {
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .emoji-picker-trigger {
   width: 52px;
   height: 52px;

@@ -196,7 +196,7 @@ const RegisterPage = () => {
                               placeholder="Tu nombre de usuario"
                               required
                             />
-                            <small className="form-text">3-30 caracteres, solo letras, números y guiones bajos</small>
+                            <small className="form-text">3-30 caracteres. Puedes usar letras, números, espacios (ej: pepe perez)</small>
                           </div>
 
                           <div className="form-group">

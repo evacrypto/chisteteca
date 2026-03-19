@@ -170,10 +170,12 @@ export const createContent = async (req, res) => {
     if (req.body.newCategory) {
       try {
         const suggestedByAdmin = user.role === 'admin';
+        const randomColor = () => '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
 
         await Category.create({
           name: req.body.newCategory,
-          emoji: req.body.newCategoryEmoji || '📁',
+          emoji: req.body.newCategoryEmoji || '😂',
+          color: req.body.newCategoryColor || randomColor(),
           createdBy: user._id,
           isPending: !suggestedByAdmin,
           isActive: suggestedByAdmin,
