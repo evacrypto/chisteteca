@@ -1,8 +1,8 @@
 /**
  * Carga Google Analytics solo si el usuario ha dado su consentimiento.
- * Configurar VITE_GA_MEASUREMENT_ID en .env (ej: G-XXXXXXXXXX)
+ * Usa VITE_GA_MEASUREMENT_ID de .env o el ID por defecto de Chisteteca.
  */
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-X8XJ314J27';
 
 export const loadGoogleAnalytics = () => {
   if (!GA_MEASUREMENT_ID) return;

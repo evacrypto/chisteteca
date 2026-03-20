@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,7 +7,6 @@ import ScrollToTop from './components/ScrollToTop';
 import BackToTop from './components/BackToTop';
 import Footer from './components/Footer';
 import CookieBanner from './components/CookieBanner';
-import { hasAcceptedCookies } from './store/cookieConsentStore';
 import { loadGoogleAnalytics } from './utils/googleAnalytics';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -103,7 +101,6 @@ function App() {
             />
             <Route path="/category/:id" element={<HomePage />} />
             <Route path="/content/:id" element={<ContentDetailPage />} />
-            <Route path="/settings" element={<HomePage />} />
             <Route path="/aviso-legal" element={<AvisoLegalPage />} />
             <Route path="/privacidad" element={<PrivacidadPage />} />
             <Route path="/cookies" element={<CookiesPage />} />

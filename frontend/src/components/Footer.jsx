@@ -1,8 +1,17 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { categoriesAPI } from '../services/api';
 import './Footer.css';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    categoriesAPI.getAll()
+      .then((res) => setCategories(res.data?.data || []))
+      .catch(() => {});
+  }, []);
 
   return (
     <footer id="footer" className="chisteteca-footer">
@@ -100,16 +109,16 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Columna 3: Categorías */}
+            {/* Columna 3: Categorías (dinámicas desde API) */}
             <div className="col-sm-6 col-lg-2">
               <div className="widget widget_links">
                 <h4 className="widget-title">Categorías</h4>
                 <ul>
-                  <li><Link to="/category/programadores">Programadores</Link></li>
-                  <li><Link to="/category/jaimito">Jaimito</Link></li>
-                  <li><Link to="/category/memes">Memes</Link></li>
-                  <li><Link to="/category/videos">Videos</Link></li>
-                  <li><Link to="/category/absurdo">Humor absurdo</Link></li>
+                  {categories.slice(0, 6).map((cat) => (
+                    <li key={cat._id}>
+                      <Link to={`/category/${cat._id}`}>{cat.name}</Link>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>

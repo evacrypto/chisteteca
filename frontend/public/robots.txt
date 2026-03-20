@@ -6,7 +6,6 @@ Disallow: /register
 Disallow: /reset-password
 Disallow: /admin
 Disallow: /create
-Disallow: /settings
 Disallow: /api/
 
 Sitemap: https://chisteteca.es/sitemap.xml
