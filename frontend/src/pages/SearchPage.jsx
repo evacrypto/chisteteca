@@ -113,6 +113,7 @@ const SearchPage = () => {
                     contentIds={content.map(c => c._id)}
                     currentIndex={idx}
                     returnPath="/search"
+                    compact
                   />
                 </Col>
               ))}

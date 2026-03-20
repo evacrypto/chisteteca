@@ -9,7 +9,7 @@ import Hero4 from '../components/Hero4';
 import { contentAPI } from '../services/api';
 import './HomePage.css';
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 30;
 
 const HomePage = () => {
   const { id: categoryId } = useParams();
@@ -40,9 +40,9 @@ const HomePage = () => {
     if (replace) setLoading(true);
     else setLoadingMore(true);
     try {
-      // Populares: 20 fijos, sin paginación. Inicio/categorías: 15 por página.
+      // Populares: 30 fijos, sin paginación. Inicio/categorías: 30 por página.
       const contentRes = isPopularPage
-        ? await contentAPI.getPopular({ limit: 20 })
+        ? await contentAPI.getPopular({ limit: 30 })
         : await contentAPI.getAll({
             limit: PAGE_SIZE,
             page: pageNum,
@@ -54,7 +54,7 @@ const HomePage = () => {
       setContent(prev => replace ? newData : [...prev, ...newData]);
       setPage(pageNum);
       pageRef.current = pageNum;
-      // Populares: sin "Cargar más" (solo 20). Inicio/categorías: paginación normal.
+      // Populares: sin "Cargar más" (solo 30). Inicio/categorías: paginación normal.
       const moreFromPagination = !isPopularPage && pagination && pageNum < pagination.pages;
       const moreFromFullPage = !isPopularPage && newData.length >= PAGE_SIZE;
       setHasMore(newData.length > 0 && (moreFromPagination || moreFromFullPage));
@@ -78,7 +78,7 @@ const HomePage = () => {
       return (
         <>
           <i className="icon-fire text-warning me-2" aria-hidden="true"></i>
-          Los 20 chistes más populares de esta semana
+          Los 30 chistes más populares de esta semana
         </>
       );
     }
@@ -143,6 +143,7 @@ const HomePage = () => {
                     contentIds={content.map(c => c._id)}
                     currentIndex={idx}
                     returnPath={location.pathname}
+                    compact
                   />
                 </Col>
               ))}

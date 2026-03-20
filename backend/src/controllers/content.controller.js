@@ -348,7 +348,7 @@ export const deleteContent = async (req, res) => {
 // @desc    Get trending content
 // @route   GET /api/content/trending
 // @access  Public
-const POPULAR_LIMIT = 20;
+const POPULAR_LIMIT = 30;
 
 export const getTrendingContent = async (req, res) => {
   try {

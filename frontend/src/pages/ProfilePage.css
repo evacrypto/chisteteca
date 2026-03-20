@@ -172,15 +172,42 @@
 /* Profile Stats */
 .profile-stats {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.profile-stats .stat-item {
+  flex: 1;
+  min-width: 90px;
+}
+
+/* Desktop: own profile - cards same line, equal width, no overflow */
+@media (min-width: 768px) {
+  .profile-stats--own {
+    flex-wrap: nowrap;
+  }
+
+  .profile-stats--own .stat-item {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .profile-stats--own .stat-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .stat-item {
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 15px;
+  gap: 10px;
+  padding: 12px 16px;
   background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(253, 126, 20, 0.1));
   border-radius: 12px;
   border: 1px solid rgba(255, 193, 7, 0.2);
@@ -188,7 +215,7 @@
 }
 
 .stat-item:hover {
-  transform: translateX(5px);
+  transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2);
 }
 
@@ -327,7 +354,51 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive */
+/* Responsive - when header becomes mobile (991px) */
+@media (max-width: 991px) {
+  .profile-header-card .card-body .row {
+    flex-direction: column;
+  }
+
+  .profile-header-card .card-body .row > [class*="col-"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .profile-info {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    box-sizing: border-box;
+  }
+
+  .profile-username,
+  .profile-bio {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .profile-stats {
+    margin-top: 20px;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .profile-stats .stat-item {
+    flex: none;
+    width: 100%;
+    min-width: unset;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .profile-stats--own .stat-item {
+    min-width: unset;
+  }
+}
+
 @media (max-width: 767px) {
   .profile-header-card .card-body {
     padding: 25px;
@@ -344,6 +415,13 @@
 
   .profile-stats {
     margin-top: 20px;
+    flex-direction: column;
+  }
+
+  .profile-stats .stat-item {
+    flex: none;
+    width: 100%;
+    min-width: unset;
   }
 
   .stat-item {

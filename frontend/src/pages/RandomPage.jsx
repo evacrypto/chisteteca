@@ -6,7 +6,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { contentAPI } from '../services/api';
 import { toast } from 'react-toastify';
 
-const RANDOM_BATCH = 15;
+const RANDOM_BATCH = 30;
 
 const RandomPage = () => {
   const [content, setContent] = useState([]);
@@ -70,6 +70,7 @@ const RandomPage = () => {
                   contentIds={content.map(c => c._id)}
                   currentIndex={idx}
                   returnPath="/random"
+                  compact
                 />
               </Col>
             ))}

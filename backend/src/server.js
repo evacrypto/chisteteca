@@ -17,6 +17,7 @@ import contentRoutes from './routes/content.routes.js';
 import categoryRoutes from './routes/category.routes.js';
 import interactionRoutes from './routes/interaction.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import { serveOgHtml } from './controllers/og.controller.js';
 
 dotenv.config();
 
@@ -55,6 +56,9 @@ const uploadsDir = path.join(process.cwd(), 'uploads');
 
 // Static files for uploads
 app.use('/uploads', express.static('uploads'));
+
+// OG meta endpoint for social crawlers (Facebook, X, etc.) - must be before /api
+app.get('/o/:id', serveOgHtml);
 
 // Routes
 app.use('/api/auth', authRoutes);

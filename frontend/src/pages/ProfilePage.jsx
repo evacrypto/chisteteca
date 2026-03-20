@@ -202,7 +202,7 @@ const ProfilePage = () => {
                   <small className="text-muted d-block mt-2">Click para cambiar avatar</small>
                 )}
               </Col>
-              <Col xs={12} md={6}>
+              <Col xs={12} md={4}>
                 <div className="profile-info">
                   {isEditing ? (
                     <div className="edit-form">
@@ -255,18 +255,20 @@ const ProfilePage = () => {
                   )}
                 </div>
               </Col>
-              <Col xs={12} md={3}>
-                <div className="profile-stats">
+              <Col xs={12} md={5}>
+                <div className={`profile-stats ${isOwnProfile ? 'profile-stats--own' : ''}`}>
                   <div className="stat-item">
                     <i className="stat-icon icon-file-alt" aria-hidden="true"></i>
                     <span className="stat-number">{publishedContent.length}</span>
                     <span className="stat-label">Publicados</span>
                   </div>
-                  <div className="stat-item">
-                    <i className="stat-icon icon-clock" aria-hidden="true"></i>
-                    <span className="stat-number">{pendingContent.length}</span>
-                    <span className="stat-label">Pendientes</span>
-                  </div>
+                  {isOwnProfile && (
+                    <div className="stat-item">
+                      <i className="stat-icon icon-clock" aria-hidden="true"></i>
+                      <span className="stat-number">{pendingContent.length}</span>
+                      <span className="stat-label">Pendientes</span>
+                    </div>
+                  )}
                   <div className="stat-item">
                     <i className="stat-icon icon-heart" aria-hidden="true"></i>
                     <span className="stat-number">{profileUser?.stats?.totalLikes || 0}</span>

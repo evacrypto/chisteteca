@@ -7,7 +7,7 @@ import './ContentCard.css';
 
 const CHISTE_GRADIENT_COUNT = 8;
 
-const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = false, contentIds, currentIndex, returnPath }) => {
+const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = false, contentIds, currentIndex, returnPath, compact = false }) => {
   const { isAuthenticated, user } = useAuthStore();
   const currentUserId = user?._id || user?.id;
   const authorId = content.author?._id || null;
@@ -102,7 +102,6 @@ const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = fa
           <div className={`card-chiste-preview ${getChisteGradientClass()}`}>
             <p>
               {truncated}{hasMore && '...'}
-              {hasMore && <span className="card-chiste-cta">CLICK PARA VERLO</span>}
             </p>
           </div>
         );
@@ -137,7 +136,7 @@ const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = fa
   };
 
   return (
-    <article className="chisteteca-card">
+    <article className={`chisteteca-card ${compact ? 'chisteteca-card--compact' : ''}`}>
       <div className="card-inner">
 
         {/* Imagen/Contenido */}
@@ -151,7 +150,8 @@ const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = fa
           </Link>
         </div>
 
-        {/* Descripción */}
+        {/* Descripción - oculta en modo compact */}
+        {!compact && (
         <div className="card-desc">
           {/* Autor */}
           <div className="card-author">
@@ -232,6 +232,7 @@ const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = fa
             </button>
           </div>
         </div>
+        )}
 
       </div>
     </article>

@@ -4,6 +4,12 @@ import { toast } from 'react-toastify';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_BASE = API_URL.replace(/\/api\/?$/, '') || 'http://localhost:5000';
 
+/** URL para compartir en redes sociales. Usa el endpoint /o/:id del backend que devuelve HTML con meta OG para crawlers (Facebook, X). */
+export const getShareUrl = (contentId) => {
+  const base = API_URL.replace(/\/api\/?$/, '') || 'http://localhost:5000';
+  return `${base.replace(/\/$/, '')}/o/${contentId}`;
+};
+
 /** Convierte rutas de uploads a URL válida. En dev usa ruta relativa (proxy Vite). En prod usa URL completa del backend. */
 export const getUploadUrl = (path) => {
   if (!path) return null;

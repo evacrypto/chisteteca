@@ -101,6 +101,69 @@
   margin-bottom: 30px;
 }
 
+/* Diseño tipo ficha (card) */
+.detail-article--card-style {
+  padding: 0;
+  overflow: hidden;
+}
+
+.detail-article--card-style .detail-content-block {
+  padding: 20px 20px 0;
+}
+
+.detail-article--card-style .card-desc {
+  padding: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.detail-author-categories-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.detail-author-categories-row .card-author {
+  margin-bottom: 0;
+}
+
+.detail-author-categories-row .card-categories {
+  margin-bottom: 0;
+  justify-content: flex-end;
+}
+
+.detail-article--card-style .card-actions {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e9ecef;
+}
+
+.detail-article--card-style .actions-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-article--card-style .views-badge.action-btn {
+  cursor: default;
+}
+
+.detail-article--card-style .views-badge.action-btn:hover {
+  transform: none;
+}
+
+.detail-article--card-style .action-btn.favorite-btn {
+  margin-left: 0;
+}
+
+.detail-article--card-style .article-description {
+  padding: 20px;
+  margin: 0;
+  border-top: 1px solid #e9ecef;
+}
+
 /* Article Header */
 .article-header {
   margin-bottom: 30px;
@@ -427,6 +490,21 @@
   gap: 24px;
 }
 
+/* Related in sidebar - single column */
+.related-grid--sidebar {
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.related-sidebar h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #ffc107;
+}
+
 @media (max-width: 991px) {
   .related-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -528,6 +606,10 @@
 
 .related-grid .card-image-wrapper {
   aspect-ratio: 16/10;
+}
+
+.related-grid .card-image-wrapper--chiste {
+  aspect-ratio: 1.6/1;
 }
 
 /* ============================================
@@ -760,6 +842,37 @@
   color: #ffc107;
 }
 
+/* Share Box - between joke and comments */
+.share-box {
+  padding: 20px;
+  margin-bottom: 30px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.share-box-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #ffc107;
+}
+
+.share-box-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.share-box-buttons .share-btn {
+  flex: 1;
+  min-width: 120px;
+}
+
 /* Share Buttons */
 .share-buttons {
   display: flex;
@@ -778,6 +891,7 @@
   color: #fff;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
   transition: all 0.3s ease;
 }
 
@@ -790,8 +904,15 @@
   background: #1877f2;
 }
 
-.share-btn.twitter {
-  background: #1da1f2;
+.share-btn.twitter,
+.share-btn.x-share {
+  background: #000;
+}
+
+.share-btn.x-share .x-logo {
+  font-weight: 800;
+  font-size: 1.1em;
+  letter-spacing: -0.05em;
 }
 
 .share-btn.whatsapp {
@@ -825,11 +946,46 @@
   }
 }
 
+/* Desktop: slightly reduced distance below color box */
+@media (min-width: 992px) {
+  .content-chiste {
+    margin-bottom: 20px;
+  }
+}
+
+/* Tablet: reduced spacing (between mobile and desktop) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .detail-article--card-style .detail-content-block {
+    padding: 8px 8px 0;
+  }
+
+  .detail-article--card-style .card-desc {
+    padding: 8px;
+  }
+
+  .content-chiste {
+    margin-bottom: 36px;
+  }
+
+  .detail-article--card-style .card-actions {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+}
+
 @media (max-width: 767px) {
   .detail-article,
   .author-info-card,
   .comments-section {
     padding: 20px;
+  }
+
+  .detail-article--card-style .detail-content-block {
+    padding: 8px 8px 0;
+  }
+
+  .detail-article--card-style .card-desc {
+    padding: 8px;
   }
 
   .article-title {
@@ -858,6 +1014,12 @@
 
   .content-chiste {
     padding: 30px;
+    margin-bottom: 24px;
+  }
+
+  .detail-article--card-style .card-actions {
+    margin-top: 8px;
+    padding-top: 8px;
   }
 
   .content-chiste p {

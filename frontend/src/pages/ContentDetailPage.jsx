@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { toast } from 'react-toastify';
-import { contentAPI, interactionsAPI, getUploadUrl } from '../services/api';
+import { contentAPI, interactionsAPI, usersAPI, getUploadUrl, getShareUrl } from '../services/api';
 import useAuthStore from '../store/authStore';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ContentCard from '../components/ContentCard';
@@ -22,6 +23,7 @@ const ContentDetailPage = () => {
   const [commentText, setCommentText] = useState('');
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [submittingComment, setSubmittingComment] = useState(false);
 
   const currentUserId = user?._id || user?.id;
@@ -77,13 +79,24 @@ const ContentDetailPage = () => {
       setIsLiked(liked || false);
       setLikesCount(contentRes.data.data.likes?.length || 0);
 
-      // Get related content (same category)
+      if (isAuthenticated) {
+        try {
+          const favRes = await usersAPI.getFavorites();
+          const favIds = (favRes.data.data || []).map(f => String(f._id || f));
+          setIsFavorite(favIds.includes(String(id)));
+        } catch {
+          setIsFavorite(false);
+        }
+      } else {
+        setIsFavorite(false);
+      }
+
       if (contentRes.data.data.categories?.length > 0) {
         const relatedRes = await contentAPI.getAll({
           category: contentRes.data.data.categories[0]._id,
-          limit: 4
+          limit: 7
         });
-        setRelated(relatedRes.data.data.filter(c => c._id !== id).slice(0, 3));
+        setRelated(relatedRes.data.data.filter(c => c._id !== id).slice(0, 6));
       }
     } catch (error) {
       toast.error('Error loading content');
@@ -108,24 +121,28 @@ const ContentDetailPage = () => {
     }
   };
 
-  const handleShare = async () => {
+  const handleToggleFavorite = async () => {
+    if (!isAuthenticated) {
+      toast.info('Inicia sesión para guardar favoritos');
+      return;
+    }
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: content.text?.substring(0, 50) || 'Chiste',
-          text: content.text?.substring(0, 100),
-          url: window.location.href
-        });
+      if (isFavorite) {
+        await usersAPI.removeFromFavorites(id);
+        setIsFavorite(false);
+        toast.success('Eliminado de favoritos');
       } else {
-        await navigator.clipboard.writeText(window.location.href);
-        toast.success('Enlace copiado al portapapeles');
+        await usersAPI.addToFavorites(id);
+        setIsFavorite(true);
+        toast.success('Guardado en favoritos');
       }
     } catch (error) {
-      if (error.name !== 'AbortError') {
-        toast.error('Error al compartir');
-      }
+      toast.error(error.response?.data?.message || 'Error al guardar favorito');
     }
   };
+
+  const shareUrl = id ? getShareUrl(id) : window.location.href;
+  const shareText = content?.text?.substring(0, 100) || 'Chiste';
 
   const handleComment = async (e) => {
     e.preventDefault();
@@ -177,14 +194,14 @@ const ContentDetailPage = () => {
       case 'image':
         return (
           <div className="content-image-wrapper">
-            <img src={content.mediaUrl} alt={content.text?.substring(0, 50) || 'Imagen'} className="content-image" />
+            <img src={getUploadUrl(content.mediaUrl) || content.mediaUrl} alt={content.text?.substring(0, 50) || 'Imagen'} className="content-image" />
           </div>
         );
       
       case 'video':
         return (
           <div className="content-video-wrapper">
-            <video src={content.mediaUrl} controls className="content-video" />
+            <video src={getUploadUrl(content.mediaUrl) || content.mediaUrl} controls className="content-video" />
           </div>
         );
       
@@ -208,8 +225,28 @@ const ContentDetailPage = () => {
     );
   }
 
+  const ogTitle = content?.text ? `${content.text.substring(0, 60)}${content.text.length > 60 ? '...' : ''}` : 'Chiste - Chisteteca';
+  const ogDescription = content?.text?.substring(0, 160) || 'Descubre este chiste en Chisteteca';
+  const rawImage = content?.mediaUrl ? getUploadUrl(content.mediaUrl) : '/logo_chisteteca.png';
+  const ogImage = rawImage?.startsWith('http') ? rawImage : `${window.location.origin}${rawImage || '/logo_chisteteca.png'}`;
+  const ogUrl = window.location.href;
+
   return (
     <section className="content-detail-page">
+      <Helmet>
+        <title>{ogTitle} | Chisteteca</title>
+        <meta name="description" content={ogDescription} />
+        <meta property="og:title" content={ogTitle} />
+        <meta property="og:description" content={ogDescription} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:url" content={ogUrl} />
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="Chisteteca" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={ogTitle} />
+        <meta name="twitter:description" content={ogDescription} />
+        <meta name="twitter:image" content={ogImage} />
+      </Helmet>
       <div className="container">
         
         {/* Navigation: Anterior | Volver | Siguiente */}
@@ -261,35 +298,22 @@ const ContentDetailPage = () => {
           {/* Main Content */}
           <div className="col-lg-9">
             
-            <article className="detail-article">
+            <article className="detail-article detail-article--card-style">
               
-              {/* Header */}
-              <header className="article-header">
-                {content.categories?.length > 0 && (
-                  <div className="article-categories">
-                    {content.categories.map((cat, idx) => (
-                      <Link 
-                        key={idx} 
-                        to={`/category/${cat._id}`}
-                        className="category-badge"
-                        style={{ 
-                          '--cat-color': cat.color,
-                          backgroundColor: cat.color,
-                          color: '#fff'
-                        }}
-                      >
-                        {cat.emoji} {cat.name}
-                      </Link>
-                    ))}
+              {/* Contenido (caja de color / imagen / vídeo) */}
+              <div className="detail-content-block">
+                {renderContent()}
+                {content.description && (
+                  <div className="article-description">
+                    <p>{content.description}</p>
                   </div>
                 )}
-                
-                {content.type !== 'chiste' && (content.title || content.text) && (
-                  <h1 className="article-title">{content.title || content.text}</h1>
-                )}
-                
-                <div className="article-meta">
-                  <div className="meta-author">
+              </div>
+
+              {/* Autor, categorías y acciones (diseño tipo ficha) */}
+              <div className="card-desc">
+                <div className="detail-author-categories-row">
+                  <div className="card-author">
                     <span className="author-avatar-wrap">
                       <img src={authorAvatar} alt={authorName} className="author-avatar" />
                     </span>
@@ -301,47 +325,100 @@ const ContentDetailPage = () => {
                       <span className="author-name">{authorName}</span>
                     )}
                   </div>
-                  
-                  <div className="meta-info">
-                    <span><i className="icon-calendar me-1" aria-hidden="true"></i> {new Date(content.createdAt).toLocaleDateString('es-ES', { dateStyle: 'short' })}</span>
-                    <span><i className="icon-comment me-1" aria-hidden="true"></i> {comments.length} comentarios</span>
-                  </div>
-                </div>
-              </header>
 
-              {/* Content */}
-              <div className="article-content">
-                {renderContent()}
-                
-                {content.description && (
-                  <div className="article-description">
-                    <p>{content.description}</p>
+                  {content.categories?.length > 0 && (
+                    <div className="card-categories">
+                    {content.categories.slice(0, 3).map((cat, idx) => (
+                      <Link 
+                        key={idx} 
+                        to={`/category/${cat._id}`}
+                        className="category-tag"
+                        style={{ 
+                          '--cat-color': cat.color,
+                          backgroundColor: (cat.color || '#6c757d') + '20',
+                          color: cat.color || '#6c757d',
+                          borderColor: (cat.color || '#6c757d') + '40'
+                        }}
+                      >
+                        {cat.emoji} {cat.name}
+                      </Link>
+                    ))}
                   </div>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="article-actions">
-                <div className="actions-left">
-                  <button 
-                    className={`action-btn like-btn ${isLiked ? 'liked' : ''}`}
-                    onClick={handleLike}
-                  >
-                    <i className={isLiked ? 'icon-heart' : 'icon-heart-empty'} aria-hidden="true"></i>
-                    <span>{likesCount} Risas</span>
-                  </button>
-                  
-                  <button className="action-btn" onClick={handleShare}>
-                    <i className="icon-share-alt" aria-hidden="true"></i> Compartir
-                  </button>
+                  )}
                 </div>
-                
-                <div className="views-count">
-                  👁️ {content.views || 0} vistas
+
+                <div className="card-actions">
+                  <div className="actions-left">
+                    <button 
+                      className={`action-btn like-btn ${isLiked ? 'liked' : ''}`}
+                      onClick={handleLike}
+                      title="Dar risa"
+                    >
+                      <i className={isLiked ? 'icon-heart' : 'icon-heart-empty'} aria-hidden="true"></i>
+                      <span>{likesCount}</span>
+                    </button>
+                    
+                    <a 
+                      href="#comments" 
+                      className="action-btn"
+                      title="Comentarios"
+                    >
+                      <i className="icon-comment" aria-hidden="true"></i>
+                      <span>{comments.length}</span>
+                    </a>
+                  </div>
+                  
+                  <div className="actions-right">
+                    <span className="views-badge action-btn" title="Visualizaciones">
+                      <i className="icon-line-eye" aria-hidden="true"></i>
+                      <span>{content.views || 0}</span>
+                    </span>
+                    <button 
+                      className={`action-btn favorite-btn ${isFavorite ? 'active' : ''}`}
+                      onClick={handleToggleFavorite}
+                      title="Guardar en favoritos"
+                    >
+                      <i className={isFavorite ? 'icon-bookmark' : 'icon-bookmark-empty'} aria-hidden="true"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
 
             </article>
+
+            {/* Share box - between joke and comments */}
+            <div className="share-box">
+              <h4 className="share-box-title">Compartir</h4>
+              <div className="share-box-buttons">
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="share-btn facebook"
+                title="Compartir en Facebook"
+              >
+                <i className="icon-facebook" aria-hidden="true"></i> Facebook
+              </a>
+              <a
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="share-btn x-share"
+                title="Compartir en X"
+              >
+                <span className="x-logo" aria-hidden="true">X</span>
+              </a>
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="share-btn whatsapp"
+                title="Compartir en WhatsApp"
+              >
+                <i className="icon-share-alt" aria-hidden="true"></i> WhatsApp
+              </a>
+              </div>
+            </div>
 
             {/* Comments - right after the joke (author already shown in header) */}
             <div id="comments" className="comments-section">
@@ -410,61 +487,21 @@ const ContentDetailPage = () => {
               )}
             </div>
 
-            {/* Related Content */}
-            {related.length > 0 && (
-              <div className="related-section">
-                <h3>Contenido Relacionado</h3>
-                <div className="related-grid">
+          </div>
+
+          {/* Sidebar - Related Content */}
+          {related.length > 0 && (
+            <aside className="col-lg-3 sidebar">
+              <div className="sidebar-widget related-sidebar">
+                <h4>Contenido Relacionado</h4>
+                <div className="related-grid related-grid--sidebar">
                   {related.map((item) => (
-                    <ContentCard key={item._id} content={item} />
+                    <ContentCard key={item._id} content={item} compact />
                   ))}
                 </div>
               </div>
-            )}
-
-          </div>
-
-          {/* Sidebar */}
-          <aside className="col-lg-3 sidebar">
-            
-            {/* Quick Stats */}
-            <div className="sidebar-widget">
-              <div className="stats-grid">
-                <div className="stat-item" aria-label="Vistas" title="Vistas">
-                  <i className="stat-icon icon-line-eye" aria-hidden="true"></i>
-                  <span className="stat-value">{content.views || 0}</span>
-                </div>
-                <div className="stat-item" aria-label="Risas" title="Risas">
-                  <i className="stat-icon icon-line-heart" aria-hidden="true"></i>
-                  <span className="stat-value">{likesCount}</span>
-                </div>
-                <div className="stat-item" aria-label="Comentarios" title="Comentarios">
-                  <i className="stat-icon icon-comment" aria-hidden="true"></i>
-                  <span className="stat-value">{comments.length}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Share Widget */}
-            <div className="sidebar-widget">
-              <h4>Compartir</h4>
-              <div className="share-buttons">
-                <button className="share-btn facebook" onClick={handleShare}>
-                  <i className="icon-share-alt" aria-hidden="true"></i> Facebook
-                </button>
-                <button className="share-btn twitter" onClick={handleShare}>
-                  <i className="icon-share-alt" aria-hidden="true"></i> Twitter
-                </button>
-                <button className="share-btn whatsapp" onClick={handleShare}>
-                  <i className="icon-share-alt" aria-hidden="true"></i> WhatsApp
-                </button>
-                <button className="share-btn copy" onClick={handleShare}>
-                  <i className="icon-share-alt" aria-hidden="true"></i> Copiar enlace
-                </button>
-              </div>
-            </div>
-
-          </aside>
+            </aside>
+          )}
 
         </div>
       </div>

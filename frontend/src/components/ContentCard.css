@@ -20,6 +20,11 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
+/* Modo compact: solo caja de contenido, sin autor/categorías/acciones */
+.chisteteca-card--compact .card-image-wrapper {
+  border-radius: 12px;
+}
+
 .card-inner {
   display: flex;
   flex-direction: column;
@@ -37,7 +42,7 @@
 }
 
 .card-image-wrapper--chiste {
-  aspect-ratio: 2/1;
+  aspect-ratio: 3/1;
 }
 
 .card-link {
@@ -374,7 +379,7 @@
   }
 
   .card-image-wrapper--chiste {
-    aspect-ratio: 2/1;
+    aspect-ratio: 3/1;
   }
 
   .card-desc {
