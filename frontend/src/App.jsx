@@ -52,7 +52,7 @@ const ProfileMeRedirect = () => {
 
 function App() {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ScrollToTop />
       <div className="min-vh-100 d-flex flex-column">
         <Navbar />

@@ -345,12 +345,18 @@
 }
 
 @media (max-width: 767px) {
+  .chisteteca-header .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
   .header-row {
     height: 70px;
+    gap: 12px;
   }
 
   .logo-image {
-    height: 65px;
+    height: 60px;
   }
 
   .logo-text {
@@ -365,8 +371,19 @@
     display: none;
   }
 
+  .header-misc {
+    gap: 6px;
+  }
+
   .user-dropdown {
-    padding: 6px;
+    padding: 4px 6px;
+  }
+
+  .user-avatar-wrap {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
   }
 
   .user-avatar {
