@@ -1,6 +1,9 @@
+import fs from 'fs';
+import path from 'path';
 import User from '../models/User.model.js';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
+import { uploadToR2, isR2Configured } from '../services/storage.service.js';
 
 // @desc    Get user profile
 // @route   GET /api/users/:id
@@ -104,7 +107,21 @@ export const updateAvatar = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
     }
 
-    user.avatar = `/uploads/avatars/${req.file.filename}`;
+    let avatarUrl;
+
+    if (isR2Configured()) {
+      const ext = path.extname(req.file.originalname) || '.jpg';
+      const key = `avatars/avatar-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+      avatarUrl = await uploadToR2(req.file.buffer, key, req.file.mimetype);
+    } else {
+      const uploadsDir = path.join(process.cwd(), 'uploads', 'avatars');
+      const filename = `avatar-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(req.file.originalname) || '.jpg'}`;
+      const filepath = path.join(uploadsDir, filename);
+      fs.writeFileSync(filepath, req.file.buffer);
+      avatarUrl = `/uploads/avatars/${filename}`;
+    }
+
+    user.avatar = avatarUrl;
     await user.save();
 
     res.json({

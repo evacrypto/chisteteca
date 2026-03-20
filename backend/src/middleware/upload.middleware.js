@@ -50,9 +50,12 @@ const fileFilter = (req, file, cb) => {
   cb(new Error('Invalid file type. Only JPEG, PNG, GIF, WebP images and MP4 videos are allowed.'));
 };
 
+// Memory storage para avatar (permite subir a R2 o guardar en disco)
+const memoryStorage = multer.memoryStorage();
+
 // Upload middleware configurations
 export const uploadAvatar = multer({
-  storage,
+  storage: memoryStorage,
   fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB
