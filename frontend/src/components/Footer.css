@@ -89,16 +89,16 @@
 }
 
 .subscribe-legal {
-  color: rgba(255, 255, 255, 0.8);
+  color: #666;
 }
 
 .subscribe-legal a {
-  color: #ffc107;
+  color: #b8860b;
   text-decoration: underline;
 }
 
 .subscribe-legal a:hover {
-  color: #ffc107;
+  color: #e0a800;
   text-decoration: none;
 }
 
@@ -252,6 +252,16 @@
   color: #ffc107;
   margin-top: 3px;
   flex-shrink: 0;
+}
+
+.infinity-icon {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.footer-contact .contact-text {
+  margin-top: 6px;
 }
 
 .contact-link {

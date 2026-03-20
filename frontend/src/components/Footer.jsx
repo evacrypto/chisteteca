@@ -121,23 +121,23 @@ const Footer = () => {
                 <ul className="list-unstyled footer-contact mb-0">
                   <li>
                     <i className="contact-icon icon-map-marker-alt" aria-hidden="true"></i>
-                    <span>Internet, Mundo Digital</span>
+                    <span className="contact-text">Internet, Mundo Digital</span>
                   </li>
                   <li>
-                    <a href="mailto:hola@chisteteca.com" className="contact-link">
+                    <a href="mailto:info@chisteteca.es" className="contact-link">
                       <i className="contact-icon icon-envelope" aria-hidden="true"></i>
-                      hola@chisteteca.com
+                      info@chisteteca.es
                     </a>
                   </li>
                   <li>
-                    <a href="mailto:soporte@chisteteca.com" className="contact-link">
-                      <i className="contact-icon icon-envelope" aria-hidden="true"></i>
-                      soporte@chisteteca.com
-                    </a>
+                    <span className="contact-link">
+                      <span className="contact-icon infinity-icon" aria-hidden="true">∞</span>
+                      Risas
+                    </span>
                   </li>
                   <li>
                     <i className="contact-icon icon-clock" aria-hidden="true"></i>
-                    <span>Risas disponibles 24/7</span>
+                    <span className="contact-text">Diversión 24/7</span>
                   </li>
                 </ul>
               </div>
