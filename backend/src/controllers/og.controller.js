@@ -36,8 +36,9 @@ export const serveOgHtml = async (req, res) => {
     }
 
     const backendBase = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
-    const frontendBase = (process.env.FRONTEND_URL || 'http://localhost:3000').split(',')[0].trim();
-    const canonicalUrl = `${frontendBase.replace(/\/$/, '')}/content/${id}`;
+    // CANONICAL_URL: dominio público para compartir (ej. https://chisteteca.es). Si no está, usa el primero de FRONTEND_URL.
+    const canonicalBase = (process.env.CANONICAL_URL || process.env.FRONTEND_URL || 'http://localhost:3000').split(',')[0].trim();
+    const canonicalUrl = `${canonicalBase.replace(/\/$/, '')}/content/${id}`;
 
     const ogTitle = content.text
       ? escapeHtml(content.text.substring(0, 60) + (content.text.length > 60 ? '...' : ''))
@@ -47,7 +48,7 @@ export const serveOgHtml = async (req, res) => {
     );
     const rawImage = content.mediaUrl
       ? (content.mediaUrl.startsWith('http') ? content.mediaUrl : `${backendBase}${content.mediaUrl.startsWith('/') ? '' : '/'}${content.mediaUrl}`)
-      : `${frontendBase.replace(/\/$/, '')}/logo_chisteteca.png`;
+      : `${canonicalBase.replace(/\/$/, '')}/logo_chisteteca.png`;
     const ogImage = rawImage;
 
     const html = `<!DOCTYPE html>
