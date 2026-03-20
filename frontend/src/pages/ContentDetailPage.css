@@ -919,8 +919,26 @@
   background: #25d366;
 }
 
+.share-btn.whatsapp .whatsapp-logo {
+  width: 1.2em;
+  height: 1.2em;
+  flex-shrink: 0;
+}
+
 .share-btn.copy {
   background: #6c757d;
+}
+
+/* Móvil: solo iconos en botones de compartir */
+@media (max-width: 767px) {
+  .share-btn .share-btn-text {
+    display: none;
+  }
+
+  .share-btn {
+    min-width: auto;
+    padding: 12px 16px;
+  }
 }
 
 /* ============================================
