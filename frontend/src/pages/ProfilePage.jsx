@@ -223,9 +223,9 @@ const ProfilePage = () => {
                           rows={3}
                           value={editData.bio}
                           onChange={(e) => setEditData({ ...editData, bio: e.target.value })}
-                          maxLength={500}
+                          maxLength={150}
                         />
-                        <small className="text-muted">{editData.bio?.length || 0}/500</small>
+                        <small className="text-muted">{editData.bio?.length || 0}/150</small>
                       </div>
                       <div className="d-flex gap-2">
                         <button className="btn btn-success btn-sm" onClick={handleSaveProfile}>

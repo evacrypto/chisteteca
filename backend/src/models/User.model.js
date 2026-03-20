@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
   },
   bio: {
     type: String,
-    maxlength: 500
+    maxlength: 150
   },
   role: {
     type: String,
