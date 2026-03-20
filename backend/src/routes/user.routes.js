@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import { 
   getAllUsers, 
   getUserProfile, 
@@ -18,13 +19,25 @@ import { uploadAvatar } from '../middleware/upload.middleware.js';
 
 const router = express.Router();
 
+const handleAvatarUploadError = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ success: false, message: 'La imagen debe pesar menos de 5MB' });
+    }
+  }
+  if (err) {
+    return res.status(400).json({ success: false, message: err.message || 'Error al subir la imagen' });
+  }
+  next();
+};
+
 router.get('/', protect, admin, getAllUsers);
 router.get('/me', protect, getUserProfile);
 router.get('/favorites', protect, getFavorites);
 router.get('/notifications', protect, getNotifications);
 
 router.put('/profile', protect, updateProfile);
-router.put('/avatar', protect, uploadAvatar.single('avatar'), updateAvatar);
+router.put('/avatar', protect, uploadAvatar.single('avatar'), handleAvatarUploadError, updateAvatar);
 
 router.put('/notifications/:id/read', protect, markNotificationRead);
 

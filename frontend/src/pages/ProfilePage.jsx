@@ -146,7 +146,8 @@ const ProfilePage = () => {
       toast.success('Avatar actualizado');
       setShowAvatarModal(false);
     } catch (error) {
-      toast.error('Error al actualizar avatar');
+      const msg = error.response?.data?.message || error.response?.data?.error || 'Error al actualizar avatar';
+      toast.error(msg);
     } finally {
       setUploadingAvatar(false);
     }

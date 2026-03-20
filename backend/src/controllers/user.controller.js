@@ -90,13 +90,20 @@ export const updateProfile = async (req, res) => {
 // @desc    Update user avatar
 // @route   PUT /api/users/avatar
 // @access  Private
-export const updateAvatar = async (req, res) => {
+export const updateAvatar = async (req, res, next) => {
   try {
+    if (req.fileValidationError) {
+      return res.status(400).json({ success: false, message: req.fileValidationError });
+    }
     if (!req.file) {
-      return res.status(400).json({ success: false, message: 'No file uploaded' });
+      return res.status(400).json({ success: false, message: 'No se ha seleccionado ninguna imagen' });
     }
 
     const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+    }
+
     user.avatar = `/uploads/avatars/${req.file.filename}`;
     await user.save();
 
@@ -106,7 +113,7 @@ export const updateAvatar = async (req, res) => {
     });
   } catch (error) {
     console.error('Update avatar error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message || 'Error al subir avatar' });
   }
 };
 

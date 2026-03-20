@@ -30,14 +30,15 @@ const storage = multer.diskStorage({
 
 // File filter
 const fileFilter = (req, file, cb) => {
-  const allowedImages = /jpeg|jpg|png|gif/;
+  const allowedImages = /jpeg|jpg|png|gif|webp/;
   const allowedVideos = /mp4/;
   
   const mimetype = file.mimetype;
-  const extname = allowedImages.test(path.extname(file.originalname).toLowerCase());
+  const ext = path.extname(file.originalname).toLowerCase().replace(/^\./, '');
+  const extOk = allowedImages.test(ext) || (ext === '' && mimetype.startsWith('image/'));
   
   if (file.fieldname === 'avatar' || (file.fieldname === 'media' && mimetype.startsWith('image/'))) {
-    if (allowedImages.test(mimetype) && extname) {
+    if ((allowedImages.test(mimetype) || mimetype === 'image/webp') && extOk) {
       return cb(null, true);
     }
   } else if (file.fieldname === 'media' && mimetype.startsWith('video/')) {
@@ -46,7 +47,7 @@ const fileFilter = (req, file, cb) => {
     }
   }
   
-  cb(new Error('Invalid file type. Only JPEG, PNG, GIF images and MP4 videos are allowed.'));
+  cb(new Error('Invalid file type. Only JPEG, PNG, GIF, WebP images and MP4 videos are allowed.'));
 };
 
 // Upload middleware configurations
