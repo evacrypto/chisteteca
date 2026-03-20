@@ -36,8 +36,10 @@ export const serveOgHtml = async (req, res) => {
     }
 
     const backendBase = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
-    // CANONICAL_URL: dominio público para compartir (ej. https://chisteteca.es). Si no está, usa el primero de FRONTEND_URL.
-    const canonicalBase = (process.env.CANONICAL_URL || process.env.FRONTEND_URL || 'http://localhost:3000').split(',')[0].trim();
+    // CANONICAL_URL: dominio público para compartir. Si no está, preferir dominio custom sobre pages.dev en FRONTEND_URL.
+    const frontendUrls = (process.env.FRONTEND_URL || 'http://localhost:3000').split(',').map((u) => u.trim()).filter(Boolean);
+    const customDomain = frontendUrls.find((u) => !u.includes('pages.dev'));
+    const canonicalBase = (process.env.CANONICAL_URL || customDomain || frontendUrls[0] || 'http://localhost:3000').replace(/\/$/, '');
     const canonicalUrl = `${canonicalBase.replace(/\/$/, '')}/content/${id}`;
 
     const ogTitle = content.text
