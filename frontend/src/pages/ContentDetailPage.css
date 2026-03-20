@@ -958,7 +958,7 @@
    ============================================ */
 @media (max-width: 991px) {
   .content-detail-page {
-    padding: 40px 20px;
+    padding: 40px 0;
   }
 
   .detail-article,
@@ -973,6 +973,14 @@
   .sidebar {
     padding-left: 0;
     margin-top: 30px;
+  }
+}
+
+/* Móvil: más margen arriba para contenido relacionado */
+@media (max-width: 767px) {
+  .sidebar,
+  .related-sidebar {
+    margin-top: 40px;
   }
 }
 
