@@ -976,11 +976,25 @@
   }
 }
 
-/* Móvil: más margen arriba para contenido relacionado */
+/* Móvil: más margen arriba y cajas de chistes menos altas en contenido relacionado */
 @media (max-width: 767px) {
   .sidebar,
   .related-sidebar {
     margin-top: 40px;
+  }
+
+  .related-grid .card-image-wrapper--chiste {
+    aspect-ratio: 3.2/1;
+  }
+
+  .related-grid .card-chiste-preview {
+    padding: 8px 12px;
+  }
+
+  .related-grid .card-chiste-preview p {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    -webkit-line-clamp: 2;
   }
 }
 
