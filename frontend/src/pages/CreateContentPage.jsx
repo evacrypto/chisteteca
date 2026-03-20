@@ -65,6 +65,7 @@ const CreateContentPage = () => {
         ? prev.categories.filter(id => id !== categoryId)
         : [...prev.categories, categoryId]
     }));
+    setCatDropdownOpen(false);
   };
 
   const handleSubmit = async (e) => {
