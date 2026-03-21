@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,6 +9,7 @@ import BackToTop from './components/BackToTop';
 import Footer from './components/Footer';
 import CookieBanner from './components/CookieBanner';
 import { loadGoogleAnalytics } from './utils/googleAnalytics';
+import { hasAcceptedCookies } from './store/cookieConsentStore';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -49,6 +51,12 @@ const ProfileMeRedirect = () => {
 };
 
 function App() {
+  useEffect(() => {
+    if (hasAcceptedCookies()) {
+      loadGoogleAnalytics();
+    }
+  }, []);
+
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ScrollToTop />
