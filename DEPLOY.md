@@ -130,7 +130,7 @@ Una vez tengas la URL final de Cloudflare:
 
 ### Frontend:
 - Abre: `https://chisteteca-frontend.pages.dev`
-- Prueba el login con: `info@chisteteca.es` / `admin123`
+- Prueba el login con: `admin@chisteteca.es` / `admin123`
 
 ---
 
