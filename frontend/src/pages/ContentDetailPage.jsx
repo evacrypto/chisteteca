@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'react-toastify';
@@ -34,6 +35,39 @@ const ContentDetailPage = () => {
   const authorAvatar = getUploadUrl(content?.author?.avatar || content?.authorAvatar) || '/logo_chisteteca.png';
 
   const useAdjacentNav = returnPath === '/' || returnPath === '/random';
+
+  // prevId/nextId para navegación (botones y gestos)
+  const idx = contentIds.indexOf(id);
+  const prevId = contentIds.length > 0 && idx > 0
+    ? contentIds[idx - 1]
+    : (useAdjacentNav ? adjacent?.prev : null);
+  const nextId = contentIds.length > 0 && idx >= 0 && idx < contentIds.length - 1
+    ? contentIds[idx + 1]
+    : (useAdjacentNav ? adjacent?.next : null);
+
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const fn = () => setIsMobile(mq.matches);
+    mq.addEventListener('change', fn);
+    return () => mq.removeEventListener('change', fn);
+  }, []);
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (isMobile && nextId && !loading) {
+        navigate(`/content/${nextId}`, { state: { contentIds, returnPath, navDirection: 'next' } });
+      }
+    },
+    onSwipedRight: () => {
+      if (isMobile && prevId && !loading) {
+        navigate(`/content/${prevId}`, { state: { contentIds, returnPath, navDirection: 'prev' } });
+      }
+    },
+    trackMouse: false,
+    delta: 50,
+    preventScrollOnSwipe: false
+  });
 
   useEffect(() => {
     fetchData();
@@ -275,35 +309,22 @@ const ContentDetailPage = () => {
               <button className="btn-back-top" onClick={() => navigate(returnPath)} title="Volver">
                 <i className="icon-home" aria-hidden="true"></i>
               </button>
-              {(() => {
-                const idx = contentIds.indexOf(id);
-                const prevId = contentIds.length > 0 && idx > 0
-                  ? contentIds[idx - 1]
-                  : (useAdjacentNav ? adjacent?.prev : null);
-                const nextId = contentIds.length > 0 && idx >= 0 && idx < contentIds.length - 1
-                  ? contentIds[idx + 1]
-                  : (useAdjacentNav ? adjacent?.next : null);
-                return (
-                  <>
-                    <button 
-                      className="btn-nav-prev" 
-                      onClick={() => prevId && navigate(`/content/${prevId}`, { state: { contentIds, returnPath, navDirection: 'prev' } })}
-                      disabled={!prevId}
-                      title="Chiste anterior"
-                    >
-                      <i className="icon-arrow-left" aria-hidden="true"></i> Anterior
-                    </button>
-                    <button 
-                      className="btn-nav-next" 
-                      onClick={() => nextId && navigate(`/content/${nextId}`, { state: { contentIds, returnPath, navDirection: 'next' } })}
-                      disabled={!nextId}
-                      title="Siguiente chiste"
-                    >
-                      Siguiente <i className="icon-arrow-left icon-arrow-right" aria-hidden="true"></i>
-                    </button>
-                  </>
-                );
-              })()}
+              <button 
+                className="btn-nav-prev" 
+                onClick={() => prevId && navigate(`/content/${prevId}`, { state: { contentIds, returnPath, navDirection: 'prev' } })}
+                disabled={!prevId}
+                title="Chiste anterior"
+              >
+                <i className="icon-arrow-left" aria-hidden="true"></i> Anterior
+              </button>
+              <button 
+                className="btn-nav-next" 
+                onClick={() => nextId && navigate(`/content/${nextId}`, { state: { contentIds, returnPath, navDirection: 'next' } })}
+                disabled={!nextId}
+                title="Siguiente chiste"
+              >
+                Siguiente <i className="icon-arrow-left icon-arrow-right" aria-hidden="true"></i>
+              </button>
             </>
           ) : (
             <button className="btn-back-top" onClick={() => navigate(returnPath)} title="Volver">
@@ -311,11 +332,18 @@ const ContentDetailPage = () => {
             </button>
           )}
         </div>
+        {isMobile && (prevId || nextId) && (
+          <p className="detail-swipe-hint" aria-hidden="true">Desliza ← → para cambiar de chiste</p>
+        )}
 
         <div className="row">
           
-          {/* Main Content */}
-          <div className="col-lg-9" style={{ position: 'relative', perspective: 1200 }}>
+          {/* Main Content - gestos swipe en móvil cuando hay prev/next */}
+          <div 
+            className="col-lg-9" 
+            style={{ position: 'relative', perspective: 1200 }}
+            {...(isMobile && (prevId || nextId) ? swipeHandlers : {})}
+          >
             <AnimatePresence>
               {loading && content && (
                 <motion.div
