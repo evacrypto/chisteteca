@@ -164,8 +164,8 @@ const RegisterPage = () => {
                               name="password"
                               value={formData.password}
                               onChange={handleChange}
-                              className="form-control"
-                              placeholder="••••••••"
+                              className="form-control auth-password-input"
+                              placeholder=""
                               required
                             />
                           </div>
@@ -217,7 +217,7 @@ const RegisterPage = () => {
                           <div className="form-group">
                             <label htmlFor="register-username">
                               <i className="label-icon icon-user" aria-hidden="true"></i>
-                              Username:
+                              Usuario:
                             </label>
                             <input
                               type="text"
@@ -226,7 +226,7 @@ const RegisterPage = () => {
                               value={formData.username}
                               onChange={handleChange}
                               className="form-control"
-                              placeholder="Tu nombre de usuario"
+                              placeholder="Introduce tu nombre"
                               required
                             />
                             <small className="form-text">3-30 caracteres. Puedes usar letras, números, espacios (ej: pepe perez)</small>
@@ -244,7 +244,7 @@ const RegisterPage = () => {
                               value={formData.email}
                               onChange={handleChange}
                               className="form-control"
-                              placeholder="tu@email.com"
+                              placeholder="Introduce tu email"
                               required
                             />
                           </div>
@@ -260,8 +260,8 @@ const RegisterPage = () => {
                               name="password"
                               value={formData.password}
                               onChange={handleChange}
-                              className="form-control"
-                              placeholder="••••••••"
+                              className="form-control auth-password-input"
+                              placeholder=""
                               required
                             />
                           </div>
@@ -277,8 +277,8 @@ const RegisterPage = () => {
                               name="confirmPassword"
                               value={formData.confirmPassword}
                               onChange={handleChange}
-                              className="form-control"
-                              placeholder="••••••••"
+                              className="form-control auth-password-input"
+                              placeholder=""
                               required
                             />
                           </div>

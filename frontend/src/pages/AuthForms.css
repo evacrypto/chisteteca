@@ -117,6 +117,13 @@
   margin: 0 auto;
 }
 
+.auth-password-input {
+  color: #555;
+}
+.auth-password-input::placeholder {
+  color: #adb5bd;
+}
+
 .card-body {
   padding: 20px 0;
 }
