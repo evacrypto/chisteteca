@@ -309,8 +309,11 @@ const ContentDetailPage = () => {
               <button className="btn-back-top" onClick={() => navigate(returnPath)} title="Volver">
                 <i className="icon-home" aria-hidden="true"></i>
               </button>
+              {(prevId || nextId) && (
+                <span className="detail-swipe-hint">Desliza para ver más chistes</span>
+              )}
               <button 
-                className="btn-nav-prev" 
+                className="btn-nav-prev btn-nav-desktop" 
                 onClick={() => prevId && navigate(`/content/${prevId}`, { state: { contentIds, returnPath, navDirection: 'prev' } })}
                 disabled={!prevId}
                 title="Chiste anterior"
@@ -318,7 +321,7 @@ const ContentDetailPage = () => {
                 <i className="icon-arrow-left" aria-hidden="true"></i> Anterior
               </button>
               <button 
-                className="btn-nav-next" 
+                className="btn-nav-next btn-nav-desktop" 
                 onClick={() => nextId && navigate(`/content/${nextId}`, { state: { contentIds, returnPath, navDirection: 'next' } })}
                 disabled={!nextId}
                 title="Siguiente chiste"
@@ -332,9 +335,6 @@ const ContentDetailPage = () => {
             </button>
           )}
         </div>
-        {isMobile && (prevId || nextId) && (
-          <p className="detail-swipe-hint" aria-hidden="true">Desliza ← → para cambiar de chiste</p>
-        )}
 
         <div className="row">
           

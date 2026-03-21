@@ -65,17 +65,19 @@
   cursor: not-allowed;
 }
 
-/* Hint gestos swipe en móvil */
+/* Hint gestos swipe: visible solo en móvil, al lado del botón inicio */
 .detail-swipe-hint {
   display: none;
-  font-size: 0.75rem;
-  color: #999;
-  margin-top: 6px;
-  text-align: center;
+  font-size: 0.85rem;
+  color: #666;
+  align-self: center;
 }
 @media (max-width: 767px) {
   .detail-swipe-hint {
-    display: block;
+    display: inline;
+  }
+  .btn-nav-desktop {
+    display: none !important;
   }
   .detail-nav-buttons {
     gap: 8px;
