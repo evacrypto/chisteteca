@@ -582,10 +582,12 @@ const ContentDetailPage = () => {
 
           </div>
 
-          {/* Sidebar - Reservado para publicidad. Oculto. Para mostrar: quitar display:none en CSS y cambiar col-12 a col-lg-9 arriba. */}
+          {/* Sidebar - Espacio reservado para publicidad */}
           <aside className="col-lg-3 sidebar sidebar--ad-placeholder">
             <div className="sidebar-widget sidebar-ad-slot">
-              {/* Añadir aquí el banner de publicidad cuando se desee */}
+              <img src="/logo_chisteteca.png" alt="Chisteteca" className="sidebar-logo" />
+              <h4 className="sidebar-ad-title">Coloque aquí su publicidad</h4>
+              <p className="sidebar-ad-subtitle">Contacte para más info</p>
             </div>
           </aside>
 

@@ -829,6 +829,31 @@
 
 .sidebar-ad-slot {
   min-height: 200px;
+  text-align: center;
+}
+
+.sidebar-ad-slot .sidebar-logo {
+  max-width: 100px;
+  height: auto;
+  margin-bottom: 16px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sidebar-ad-slot .sidebar-ad-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.sidebar-ad-slot .sidebar-ad-subtitle {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin: 0;
 }
 
 /* Stats Grid */
