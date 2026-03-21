@@ -226,7 +226,8 @@ const RegisterPage = () => {
                               value={formData.username}
                               onChange={handleChange}
                               className="form-control"
-                              placeholder="Introduce tu nombre"
+                              placeholder="introduce tu nombre"
+                              autoComplete="username"
                               required
                             />
                             <small className="form-text">3-30 caracteres. Puedes usar letras, números, espacios (ej: pepe perez)</small>
@@ -245,6 +246,7 @@ const RegisterPage = () => {
                               onChange={handleChange}
                               className="form-control"
                               placeholder="introduce tu email"
+                              autoComplete="email"
                               required
                             />
                           </div>
@@ -261,7 +263,7 @@ const RegisterPage = () => {
                               value={formData.password}
                               onChange={handleChange}
                               className="form-control auth-password-input"
-                              placeholder="introduce tu contraseña"
+                              placeholder="••••••••"
                               required
                             />
                           </div>
@@ -278,7 +280,7 @@ const RegisterPage = () => {
                               value={formData.confirmPassword}
                               onChange={handleChange}
                               className="form-control auth-password-input"
-                              placeholder="repite tu contraseña"
+                              placeholder="••••••••"
                               required
                             />
                           </div>
