@@ -217,11 +217,21 @@
   color: #fd7e14;
 }
 
-.detail-end-card-home-icon {
-  display: inline-block;
+.detail-end-card-home-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  background: #fff;
+  border: 2px solid #e9ecef;
+  border-radius: 50px;
+  color: #666;
   vertical-align: middle;
   margin: 0 2px;
-  font-size: 1.1em;
+}
+
+.detail-end-card-home-btn .icon-home {
+  font-size: 1rem;
 }
 
 /* Article Header */
