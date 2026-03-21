@@ -825,12 +825,7 @@
   border-bottom: 2px solid #ffc107;
 }
 
-/* Espacio reservado para publicidad futura - oculto hasta que se añada banner.
-   Para mostrar: quitar display:none de .sidebar--ad-placeholder y cambiar
-   el col del contenido principal a col-lg-9 para dejar espacio al sidebar. */
-.sidebar--ad-placeholder {
-  display: none;
-}
+/* Espacio reservado para publicidad futura. Visible para dejar hueco a la derecha. */
 
 .sidebar-ad-slot {
   min-height: 200px;

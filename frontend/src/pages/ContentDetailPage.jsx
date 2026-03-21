@@ -332,7 +332,7 @@ const ContentDetailPage = () => {
           
           {/* Main Content - gestos swipe en móvil cuando hay prev/next */}
           <div 
-            className="col-12" 
+            className="col-12 col-lg-9" 
             style={{ position: 'relative', perspective: 1200 }}
             {...(isMobile && (prevId || nextId) ? swipeHandlers : {})}
           >
