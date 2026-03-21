@@ -25,7 +25,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [editingCategory, setEditingCategory] = useState(null);
-  const [editForm, setEditForm] = useState({ name: '', description: '', emoji: '', color: '#ffc107' });
+  const [editForm, setEditForm] = useState({ name: '', emoji: '', color: '#ffc107' });
   const [editingContent, setEditingContent] = useState(null);
   const [editContentText, setEditContentText] = useState('');
   const [editContentCategories, setEditContentCategories] = useState([]);
@@ -419,7 +419,6 @@ const AdminDashboard = () => {
     setEditingCategory(cat);
     setEditForm({
       name: cat.name || '',
-      description: cat.description || '',
       emoji: cat.emoji || '😂',
       color: cat.color || '#ffc107'
     });
@@ -434,7 +433,6 @@ const AdminDashboard = () => {
     try {
       await categoriesAPI.update(editingCategory._id, {
         name: editForm.name,
-        description: editForm.description,
         emoji: editForm.emoji,
         color: editForm.color
       });
@@ -1539,17 +1537,6 @@ const AdminDashboard = () => {
                   onChange={(e) => setEditForm(f => ({ ...f, name: e.target.value }))}
                   maxLength={50}
                   required
-                />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Descripción (opcional)</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={2}
-                  placeholder="Breve descripción de la categoría"
-                  value={editForm.description}
-                  onChange={(e) => setEditForm(f => ({ ...f, description: e.target.value }))}
-                  maxLength={500}
                 />
               </Form.Group>
               <Form.Group className="mb-3">
