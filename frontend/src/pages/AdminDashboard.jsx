@@ -66,7 +66,7 @@ const AdminDashboard = () => {
         adminAPI.getStats(),
         adminAPI.getPendingContent({ limit: 50, page: 1 }),
         adminAPI.getPendingCategories(),
-        categoriesAPI.getAll()
+        adminAPI.getAdminCategories()
       ]);
       setStats(statsRes.data.data);
       setPendingContent(pendingRes.data.data);
@@ -1009,8 +1009,12 @@ const AdminDashboard = () => {
                   </thead>
                   <tbody>
                     {allCategories.map((cat) => (
-                      <tr key={cat._id}>
-                        <td><strong>{cat.name}</strong></td>
+                      <tr key={cat._id} className={!cat.isActive ? 'table-secondary' : ''}>
+                        <td>
+                          <strong>{cat.name}</strong>
+                          {cat.isPending && <Badge bg="warning" className="ms-2">Pendiente</Badge>}
+                          {!cat.isActive && !cat.isPending && <Badge bg="secondary" className="ms-2">Inactiva</Badge>}
+                        </td>
                         <td className="fs-4">{cat.emoji}</td>
                         <td>
                           <span

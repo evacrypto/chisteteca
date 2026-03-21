@@ -174,6 +174,7 @@ export const adminAPI = {
   getDuplicates: (params) => api.get('/admin/content/duplicates', { params }),
   getCategoryDuplicates: (params) => api.get('/admin/categories/duplicates', { params }),
   mergeCategories: (targetId, sourceIds) => api.post('/admin/categories/merge', { targetId, sourceIds }),
+  getAdminCategories: () => api.get('/admin/categories/all'),
   getPendingCategories: () => api.get('/admin/categories/pending'),
   approveAllCategories: () => api.put('/admin/categories/approve-all'),
   approveCategory: (id) => api.put(`/admin/categories/${id}/approve`),

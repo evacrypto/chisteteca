@@ -13,6 +13,7 @@ import {
   deleteUser,
   getReportedContent,
   getAnalytics,
+  getAdminCategories,
   getPendingCategories,
   approveCategory,
   rejectCategory,
@@ -39,6 +40,7 @@ router.put('/content/:id/approve', approveContent);
 router.put('/content/:id/reject', rejectContent);
 router.delete('/content/:id', deleteContent);
 
+router.get('/categories/all', getAdminCategories);
 router.get('/categories/pending', getPendingCategories);
 router.get('/categories/duplicates', getDuplicateCategories);
 router.post('/categories/merge', mergeCategories);

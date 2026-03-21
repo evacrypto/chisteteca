@@ -548,6 +548,24 @@ export const getAnalytics = async (req, res) => {
   }
 };
 
+// @desc    Get all categories for admin (active, inactive, pending)
+// @route   GET /api/admin/categories/all
+// @access  Private/Admin
+export const getAdminCategories = async (req, res) => {
+  try {
+    const categories = await Category.find()
+      .sort({ name: 1 })
+      .lean();
+    res.json({
+      success: true,
+      data: categories
+    });
+  } catch (error) {
+    console.error('Get admin categories error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 // @desc    Get pending categories
 // @route   GET /api/admin/categories/pending
 // @access  Private/Admin
@@ -894,12 +912,19 @@ export const mergeCategories = async (req, res) => {
       return res.status(400).json({ success: false, message: 'targetId y sourceIds (array) son requeridos' });
     }
 
+    if (!isValidId(targetId)) {
+      return res.status(400).json({ success: false, message: 'targetId inválido' });
+    }
+
     const target = await Category.findById(targetId);
     if (!target) {
       return res.status(404).json({ success: false, message: 'Categoría destino no encontrada' });
     }
 
-    const toMerge = sourceIds.filter((id) => id.toString() !== targetId.toString());
+    const targetObjId = new mongoose.Types.ObjectId(targetId);
+    const toMerge = sourceIds
+      .filter((id) => id && String(id) !== String(targetId) && mongoose.Types.ObjectId.isValid(id))
+      .map((id) => new mongoose.Types.ObjectId(id));
     if (toMerge.length === 0) {
       return res.status(400).json({ success: false, message: 'No hay categorías distintas para fusionar' });
     }
@@ -912,13 +937,13 @@ export const mergeCategories = async (req, res) => {
     for (const src of sources) {
       await Content.updateMany(
         { categories: src._id },
-        { $addToSet: { categories: targetId }, $pull: { categories: src._id } }
+        { $addToSet: { categories: targetObjId }, $pull: { categories: src._id } }
       );
       await src.deleteOne();
     }
 
-    const newCount = await Content.countDocuments({ categories: targetId });
-    await Category.findByIdAndUpdate(targetId, { contentCount: newCount });
+    const newCount = await Content.countDocuments({ categories: targetObjId });
+    await Category.findByIdAndUpdate(targetObjId, { contentCount: newCount });
 
     res.json({
       success: true,
@@ -927,6 +952,9 @@ export const mergeCategories = async (req, res) => {
     });
   } catch (error) {
     console.error('Merge categories error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error'
+    });
   }
 };
