@@ -521,6 +521,26 @@ export const getPendingCategories = async (req, res) => {
   }
 };
 
+// @desc    Approve all pending categories
+// @route   PUT /api/admin/categories/approve-all
+// @access  Private/Admin
+export const approveAllPendingCategories = async (req, res) => {
+  try {
+    const result = await Category.updateMany(
+      { isPending: true },
+      { $set: { isPending: false, isActive: true, rejectionReason: '' } }
+    );
+
+    res.json({
+      success: true,
+      data: { approved: result.modifiedCount }
+    });
+  } catch (error) {
+    console.error('Approve all categories error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 // @desc    Approve category
 // @route   PUT /api/admin/categories/:id/approve
 // @access  Private/Admin

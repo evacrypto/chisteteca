@@ -205,10 +205,33 @@ const AdminDashboard = () => {
     toast.success('Lista actualizada');
   };
 
+  const handleRefreshPendingCategories = async () => {
+    const categoriesRes = await adminAPI.getPendingCategories();
+    setPendingCategories(categoriesRes.data.data || []);
+    await fetchData();
+    toast.success('Lista actualizada');
+  };
+
+  const handleApproveAllCategories = async () => {
+    if (pendingCategories.length === 0) {
+      toast.info('No hay categorías pendientes');
+      return;
+    }
+    const confirmed = window.confirm(`¿Aprobar las ${pendingCategories.length} categorías pendientes?`);
+    if (!confirmed) return;
+    try {
+      const res = await adminAPI.approveAllCategories();
+      toast.success(`${res.data.data?.approved || 0} categorías aprobadas`);
+      await handleRefreshPendingCategories();
+    } catch (error) {
+      toast.error('Error al aprobar categorías');
+    }
+  };
+
   const handleApproveAll = async () => {
     const count = stats?.overview?.pendingContent ?? pendingPagination.total;
     if (count === 0) {
-      toast.info('No hay contenido pendiente');
+      toast.info('No hay chistes pendientes');
       return;
     }
     const confirmed = window.confirm(`¿Aprobar los ${count} contenidos pendientes de una vez?`);
@@ -422,7 +445,7 @@ const AdminDashboard = () => {
           onClick={() => setActiveTab('pending')}
           aria-pressed={activeTab === 'pending'}
         >
-          Pendientes ({stats?.overview?.pendingContent ?? pendingPagination.total})
+          Pendientes ({(stats?.overview?.pendingContent ?? pendingPagination.total) + pendingCategories.length})
         </button>
         <button
           type="button"
@@ -563,9 +586,11 @@ const AdminDashboard = () => {
       )}
 
       {activeTab === 'pending' && (
-          <Card className="card-custom">
+        <>
+          {/* Caja 1: Chistes pendientes */}
+          <Card className="card-custom mb-4">
             <Card.Header className="bg-transparent border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
-              <h4 className="mb-0">Contenido Pendiente de Aprobación</h4>
+              <h4 className="mb-0">Chistes pendientes de aprobación ({stats?.overview?.pendingContent ?? pendingPagination.total})</h4>
               <div className="d-flex gap-2">
                 <Button variant="success" size="sm" onClick={handleApproveAll} disabled={(stats?.overview?.pendingContent ?? pendingPagination.total) === 0}>
                   <i className="icon-check-circle" aria-hidden="true"></i> Aprobar todo
@@ -707,22 +732,25 @@ const AdminDashboard = () => {
               </Card.Footer>
             )}
           </Card>
-      )}
 
-      {activeTab === 'categories' && (
-        <>
-          <Card className="card-custom mb-4">
-            <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center">
-              <h4 className="mb-0">Categorías Pendientes de Aprobación</h4>
-              <Button variant="outline-secondary" size="sm" onClick={fetchData}>
-                🔄 Actualizar
-              </Button>
+          {/* Caja 2: Categorías pendientes */}
+          <Card className="card-custom">
+            <Card.Header className="bg-transparent border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <h4 className="mb-0">Categorías pendientes de aprobación ({pendingCategories.length})</h4>
+              <div className="d-flex gap-2">
+                <Button variant="success" size="sm" onClick={handleApproveAllCategories} disabled={pendingCategories.length === 0}>
+                  <i className="icon-check-circle" aria-hidden="true"></i> Aprobar todo
+                </Button>
+                <Button variant="outline-secondary" size="sm" onClick={handleRefreshPendingCategories}>
+                  🔄 Actualizar
+                </Button>
+              </div>
             </Card.Header>
             <Card.Body>
               {pendingCategories.length === 0 ? (
                 <div className="text-center py-5">
                   <i className="icon-check-circle text-success mb-3" style={{ fontSize: '50px' }} aria-hidden="true"></i>
-                  <p className="text-muted">¡No hay categorías pendientes!</p>
+                  <p className="text-muted">¡No hay categorías pendientes de aprobación!</p>
                 </div>
               ) : (
                 <Table responsive hover className="align-middle">
@@ -738,41 +766,23 @@ const AdminDashboard = () => {
                   <tbody>
                     {pendingCategories.map((cat) => (
                       <tr key={cat._id}>
-                        <td>
-                          <strong>{cat.name}</strong>
-                        </td>
+                        <td><strong>{cat.name}</strong></td>
                         <td className="fs-3">{cat.emoji}</td>
                         <td>{cat.createdBy?.username || 'Desconocido'}</td>
                         <td className="text-muted">
                           {new Date(cat.createdAt).toLocaleDateString('es-ES')}
                         </td>
                         <td className="text-end admin-actions-cell">
-                          <Button
-                            variant="success"
-                            size="sm"
-                            onClick={() => handleApproveCategory(cat._id)}
-                          >
+                          <Button variant="success" size="sm" onClick={() => handleApproveCategory(cat._id)}>
                             <i className="icon-check-circle" aria-hidden="true"></i> Aprobar
                           </Button>
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            onClick={() => handleEditCategory(cat)}
-                          >
+                          <Button variant="outline-primary" size="sm" onClick={() => handleEditCategory(cat)}>
                             <i className="icon-edit" aria-hidden="true"></i> Editar
                           </Button>
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => handleRejectCategory(cat._id, cat.name)}
-                          >
+                          <Button variant="danger" size="sm" onClick={() => handleRejectCategory(cat._id, cat.name)}>
                             <i className="icon-times-circle" aria-hidden="true"></i> Rechazar
                           </Button>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() => handleDeleteCategory(cat)}
-                          >
+                          <Button variant="outline-danger" size="sm" onClick={() => handleDeleteCategory(cat)}>
                             <i className="icon-trash" aria-hidden="true"></i> Eliminar
                           </Button>
                         </td>
@@ -783,7 +793,11 @@ const AdminDashboard = () => {
               )}
             </Card.Body>
           </Card>
+        </>
+      )}
 
+      {activeTab === 'categories' && (
+        <>
           <Card className="card-custom mb-4">
             <Card.Header className="bg-transparent border-0">
               <h4 className="mb-0">Nueva categoría</h4>

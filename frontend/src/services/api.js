@@ -160,6 +160,7 @@ export const adminAPI = {
   getReportedContent: () => api.get('/admin/content/reported'),
   getDuplicates: (params) => api.get('/admin/content/duplicates', { params }),
   getPendingCategories: () => api.get('/admin/categories/pending'),
+  approveAllCategories: () => api.put('/admin/categories/approve-all'),
   approveCategory: (id) => api.put(`/admin/categories/${id}/approve`),
   rejectCategory: (id, reason) => api.put(`/admin/categories/${id}/reject`, { reason })
 };
