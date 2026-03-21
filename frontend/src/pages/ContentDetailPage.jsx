@@ -399,7 +399,7 @@ const ContentDetailPage = () => {
                       <Link to={backPath} className="detail-end-card-link">
                         AQUÍ
                       </Link>
-                      {' '}o en el icono de arriba para volver.
+                      {' '}o en <i className="icon-home detail-end-card-home-icon" aria-hidden="true"></i> arriba para volver.
                     </h3>
                   </div>
                 </motion.article>

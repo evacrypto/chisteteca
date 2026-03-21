@@ -217,6 +217,13 @@
   color: #fd7e14;
 }
 
+.detail-end-card-home-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 2px;
+  font-size: 1.1em;
+}
+
 /* Article Header */
 .article-header {
   margin-bottom: 30px;
