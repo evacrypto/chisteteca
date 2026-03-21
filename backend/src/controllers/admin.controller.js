@@ -410,6 +410,17 @@ export const toggleUserVip = async (req, res) => {
     user.isVip = !user.isVip;
     await user.save();
 
+    if (user.isVip && user.email) {
+      setImmediate(async () => {
+        try {
+          const { sendVipNotification } = await import('../services/email.service.js');
+          await sendVipNotification(user.email, user.username);
+        } catch (err) {
+          console.error('[Admin] VIP email notification failed:', err);
+        }
+      });
+    }
+
     res.json({
       success: true,
       data: {

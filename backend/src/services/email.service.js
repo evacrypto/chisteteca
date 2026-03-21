@@ -172,6 +172,72 @@ export const sendPendingReviewNotification = async (pendingContent, pendingCateg
   }
 };
 
+/**
+ * Notifica al usuario que ha sido nombrado VIP.
+ * @param {string} to - Email del usuario
+ * @param {string} username - Nombre de usuario
+ * @returns {Promise<boolean>}
+ */
+export const sendVipNotification = async (to, username) => {
+  const baseUrl = getBaseUrl().replace(/\/$/, '');
+  const logoUrl = `${baseUrl}/logo_chisteteca.png`;
+  const from = getFromAddress();
+  const safeName = escapeHtml(username || 'usuario');
+
+  const html = `
+    <div style="font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; max-width: 520px; margin: 0 auto; background: #f8f9fa; padding: 24px; border-radius: 12px;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <img src="${logoUrl}" alt="Chisteteca" width="120" height="auto" style="display: block; margin: 0 auto 12px;" />
+        <p style="color: #1a1a2e; margin: 0; font-size: 14px; font-weight: 500;">La biblioteca de chistes</p>
+      </div>
+      <div style="background: white; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+        <h2 style="color: #1a1a2e; margin: 0 0 16px;">¡Hola ${safeName}!</h2>
+        <p style="color: #555; line-height: 1.6;">Ahora eres un usuario VIP de la Chisteteca. Podrás subir categorías y chistes sin necesidad de aprobación.</p>
+        <p style="text-align: center; margin: 24px 0;">
+          <a href="${baseUrl}" style="display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #ffc107, #fd7e14); color: #1a1a2e !important; text-decoration: none; border-radius: 8px; font-weight: 600;">Ir a Chisteteca</a>
+        </p>
+      </div>
+      <p style="text-align: center; margin-top: 20px;">
+        <a href="${baseUrl}" style="color: #e0a800; font-size: 12px;">chisteteca.es</a>
+      </p>
+    </div>
+  `;
+
+  const resend = getResendClient();
+  if (resend) {
+    const { error } = await resend.emails.send({
+      from,
+      to,
+      subject: '¡Eres usuario VIP de Chisteteca!',
+      html
+    });
+    if (error) {
+      console.error('[Email] VIP notification error:', error);
+      return false;
+    }
+    return true;
+  }
+
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.log('[Email] Sin Resend ni SMTP. No se envió notificación VIP.');
+    return false;
+  }
+
+  try {
+    await transporter.sendMail({
+      from,
+      to,
+      subject: '¡Eres usuario VIP de Chisteteca!',
+      html
+    });
+    return true;
+  } catch (err) {
+    console.error('[Email] VIP notification error:', err);
+    return false;
+  }
+};
+
 const escapeHtml = (str) => {
   if (!str || typeof str !== 'string') return '';
   return str
