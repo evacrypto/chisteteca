@@ -158,11 +158,11 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="header-login">
-                    Iniciar sesión
+                  <Link to="/unete-gratis" className="header-cta-btn header-cta-btn--yellow">
+                    <i className="btn-icon icon-user" aria-hidden="true"></i> Únete gratis
                   </Link>
-                  <Link to="/register" className="header-cta-btn">
-                    <i className="btn-icon icon-user" aria-hidden="true"></i> Únete
+                  <Link to="/login" className="header-login header-login--blue">
+                    Iniciar sesión
                   </Link>
                 </>
               )}

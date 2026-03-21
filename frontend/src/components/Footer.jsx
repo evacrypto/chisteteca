@@ -103,7 +103,7 @@ const Footer = () => {
                   <li><Link to="/">Inicio</Link></li>
                   <li><Link to="/popular">Populares</Link></li>
                   <li><Link to="/random">Aleatorio</Link></li>
-                  <li><Link to="/register">Crear cuenta</Link></li>
+                  <li><Link to="/unete-gratis">Únete gratis</Link></li>
                   <li><Link to="/login">Iniciar sesión</Link></li>
                 </ul>
               </div>

@@ -64,7 +64,7 @@ api.interceptors.response.use(
       const url = String(error.config?.url || error.config?.baseURL || '');
       const isAuthRequest = /\/auth\/(login|register)/.test(url);
       const isOnAuthPage = typeof window !== 'undefined' && 
-        (window.location.pathname === '/login' || window.location.pathname === '/register');
+        (window.location.pathname === '/login' || window.location.pathname === '/register' || window.location.pathname === '/unete-gratis');
       if (!isAuthRequest && !isOnAuthPage) {
         clearAuthAndRedirect();
       }

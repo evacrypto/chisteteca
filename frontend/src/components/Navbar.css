@@ -185,7 +185,7 @@
   flex-shrink: 0;
 }
 
-/* Botón Login */
+/* Botón Login - azul/transparente */
 .header-login {
   font-size: 14px;
   font-weight: 500;
@@ -201,7 +201,19 @@
   background: rgba(0, 0, 0, 0.05);
 }
 
-/* Botón CTA */
+.header-login--blue {
+  color: #0066ff;
+  border: 2px solid #0066ff;
+  padding: 8px 18px;
+}
+
+.header-login--blue:hover {
+  background: rgba(0, 102, 255, 0.08);
+  color: #0052cc;
+  border-color: #0052cc;
+}
+
+/* Botón CTA - por defecto azul (Crear cuando logueado) */
 .header-cta-btn {
   display: inline-flex;
   align-items: center;
@@ -226,6 +238,18 @@
   color: #fff !important;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+}
+
+/* Botón CTA amarillo - Únete gratis */
+.header-cta-btn--yellow {
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  color: #1a1a2e !important;
+}
+
+.header-cta-btn--yellow:hover {
+  background: linear-gradient(135deg, #fd7e14, #ffc107);
+  color: #1a1a2e !important;
+  box-shadow: 0 8px 20px rgba(255, 193, 7, 0.4);
 }
 
 .btn-icon {

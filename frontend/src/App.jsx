@@ -75,13 +75,14 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/unete-gratis" element={<RegisterPage />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             <Route
               path="/create"
               element={
-                <ProtectedRoute redirectTo="/register">
+                <ProtectedRoute redirectTo="/unete-gratis">
                   <CreateContentPage />
                 </ProtectedRoute>
               }

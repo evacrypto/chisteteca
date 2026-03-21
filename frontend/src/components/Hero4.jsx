@@ -48,14 +48,14 @@ const Hero4 = () => {
                 <i className="btn-icon icon-plus" aria-hidden="true"></i>
                 Crear Contenido
               </Link>
-              <Link to="/popular" className="hero4-btn hero4-btn-outline">
-                <i className="btn-icon icon-fire" aria-hidden="true"></i>
-                Populares
+              <Link to="/search" className="hero4-btn hero4-btn-outline">
+                <i className="btn-icon icon-search" aria-hidden="true"></i>
+                Buscar
               </Link>
             </>
           ) : (
             <>
-              <Link to="/register" className="hero4-btn hero4-btn-primary">
+              <Link to="/unete-gratis" className="hero4-btn hero4-btn-primary">
                 <i className="btn-icon icon-smile" aria-hidden="true"></i>
                 Únete Gratis
               </Link>
