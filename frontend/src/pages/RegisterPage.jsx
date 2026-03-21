@@ -217,7 +217,7 @@ const RegisterPage = () => {
                           <div className="form-group">
                             <label htmlFor="register-username">
                               <i className="label-icon icon-user" aria-hidden="true"></i>
-                              Usuario:
+                              Nombre de usuario:
                             </label>
                             <input
                               type="text"
@@ -244,7 +244,7 @@ const RegisterPage = () => {
                               value={formData.email}
                               onChange={handleChange}
                               className="form-control"
-                              placeholder="Introduce tu email"
+                              placeholder="introduce tu email"
                               required
                             />
                           </div>
@@ -261,7 +261,7 @@ const RegisterPage = () => {
                               value={formData.password}
                               onChange={handleChange}
                               className="form-control auth-password-input"
-                              placeholder=""
+                              placeholder="introduce tu contraseña"
                               required
                             />
                           </div>
@@ -278,7 +278,7 @@ const RegisterPage = () => {
                               value={formData.confirmPassword}
                               onChange={handleChange}
                               className="form-control auth-password-input"
-                              placeholder=""
+                              placeholder="repite tu contraseña"
                               required
                             />
                           </div>
