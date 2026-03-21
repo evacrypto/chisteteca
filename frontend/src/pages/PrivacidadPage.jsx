@@ -37,7 +37,7 @@ const PrivacidadPage = () => (
     <h2>Destinatarios</h2>
     <p>
       Los datos se almacenan en servidores de <strong>MongoDB Atlas</strong> (base de datos). 
-      El sitio web está alojado en <strong>Cloudflare Pages</strong> (frontend) y <strong>Render</strong> (backend). 
+      El sitio web está alojado en <strong>Cloudflare Pages</strong> (frontend) y <strong>Railway</strong> (backend). 
       La plataforma de newsletter puede implicar terceros proveedores de servicios de email. 
       Estos proveedores actúan como encargados del tratamiento y cumplen con el RGPD.
     </p>

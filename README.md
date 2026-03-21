@@ -62,14 +62,14 @@ Variables mínimas:
 
 Si usas la configuración local estándar, los valores por defecto de los ejemplos ya sirven.
 
-#### Cloudflare R2 (producción: Render, etc.)
+#### Cloudflare R2 (producción: Railway, etc.)
 
-En entornos con disco efímero (p. ej. Render), los avatares se pierden al redeployar. Para almacenamiento persistente, configura Cloudflare R2:
+En entornos con disco efímero (p. ej. Railway), los avatares se pierden al redeployar. Para almacenamiento persistente, configura Cloudflare R2:
 
 1. Crea un bucket en [Cloudflare Dashboard](https://dash.cloudflare.com) → R2 → Create bucket
 2. Crea un API token: R2 → Manage R2 API Tokens → Create API token
 3. Habilita acceso público al bucket y copia la URL pública (ej: `https://pub-xxx.r2.dev`)
-4. Añade en Render (o tu hosting) las variables:
+4. Añade en Railway (o tu hosting) las variables:
    - `R2_ACCOUNT_ID` (tu Account ID de Cloudflare)
    - `R2_ACCESS_KEY_ID`
    - `R2_SECRET_ACCESS_KEY`

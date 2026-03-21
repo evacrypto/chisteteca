@@ -3,7 +3,7 @@
 # ========================================
 # 
 # Este documento te guiará para deployar la app en:
-# - Backend: Render (https://render.com)
+# - Backend: Railway (https://railway.app)
 # - Frontend: Cloudflare Pages (https://pages.cloudflare.com)
 #
 # ========================================
@@ -34,27 +34,22 @@ git push -u origin main
 
 ---
 
-## 2. DEPLOY BACKEND EN RENDER
+## 2. DEPLOY BACKEND EN RAILWAY
 
-### Pasos en Render:
-1. Ve a https://render.com y crea una cuenta (usa GitHub login)
-2. Click en **"New +"** → **"Web Service"**
-3. Conecta tu cuenta de GitHub
-4. Busca y selecciona `chisteteca`
-5. Configura el servicio:
+### Pasos en Railway:
+1. Ve a https://railway.app y crea una cuenta (usa GitHub login)
+2. Click en **"New Project"** → **"Deploy from GitHub repo"**
+3. Conecta tu cuenta de GitHub y selecciona `chisteteca`
+4. Railway detectará el repo. Configura el servicio:
 
 | Campo | Valor |
 |-------|-------|
-| **Name** | `chisteteca-backend` |
-| **Region** | `Frankfurt, Germany` (más cercano a España) |
-| **Branch** | `main` |
 | **Root Directory** | `backend` |
-| **Runtime** | `Node` |
 | **Build Command** | `npm install` |
 | **Start Command** | `npm start` |
-| **Instance Type** | `Free` |
 
-6. Click en **"Advanced"** y añade las **Environment Variables**:
+5. Ve a **Settings** → **Networking** → **Generate Domain** para obtener la URL pública
+6. En **Variables**, añade las **Environment Variables**:
 
 | Key | Value |
 |-----|-------|
@@ -67,7 +62,7 @@ git push -u origin main
 | `MAX_VIDEO_SIZE` | `52428800` |
 | `MAX_VIDEO_DURATION` | `120` |
 
-7. Click en **"Create Web Service"**
+7. Copia la URL de tu backend (ej: `https://chisteteca-backend-production-xxxx.up.railway.app`)
 
 ### MongoDB Atlas (si no tienes):
 1. Ve a https://cloud.mongodb.com
@@ -77,15 +72,12 @@ git push -u origin main
 5. En "Network Access", añade `0.0.0.0/0` (allow all)
 6. Obtén el connection string
 7. Reemplaza `<password>` con tu contraseña
-8. Pégalo en `MONGODB_URI` en Render
+8. Pégalo en `MONGODB_URI` en Railway
 
 Formato del connection string:
 ```
 mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/chisteteca?retryWrites=true&w=majority
 ```
-
-8. Espera a que el deploy termine (~2-5 minutos)
-9. Copia la URL de tu backend: `https://chisteteca-backend.onrender.com`
 
 ---
 
@@ -110,7 +102,7 @@ mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/chisteteca?retryW
 
 | Variable name | Value |
 |---------------|-------|
-| `VITE_API_URL` | `https://chisteteca-backend.onrender.com/api` |
+| `VITE_API_URL` | `https://TU-URL-RAILWAY.up.railway.app/api` |
 | `VITE_FRONTEND_URL` | `https://chisteteca-frontend.pages.dev` |
 
 7. Click en **"Save and Deploy"**
@@ -123,18 +115,17 @@ mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/chisteteca?retryW
 
 Una vez tengas la URL final de Cloudflare:
 
-1. Ve a Render → Tu servicio → **Environment**
+1. Ve a Railway → Tu servicio → **Variables**
 2. Edita `FRONTEND_URL`:
-   - Cambia a: `https://chisteteca-frontend.pages.dev`
-3. Click en **"Save Changes"**
-4. El servicio se redeployará automáticamente
+   - Cambia a: `https://chisteteca-frontend.pages.dev` (o tu dominio custom)
+3. El servicio se redeployará automáticamente
 
 ---
 
 ## 5. VERIFICAR DEPLOY
 
 ### Backend:
-- Abre: `https://chisteteca-backend.onrender.com/api/health`
+- Abre: `https://TU-URL-RAILWAY.up.railway.app/api/health`
 - Deberías ver: `{"status": "OK", "message": "Chisteteca API is running"}`
 
 ### Frontend:
@@ -145,7 +136,7 @@ Una vez tengas la URL final de Cloudflare:
 
 ## 6. VARIABLES DE ENTORNO RESUMEN
 
-### Render (Backend):
+### Railway (Backend):
 ```
 NODE_ENV=production
 PORT=5000
@@ -159,7 +150,7 @@ MAX_VIDEO_DURATION=120
 
 ### Cloudflare Pages (Frontend):
 ```
-VITE_API_URL=https://chisteteca-backend.onrender.com/api
+VITE_API_URL=https://TU-URL-RAILWAY.up.railway.app/api
 VITE_FRONTEND_URL=https://chisteteca-frontend.pages.dev
 ```
 
@@ -168,7 +159,7 @@ VITE_FRONTEND_URL=https://chisteteca-frontend.pages.dev
 ## 7. DEPLOYS FUTUROS
 
 Cada vez que hagas push a `main`:
-- **Render** redeployará automáticamente el backend
+- **Railway** redeployará automáticamente el backend
 - **Cloudflare Pages** redeployará automáticamente el frontend
 
 Para deployar cambios:
@@ -182,15 +173,15 @@ git push
 
 ## 8. SOLUCIÓN DE PROBLEMAS
 
-### Backend no arranca en Render:
-- Revisa los logs en Render → Logs
+### Backend no arranca en Railway:
+- Revisa los logs en Railway → Deployments → View Logs
 - Verifica que `MONGODB_URI` sea correcta
 - Asegúrate de que MongoDB Atlas permita conexiones desde cualquier IP
 
 ### Frontend no conecta con API:
 - Verifica `VITE_API_URL` en Cloudflare Pages
 - Revisa la consola del navegador (F12) para errores CORS
-- Asegúrate de que `FRONTEND_URL` en Render sea la URL de Cloudflare
+- Asegúrate de que `FRONTEND_URL` en Railway sea la URL de Cloudflare
 
 ### Error 404 en frontend:
 - Verifica que el build output directory sea `dist`
@@ -206,8 +197,8 @@ git push
 ## 9. URLs FINALES
 
 - **Frontend:** https://chisteteca-frontend.pages.dev
-- **Backend API:** https://chisteteca-backend.onrender.com
-- **Health Check:** https://chisteteca-backend.onrender.com/api/health
+- **Backend API:** https://TU-URL-RAILWAY.up.railway.app
+- **Health Check:** https://TU-URL-RAILWAY.up.railway.app/api/health
 
 ---
 
@@ -232,4 +223,4 @@ cd frontend && npm run dev
 
 ---
 
-¡Listo! Tu app debería estar online y funcionando.
+¡Listo! Tu app debería estar online y funcionando. Railway no tiene spin-down como Render, así que la API responde rápido incluso tras periodos de inactividad.
