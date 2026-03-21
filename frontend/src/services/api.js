@@ -25,7 +25,8 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  timeout: 10000 // 10 seconds timeout
+  timeout: 10000, // 10 seconds timeout
+  withCredentials: true // needed for view-count cookie (once per visitor)
 });
 
 // Add token to requests

@@ -154,8 +154,22 @@ export const getContent = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Content not found' });
     }
 
-    // Increment views
-    await content.incrementViews();
+    // Increment views only once per visitor (cookie-based)
+    const VIEWS_COOKIE = 'chisteteca_views';
+    const MAX_VIEWED_IDS = 100;
+    const contentIdStr = req.params.id;
+    const viewed = (req.cookies?.[VIEWS_COOKIE] || '').split(',').filter(Boolean);
+
+    if (!viewed.includes(contentIdStr)) {
+      await content.incrementViews();
+      const updated = [...viewed, contentIdStr].slice(-MAX_VIEWED_IDS);
+      res.cookie(VIEWS_COOKIE, updated.join(','), {
+        maxAge: 365 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production'
+      });
+    }
 
     res.json({
       success: true,
