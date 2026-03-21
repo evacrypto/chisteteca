@@ -26,6 +26,7 @@ const ContentDetailPage = () => {
   const [likesCount, setLikesCount] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [showEndCard, setShowEndCard] = useState(false);
 
   const currentUserId = user?._id || user?.id;
   const VIEWED_KEY = 'chisteteca_viewed';
@@ -44,6 +45,9 @@ const ContentDetailPage = () => {
     ? contentIds[idx + 1]
     : (useAdjacentNav ? adjacent?.next : null);
 
+  const isAtEndOfList = contentIds.length > 0 && idx === contentIds.length - 1 && !nextId;
+  const backPath = returnPath?.startsWith('/#') ? returnPath : '/#home-top-cards';
+
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)');
@@ -54,12 +58,19 @@ const ContentDetailPage = () => {
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => {
-      if (isMobile && nextId && !loading) {
+      if (!isMobile || loading) return;
+      if (showEndCard) return; // ya estamos en la tarjeta de fin
+      if (nextId) {
         navigate(`/content/${nextId}`, { state: { contentIds, returnPath, navDirection: 'next' } });
+      } else if (isAtEndOfList) {
+        setShowEndCard(true);
       }
     },
     onSwipedRight: () => {
-      if (isMobile && prevId && !loading) {
+      if (!isMobile || loading) return;
+      if (showEndCard) {
+        setShowEndCard(false);
+      } else if (prevId) {
         navigate(`/content/${prevId}`, { state: { contentIds, returnPath, navDirection: 'prev' } });
       }
     },
@@ -85,6 +96,10 @@ const ContentDetailPage = () => {
   // Scroll to top when entering the page (fixes footer visible on mobile when coming from list)
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [id]);
+
+  useEffect(() => {
+    setShowEndCard(false);
   }, [id]);
 
   // Scroll to comments if hash is present
@@ -299,31 +314,37 @@ const ContentDetailPage = () => {
         <div className="detail-nav-buttons">
           {(contentIds.length > 0 || useAdjacentNav) ? (
             <>
-              <button className="btn-back-top" onClick={() => navigate(returnPath?.startsWith('/#') ? returnPath : '/#home-top-cards')} title="Volver al inicio">
+              <button className="btn-back-top" onClick={() => navigate(backPath)} title="Volver al inicio">
                 <i className="icon-home" aria-hidden="true"></i>
               </button>
-              {(prevId || nextId) && (
+              {(prevId || nextId || isAtEndOfList || showEndCard) && (
                 <span className="detail-swipe-hint">Desliza para ver más chistes</span>
               )}
               <button 
                 className="btn-nav-prev btn-nav-desktop" 
-                onClick={() => prevId && navigate(`/content/${prevId}`, { state: { contentIds, returnPath, navDirection: 'prev' } })}
-                disabled={!prevId}
-                title="Chiste anterior"
+                onClick={() => {
+                  if (showEndCard) setShowEndCard(false);
+                  else if (prevId) navigate(`/content/${prevId}`, { state: { contentIds, returnPath, navDirection: 'prev' } });
+                }}
+                disabled={!showEndCard && !prevId}
+                title={showEndCard ? 'Chiste anterior' : 'Chiste anterior'}
               >
                 <i className="icon-arrow-left" aria-hidden="true"></i> Anterior
               </button>
               <button 
                 className="btn-nav-next btn-nav-desktop" 
-                onClick={() => nextId && navigate(`/content/${nextId}`, { state: { contentIds, returnPath, navDirection: 'next' } })}
-                disabled={!nextId}
+                onClick={() => {
+                  if (isAtEndOfList && !showEndCard) setShowEndCard(true);
+                  else if (nextId) navigate(`/content/${nextId}`, { state: { contentIds, returnPath, navDirection: 'next' } });
+                }}
+                disabled={!(nextId || (isAtEndOfList && !showEndCard))}
                 title="Siguiente chiste"
               >
                 Siguiente <i className="icon-arrow-left icon-arrow-right" aria-hidden="true"></i>
               </button>
             </>
           ) : (
-            <button className="btn-back-top" onClick={() => navigate(returnPath?.startsWith('/#') ? returnPath : '/#home-top-cards')} title="Volver al inicio">
+            <button className="btn-back-top" onClick={() => navigate(backPath)} title="Volver al inicio">
               <i className="icon-home" aria-hidden="true"></i>
             </button>
           )}
@@ -362,6 +383,27 @@ const ContentDetailPage = () => {
               )}
             </AnimatePresence>
             <AnimatePresence mode="wait">
+              {showEndCard ? (
+                <motion.article
+                  key="end-card"
+                  className="detail-article detail-article--card-style detail-end-card"
+                  initial={{ opacity: 0, x: 80 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -80 }}
+                  transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+                >
+                  <div className="detail-end-card-content">
+                    <img src="/logo_chisteteca.png" alt="Chisteteca" className="detail-end-card-logo" />
+                    <h3 className="detail-end-card-title">
+                      Has llegado al final, pincha{' '}
+                      <Link to={backPath} className="detail-end-card-link">
+                        AQUÍ
+                      </Link>
+                      {' '}o en el icono de arriba para volver.
+                    </h3>
+                  </div>
+                </motion.article>
+              ) : (
               <motion.article
                 key={content?._id ?? id}
                 className="detail-article detail-article--card-style"
@@ -475,8 +517,11 @@ const ContentDetailPage = () => {
               </div>
 
             </motion.article>
+              )}
             </AnimatePresence>
 
+            {!showEndCard && (
+            <>
             {/* Share box - between joke and comments */}
             <div className="share-box">
               <h4 className="share-box-title">Compartir</h4>
@@ -581,6 +626,8 @@ const ContentDetailPage = () => {
                 <p className="no-comments">Sé el primero en comentar</p>
               )}
             </div>
+            </>
+            )}
 
           </div>
 

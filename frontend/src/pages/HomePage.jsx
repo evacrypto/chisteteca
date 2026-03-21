@@ -192,9 +192,9 @@ const HomePage = () => {
           </Row>
         ) : null}
 
-        {/* Category Filter - debajo de los populares */}
+        {/* Categorías - enlace para volver desde navegación por categoría */}
         {!isSpecialPage && (
-          <div className="mt-5">
+          <div id="home-categories" className="mt-5">
             <CategoryFilter
               selectedCategory={selectedCategory}
               onSelectCategory={setSelectedCategory}

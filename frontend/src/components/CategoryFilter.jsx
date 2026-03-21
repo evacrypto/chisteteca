@@ -5,7 +5,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import './CategoryFilter.css';
 
 const CategoryFilter = ({ selectedCategory, onSelectCategory }) => {
-  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,15 +44,6 @@ const CategoryFilter = ({ selectedCategory, onSelectCategory }) => {
         
         <Col xs={12}>
           <div className="category-filter-scroll">
-            <button
-              className={`category-btn btn btn-sm ${!selectedCategory ? 'btn-primary-custom' : 'btn-outline-custom'}`}
-              onClick={() => {
-                onSelectCategory(null);
-                navigate('/');
-              }}
-            >
-              Todas
-            </button>
             {categories.map((category) => (
               <Link
                 key={category._id}

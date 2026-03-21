@@ -177,6 +177,46 @@
   border-top: 1px solid #e9ecef;
 }
 
+/* Tarjeta de fin de navegación */
+.detail-end-card .detail-end-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.detail-end-card-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 24px;
+  object-fit: contain;
+}
+
+.detail-end-card-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.detail-end-card-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #ffc107;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.detail-end-card-link:hover {
+  color: #fd7e14;
+}
+
 /* Article Header */
 .article-header {
   margin-bottom: 30px;
