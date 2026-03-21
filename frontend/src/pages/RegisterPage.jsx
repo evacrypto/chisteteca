@@ -280,7 +280,7 @@ const RegisterPage = () => {
                               value={formData.confirmPassword}
                               onChange={handleChange}
                               className="form-control auth-password-input"
-                              placeholder="••••••••"
+                              placeholder="confirma tu contraseña"
                               required
                             />
                           </div>
