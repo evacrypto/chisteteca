@@ -92,10 +92,11 @@ const AdminDashboard = () => {
     const usersRes = await adminAPI.getUsers(params);
     let data = usersRes.data.data || [];
     if (sortBy === 'username') {
+      const collator = new Intl.Collator('es', { sensitivity: 'base' });
       data = [...data].sort((a, b) => {
-        const ua = (a.username || '').toLowerCase();
-        const ub = (b.username || '').toLowerCase();
-        return sortOrder === 'asc' ? ua.localeCompare(ub, 'es') : ub.localeCompare(ua, 'es');
+        const ua = (a.username || '').trim();
+        const ub = (b.username || '').trim();
+        return sortOrder === 'asc' ? collator.compare(ua, ub) : collator.compare(ub, ua);
       });
     }
     setUsers(data);
@@ -137,7 +138,16 @@ const AdminDashboard = () => {
       sortBy: sortByParam,
       sortOrder
     });
-    setAllContent(contentRes.data.data || []);
+    let data = contentRes.data.data || [];
+    if (sortBy === 'author') {
+      const collator = new Intl.Collator('es', { sensitivity: 'base' });
+      data = [...data].sort((a, b) => {
+        const nameA = (a.author?.username || a.authorName || '').toLowerCase();
+        const nameB = (b.author?.username || b.authorName || '').toLowerCase();
+        return sortOrder === 'asc' ? collator.compare(nameA, nameB) : collator.compare(nameB, nameA);
+      });
+    }
+    setAllContent(data);
     if (contentRes.data.pagination) {
       setContentPagination(prev => ({
         ...prev,

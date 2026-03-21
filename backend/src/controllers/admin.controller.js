@@ -149,13 +149,16 @@ export const getAllContentForAdmin = async (req, res) => {
       ];
       content = await Content.aggregate(pipeline);
     } else {
-      content = await Content.find(query)
+      const q = Content.find(query)
         .populate('author', 'username avatar')
         .populate('categories', 'name slug emoji color')
         .sort(sort)
         .limit(limit)
-        .skip(skip)
-        .lean();
+        .skip(skip);
+      if (sortBy === 'authorName') {
+        q.collation({ locale: 'es', strength: 1 });
+      }
+      content = await q.lean();
     }
 
     const total = await Content.countDocuments(query);
