@@ -75,6 +75,13 @@
   border: none;
 }
 
+/* Safari: placeholder visible (iOS/Safari bug) */
+.subscribe-widget .form-control::placeholder {
+  overflow: visible;
+  color: #6c757d;
+  opacity: 1;
+}
+
 .subscribe-widget .btn {
   background: linear-gradient(135deg, #ffc107, #fd7e14);
   border: none;
@@ -356,16 +363,20 @@
     overflow: visible; /* Evita problemas de touch/focus en iOS */
   }
 
-  /* Móvil: asegura que el input sea clickable (iOS/touch) */
-  .subscribe-widget .form-control {
+  /* Móvil: corrige width:1% de Bootstrap que colapsa el input en columna */
+  .subscribe-widget .input-group .form-control {
+    width: 100% !important;
+    min-width: 100%;
     min-height: 48px;
     touch-action: manipulation;
     -webkit-tap-highlight-color: rgba(255, 193, 7, 0.2);
     border-radius: 8px;
+    font-size: 16px; /* Evita zoom automático en iOS */
   }
 
-  .subscribe-widget .btn {
+  .subscribe-widget .input-group .btn {
     width: 100%;
+    margin-left: 0 !important;
     margin-top: 10px;
     border-radius: 8px;
   }
@@ -402,9 +413,9 @@
   color: #0066ff;
 }
 
-/* Animación de entrada */
+/* Animación de entrada (sin transform final para evitar bugs de input en iOS) */
 .chisteteca-footer {
-  animation: fadeInUp 0.8s ease-out;
+  animation: fadeInUp 0.8s ease-out forwards;
 }
 
 @keyframes fadeInUp {
@@ -414,6 +425,6 @@
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
