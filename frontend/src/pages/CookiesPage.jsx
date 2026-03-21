@@ -8,6 +8,13 @@ const CookiesPage = () => (
       de cookies en <strong>chisteteca.es</strong>.
     </p>
 
+    <h2>Responsable</h2>
+    <p>
+      <strong>Evraristo Gundín Araújo</strong> (PURO.MARKETING)<br />
+      C/ Los Lirios 7, 03186 Torrevieja, Alicante<br />
+      Email: <a href="mailto:somos@puro.marketing">somos@puro.marketing</a>
+    </p>
+
     <h2>¿Qué son las cookies?</h2>
     <p>
       Las cookies son pequeños archivos de texto que los sitios web almacenan en su dispositivo 
@@ -31,7 +38,7 @@ const CookiesPage = () => (
     <p>
       Utilizamos <strong>Google Analytics</strong> para conocer cómo se usa el sitio (páginas visitadas, 
       tiempo de permanencia, etc.). Estas cookies solo se activan si el usuario ha dado su 
-      consentimiento mediante el banner de cookies.
+      consentimiento mediante el banner de cookies RGPD.
     </p>
     <ul>
       <li><strong>_ga, _gid, _gat:</strong> cookies de Google Analytics para análisis estadístico.</li>
@@ -43,12 +50,15 @@ const CookiesPage = () => (
       de Google en: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a>
     </p>
 
-    <h2>Gestión de cookies</h2>
+    <h2>Banner de cookies RGPD</h2>
     <p>
-      Al acceder al sitio por primera vez, se muestra un banner con la opción de aceptar o 
-      rechazar las cookies no esenciales (analíticas). El consentimiento se guarda para no 
-      volver a preguntar en cada visita.
+      Al acceder al sitio por primera vez, se muestra un banner con las opciones <strong>Aceptar</strong> 
+      o <strong>Rechazar</strong> las cookies no esenciales (analíticas). El consentimiento se guarda 
+      para no volver a preguntar en cada visita. Las cookies analíticas solo se cargan si el usuario 
+      acepta.
     </p>
+
+    <h2>Gestión de cookies</h2>
     <p>
       También puede configurar su navegador para bloquear o eliminar cookies. En los enlaces 
       siguientes encontrará instrucciones para los navegadores más habituales:

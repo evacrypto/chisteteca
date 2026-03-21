@@ -10,9 +10,9 @@ const PrivacidadPage = () => (
 
     <h2>Responsable del tratamiento</h2>
     <p>
-      <strong>Identidad:</strong> Evaristo Gundin<br />
+      <strong>Identidad:</strong> Evraristo Gundín Araújo<br />
       <strong>NIF:</strong> 45563737R<br />
-      <strong>Domicilio:</strong> C/ Los Lirios 7, 03180 Torrevieja (Alicante), España<br />
+      <strong>Domicilio fiscal:</strong> C/ Los Lirios 7, 03186 Torrevieja, Alicante<br />
       <strong>Email:</strong> <a href="mailto:somos@puro.marketing">somos@puro.marketing</a>
     </p>
 

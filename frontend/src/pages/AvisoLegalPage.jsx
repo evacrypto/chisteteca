@@ -9,17 +9,29 @@ const AvisoLegalPage = () => (
 
     <h2>Identificación del titular</h2>
     <p>
-      <strong>Titular:</strong> Evaristo Gundin<br />
+      <strong>Titular:</strong> Evraristo Gundín Araújo<br />
       <strong>NIF:</strong> 45563737R<br />
-      <strong>Domicilio:</strong> C/ Los Lirios 7, 03180 Torrevieja (Alicante), España<br />
-      <strong>Email de contacto:</strong> <a href="mailto:somos@puro.marketing">somos@puro.marketing</a><br />
-      <strong>Actividad:</strong> Servicios informáticos
+      <strong>Domicilio fiscal:</strong> C/ Los Lirios 7, 03186 Torrevieja, Alicante<br />
+      <strong>Email de contacto:</strong> <a href="mailto:somos@puro.marketing">somos@puro.marketing</a>
     </p>
+
+    <h2>Actividad</h2>
+    <p>
+      <strong>Nombre comercial:</strong> PURO.MARKETING<br />
+      <strong>Tagline:</strong> Desarrollo web, diseño y marketing<br />
+      <strong>Epígrafes IAE:</strong>
+    </p>
+    <ul>
+      <li>763 – Programadores y analistas informática (principal)</li>
+      <li>765 – Grabadores y otros profesionales informática</li>
+      <li>751 – Profesionales publicidad, relaciones públicas</li>
+      <li>474 – Artes gráficas (impresión gráfica)</li>
+    </ul>
 
     <h2>Objeto</h2>
     <p>
       El presente aviso legal regula el uso y utilización del sitio web <strong>chisteteca.es</strong>, 
-      del que es titular Evaristo Gundin, autónomo dedicado a servicios informáticos.
+      del que es titular Evraristo Gundín Araújo, operando bajo la marca PURO.MARKETING.
     </p>
 
     <h2>Condiciones de uso</h2>
@@ -32,7 +44,7 @@ const AvisoLegalPage = () => (
     <h2>Propiedad intelectual</h2>
     <p>
       Todos los contenidos del sitio web, incluyendo textos, imágenes, gráficos y diseño, son propiedad 
-      de Evaristo Gundin o de sus licenciantes, y están protegidos por la legislación española sobre 
+      del titular o de sus licenciantes, y están protegidos por la legislación española sobre 
       propiedad intelectual e industrial.
     </p>
 
