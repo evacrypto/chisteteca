@@ -1385,7 +1385,7 @@ const AdminDashboard = () => {
         <Modal.Header closeButton>
           <Modal.Title>Editar categoría</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {editingCategory && (
             <>
               <Form.Group className="mb-3">
