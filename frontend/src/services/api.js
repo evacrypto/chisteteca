@@ -25,8 +25,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  timeout: 10000, // 10 seconds timeout
-  withCredentials: true // needed for view-count cookie (once per visitor)
+  timeout: 10000 // 10 seconds timeout
 });
 
 // Add token to requests
@@ -117,6 +116,7 @@ export const usersAPI = {
 export const contentAPI = {
   getAll: (params) => api.get('/content', { params }),
   getOne: (id) => api.get(`/content/${id}`),
+  registerView: (id) => api.post(`/content/${id}/view`),
   getAdjacent: (id) => api.get(`/content/${id}/adjacent`),
   create: (data) => api.post('/content', data),
   update: (id, data) => api.put(`/content/${id}`, data),

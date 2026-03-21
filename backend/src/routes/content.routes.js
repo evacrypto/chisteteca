@@ -3,6 +3,7 @@ import {
   getAllContent, 
   getContent, 
   getAdjacentContent,
+  registerView,
   createContent, 
   updateContent, 
   deleteContent,
@@ -37,6 +38,7 @@ router.get('/popular', getTrendingContent);
 router.get('/trending', getTrendingContent);
 router.get('/random', getRandomContent);
 router.get('/:id/adjacent', getAdjacentContent);
+router.post('/:id/view', registerView);
 router.get('/:id', getContent);
 
 router.post('/', 

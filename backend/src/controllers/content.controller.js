@@ -136,6 +136,26 @@ export const getAdjacentContent = async (req, res) => {
   }
 };
 
+// @desc    Register a view (called by frontend only when visitor hasn't seen this content)
+// @route   POST /api/content/:id/view
+// @access  Public
+export const registerView = async (req, res) => {
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid content ID' });
+    }
+    const content = await Content.findById(req.params.id);
+    if (!content) {
+      return res.status(404).json({ success: false, message: 'Content not found' });
+    }
+    await content.incrementViews();
+    res.json({ success: true, data: { views: content.views } });
+  } catch (error) {
+    console.error('Register view error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 // @desc    Get single content
 // @route   GET /api/content/:id
 // @access  Public
@@ -152,23 +172,6 @@ export const getContent = async (req, res) => {
 
     if (!content) {
       return res.status(404).json({ success: false, message: 'Content not found' });
-    }
-
-    // Increment views only once per visitor (cookie-based)
-    const VIEWS_COOKIE = 'chisteteca_views';
-    const MAX_VIEWED_IDS = 100;
-    const contentIdStr = req.params.id;
-    const viewed = (req.cookies?.[VIEWS_COOKIE] || '').split(',').filter(Boolean);
-
-    if (!viewed.includes(contentIdStr)) {
-      await content.incrementViews();
-      const updated = [...viewed, contentIdStr].slice(-MAX_VIEWED_IDS);
-      res.cookie(VIEWS_COOKIE, updated.join(','), {
-        maxAge: 365 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production'
-      });
     }
 
     res.json({

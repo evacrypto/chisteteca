@@ -27,6 +27,7 @@ const ContentDetailPage = () => {
   const [submittingComment, setSubmittingComment] = useState(false);
 
   const currentUserId = user?._id || user?.id;
+  const VIEWED_KEY = 'chisteteca_viewed';
   const authorId = content?.author?._id || null;
   const authorName = content?.authorName || content?.author?.name || content?.author?.username || 'Autor desconocido';
   const authorAvatar = getUploadUrl(content?.author?.avatar || content?.authorAvatar) || '/logo_chisteteca.png';
@@ -72,12 +73,26 @@ const ContentDetailPage = () => {
         interactionsAPI.getComments(id, { limit: 50 })
       ]);
       
-      setContent(contentRes.data.data);
+      const contentData = contentRes.data.data;
+      setContent(contentData);
       setComments(commentsRes.data.data);
       
-      const liked = contentRes.data.data.likes?.some(l => l._id === currentUserId || l === currentUserId);
+      const liked = contentData.likes?.some(l => l._id === currentUserId || l === currentUserId);
       setIsLiked(liked || false);
-      setLikesCount(contentRes.data.data.likes?.length || 0);
+      setLikesCount(contentData.likes?.length || 0);
+
+      // Registrar visita solo una vez por visitante (localStorage)
+      try {
+        const viewed = JSON.parse(localStorage.getItem(VIEWED_KEY) || '[]');
+        if (!viewed.includes(id)) {
+          await contentAPI.registerView(id);
+          const updated = [...viewed, id].slice(-200);
+          localStorage.setItem(VIEWED_KEY, JSON.stringify(updated));
+          setContent((prev) => prev ? { ...prev, views: (prev.views || 0) + 1 } : prev);
+        }
+      } catch {
+        // Ignorar errores de registro de vista
+      }
 
       if (isAuthenticated) {
         try {
