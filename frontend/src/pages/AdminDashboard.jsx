@@ -994,7 +994,6 @@ const AdminDashboard = () => {
                     </button>
                   </th>
                   <th>Email</th>
-                  <th>Rol</th>
                   <th>Estado</th>
                   <th>
                     <button
@@ -1016,11 +1015,11 @@ const AdminDashboard = () => {
                     <td className="text-muted small">
                       {u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '-'}
                     </td>
-                    <td>{u.username}</td>
-                    <td className="text-muted">{u.email}</td>
                     <td>
-                      <Badge bg={u.role === 'admin' ? 'warning' : 'secondary'}>{u.role}</Badge>
+                      {u.username}
+                      {u.role === 'admin' && <Badge bg="warning" className="ms-2">admin</Badge>}
                     </td>
+                    <td className="text-muted">{u.email}</td>
                     <td>
                       <Badge bg={u.isSuspended ? 'danger' : 'success'}>
                         {u.isSuspended ? 'Suspendido' : 'Activo'}
