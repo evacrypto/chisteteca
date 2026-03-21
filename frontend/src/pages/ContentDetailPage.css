@@ -1027,6 +1027,10 @@
     margin-top: 40px;
   }
 
+  .sidebar--ad-placeholder {
+    margin-top: 50px;
+  }
+
   .related-grid .card-image-wrapper--chiste {
     aspect-ratio: 3.2/1;
   }
