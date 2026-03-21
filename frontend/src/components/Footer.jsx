@@ -57,6 +57,7 @@ const Footer = () => {
                     <div className="input-group input-group-lg">
                       <input 
                         type="email" 
+                        id="newsletter-email"
                         name="subscribe-email" 
                         className="form-control" 
                         placeholder="Tu email para risas semanales"
@@ -64,6 +65,8 @@ const Footer = () => {
                         value={newsletterEmail}
                         onChange={(e) => setNewsletterEmail(e.target.value)}
                         disabled={newsletterLoading}
+                        inputMode="email"
+                        autoComplete="email"
                       />
                       <button className="btn btn-primary" type="submit" disabled={newsletterLoading}>
                         {newsletterLoading ? '...' : '¡Suscribirme!'}

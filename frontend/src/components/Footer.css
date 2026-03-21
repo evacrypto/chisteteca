@@ -65,6 +65,9 @@
   border: none;
   padding: 16px 20px;
   font-size: 15px;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
 }
 
 .subscribe-widget .form-control:focus {
@@ -336,6 +339,7 @@
 @media (max-width: 767px) {
   .chisteteca-footer {
     padding-top: 24px;
+    padding-bottom: 100px; /* Evita que el cookie banner cubra el newsletter */
   }
 
   .footer-band {
@@ -349,11 +353,21 @@
 
   .subscribe-widget .input-group {
     flex-direction: column;
+    overflow: visible; /* Evita problemas de touch/focus en iOS */
+  }
+
+  /* Móvil: asegura que el input sea clickable (iOS/touch) */
+  .subscribe-widget .form-control {
+    min-height: 48px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(255, 193, 7, 0.2);
+    border-radius: 8px;
   }
 
   .subscribe-widget .btn {
     width: 100%;
     margin-top: 10px;
+    border-radius: 8px;
   }
 
   .footer-social {
