@@ -16,7 +16,9 @@ import {
   approveCategory,
   rejectCategory,
   approveAllPendingCategories,
-  getDuplicateContent
+  getDuplicateContent,
+  getDuplicateCategories,
+  mergeCategories
 } from '../controllers/admin.controller.js';
 import { protect, admin } from '../middleware/auth.middleware.js';
 
@@ -37,6 +39,8 @@ router.put('/content/:id/reject', rejectContent);
 router.delete('/content/:id', deleteContent);
 
 router.get('/categories/pending', getPendingCategories);
+router.get('/categories/duplicates', getDuplicateCategories);
+router.post('/categories/merge', mergeCategories);
 router.put('/categories/approve-all', approveAllPendingCategories);
 router.put('/categories/:id/approve', approveCategory);
 router.put('/categories/:id/reject', rejectCategory);

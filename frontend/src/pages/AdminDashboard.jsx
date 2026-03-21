@@ -39,6 +39,11 @@ const AdminDashboard = () => {
   const [duplicatesMeta, setDuplicatesMeta] = useState(null);
   const [loadingDuplicates, setLoadingDuplicates] = useState(false);
   const [duplicatesThreshold, setDuplicatesThreshold] = useState(85);
+  const [categoryDuplicateGroups, setCategoryDuplicateGroups] = useState([]);
+  const [categoryDuplicatesMeta, setCategoryDuplicatesMeta] = useState(null);
+  const [loadingCategoryDuplicates, setLoadingCategoryDuplicates] = useState(false);
+  const [categoryDuplicatesThreshold, setCategoryDuplicatesThreshold] = useState(85);
+  const [categoryMergeTargets, setCategoryMergeTargets] = useState({});
   const [sendingDigest, setSendingDigest] = useState(false);
 
   // Check if user is admin
@@ -121,6 +126,34 @@ const AdminDashboard = () => {
       setDuplicateGroups([]);
     } finally {
       setLoadingDuplicates(false);
+    }
+  };
+
+  const loadCategoryDuplicates = async () => {
+    setLoadingCategoryDuplicates(true);
+    try {
+      const res = await adminAPI.getCategoryDuplicates({ threshold: categoryDuplicatesThreshold / 100 });
+      setCategoryDuplicateGroups(res.data.data?.groups || []);
+      setCategoryDuplicatesMeta(res.data.data || null);
+      setCategoryMergeTargets({});
+    } catch (error) {
+      toast.error('Error al cargar duplicados de categorías');
+      setCategoryDuplicateGroups([]);
+    } finally {
+      setLoadingCategoryDuplicates(false);
+    }
+  };
+
+  const handleMergeCategories = async (group, targetId) => {
+    const sourceIds = group.items.filter(c => c._id !== targetId).map(c => c._id);
+    if (sourceIds.length === 0) return;
+    try {
+      await adminAPI.mergeCategories(targetId, sourceIds);
+      toast.success('Categorías fusionadas correctamente');
+      loadCategoryDuplicates();
+      fetchData();
+    } catch (e) {
+      toast.error(e.response?.data?.message || 'Error al fusionar categorías');
     }
   };
 
@@ -506,7 +539,7 @@ const AdminDashboard = () => {
         <button
           type="button"
           className={`admin-tab-btn ${activeTab === 'duplicates' ? 'active' : ''}`}
-          onClick={() => { setActiveTab('duplicates'); loadDuplicates(); }}
+          onClick={() => { setActiveTab('duplicates'); loadDuplicates(); loadCategoryDuplicates(); }}
           aria-pressed={activeTab === 'duplicates'}
           title="Buscar chistes similares o duplicados"
         >
@@ -1096,6 +1129,7 @@ const AdminDashboard = () => {
       )}
 
       {activeTab === 'duplicates' && (
+        <>
         <Card className="card-custom">
           <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h4 className="mb-0">Chistes duplicados o similares</h4>
@@ -1180,6 +1214,91 @@ const AdminDashboard = () => {
             )}
           </Card.Body>
         </Card>
+
+        <Card className="card-custom mt-4">
+          <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h4 className="mb-0">Categorías duplicadas o similares</h4>
+            <div className="d-flex align-items-center gap-2 flex-wrap">
+              <label className="d-flex align-items-center gap-1 small">
+                Umbral:
+                <Form.Control
+                  type="number"
+                  min={50}
+                  max={100}
+                  value={categoryDuplicatesThreshold}
+                  onChange={(e) => setCategoryDuplicatesThreshold(Number(e.target.value) || 85)}
+                  style={{ width: 60 }}
+                />
+                %
+              </label>
+              <Button variant="outline-secondary" size="sm" onClick={loadCategoryDuplicates} disabled={loadingCategoryDuplicates}>
+                {loadingCategoryDuplicates ? 'Buscando...' : '🔄 Buscar duplicados'}
+              </Button>
+            </div>
+          </Card.Header>
+          <Card.Body>
+            {categoryDuplicatesMeta && (
+              <p className="text-muted small mb-3">
+                Escaneadas: {categoryDuplicatesMeta.scanned} categorías · Grupos detectados: {categoryDuplicateGroups.length} (umbral ≥{categoryDuplicatesMeta.threshold}%)
+              </p>
+            )}
+            {loadingCategoryDuplicates ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status"><span className="visually-hidden">Cargando...</span></div>
+                <p className="mt-2 text-muted">Comparando categorías...</p>
+              </div>
+            ) : categoryDuplicateGroups.length === 0 ? (
+              <div className="text-center py-5 text-muted">
+                <i className="icon-check-circle mb-2" style={{ fontSize: '40px' }} aria-hidden="true"></i>
+                <p className="mb-0">No se encontraron categorías duplicadas con el umbral actual. Prueba bajando el umbral (ej. 75%) para detectar más similitudes.</p>
+              </div>
+            ) : (
+              <div className="duplicate-groups">
+                {categoryDuplicateGroups.map((group, gIdx) => (
+                  <Card key={gIdx} className="mb-3 border-info">
+                    <Card.Header className="py-2 bg-info bg-opacity-10 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                      <strong>Grupo {gIdx + 1}</strong> — Similitud media: {group.avgSimilarity}%
+                      <div className="d-flex align-items-center gap-2">
+                        <label className="small mb-0 d-flex align-items-center gap-1">
+                          Conservar:
+                          <Form.Select
+                            size="sm"
+                            style={{ width: 'auto', minWidth: 140 }}
+                            value={categoryMergeTargets[gIdx] ?? group.items[0]?._id}
+                            onChange={(e) => setCategoryMergeTargets(prev => ({ ...prev, [gIdx]: e.target.value }))}
+                          >
+                            {group.items.map((cat) => (
+                              <option key={cat._id} value={cat._id}>
+                                {cat.emoji} {cat.name} ({cat.contentCount || 0})
+                              </option>
+                            ))}
+                          </Form.Select>
+                        </label>
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          onClick={() => handleMergeCategories(group, categoryMergeTargets[gIdx] ?? group.items[0]?._id)}
+                          disabled={!group.items[0] || group.items.length < 2}
+                        >
+                          Unir categorías
+                        </Button>
+                      </div>
+                    </Card.Header>
+                    <Card.Body className="py-2">
+                      {group.items.map((cat) => (
+                        <div key={cat._id} className="d-flex justify-content-between align-items-center py-2 border-bottom border-light">
+                          <span>{cat.emoji} <strong>{cat.name}</strong></span>
+                          <small className="text-muted">{cat.contentCount || 0} chistes</small>
+                        </div>
+                      ))}
+                    </Card.Body>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </Card.Body>
+        </Card>
+        </>
       )}
 
       {activeTab === 'content' && (
