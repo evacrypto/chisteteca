@@ -45,6 +45,7 @@ const AdminDashboard = () => {
   const [loadingCategoryDuplicates, setLoadingCategoryDuplicates] = useState(false);
   const [categoryDuplicatesThreshold, setCategoryDuplicatesThreshold] = useState(85);
   const [categoryMergeTargets, setCategoryMergeTargets] = useState({});
+  const [mergingCategories, setMergingCategories] = useState(false);
   const [sendingDigest, setSendingDigest] = useState(false);
 
   // Check if user is admin
@@ -146,15 +147,21 @@ const AdminDashboard = () => {
   };
 
   const handleMergeCategories = async (group, targetId) => {
-    const sourceIds = group.items.filter(c => c._id !== targetId).map(c => c._id);
+    const targetIdStr = String(targetId);
+    const sourceIds = group.items
+      .filter(c => String(c._id) !== targetIdStr)
+      .map(c => String(c._id));
     if (sourceIds.length === 0) return;
+    setMergingCategories(true);
     try {
-      await adminAPI.mergeCategories(targetId, sourceIds);
+      await adminAPI.mergeCategories(targetIdStr, sourceIds);
       toast.success('Categorías fusionadas correctamente');
       loadCategoryDuplicates();
       fetchData();
     } catch (e) {
       toast.error(e.response?.data?.message || 'Error al fusionar categorías');
+    } finally {
+      setMergingCategories(false);
     }
   };
 
@@ -1285,11 +1292,11 @@ const AdminDashboard = () => {
                           <Form.Select
                             size="sm"
                             style={{ width: 'auto', minWidth: 140 }}
-                            value={categoryMergeTargets[gIdx] ?? group.items[0]?._id}
+                            value={categoryMergeTargets[gIdx] ?? String(group.items[0]?._id ?? '')}
                             onChange={(e) => setCategoryMergeTargets(prev => ({ ...prev, [gIdx]: e.target.value }))}
                           >
                             {group.items.map((cat) => (
-                              <option key={cat._id} value={cat._id}>
+                              <option key={cat._id} value={String(cat._id)}>
                                 {cat.emoji} {cat.name} ({cat.contentCount || 0})
                               </option>
                             ))}
@@ -1298,10 +1305,10 @@ const AdminDashboard = () => {
                         <Button
                           size="sm"
                           variant="primary"
-                          onClick={() => handleMergeCategories(group, categoryMergeTargets[gIdx] ?? group.items[0]?._id)}
-                          disabled={!group.items[0] || group.items.length < 2}
+                          onClick={() => handleMergeCategories(group, categoryMergeTargets[gIdx] ?? group.items[0]?._id ?? '')}
+                          disabled={!group.items[0] || group.items.length < 2 || mergingCategories}
                         >
-                          Unir categorías
+                          {mergingCategories ? 'Uniendo...' : 'Unir categorías'}
                         </Button>
                       </div>
                     </Card.Header>
