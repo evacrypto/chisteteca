@@ -149,6 +149,12 @@ export const categoriesAPI = {
   delete: (id) => api.delete(`/categories/${id}`)
 };
 
+// Newsletter API
+export const newsletterAPI = {
+  subscribe: (email) => api.post('/newsletter/subscribe', { email }),
+  sendDigest: () => api.post('/newsletter/send-digest')
+};
+
 // Admin API
 export const adminAPI = {
   getStats: () => api.get('/admin/stats'),

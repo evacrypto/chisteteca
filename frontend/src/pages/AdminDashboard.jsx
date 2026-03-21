@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Container, Card, Row, Col, Table, Button, Badge, Pagination, Modal, Form } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { adminAPI, categoriesAPI, contentAPI, getUploadUrl } from '../services/api';
+import { adminAPI, categoriesAPI, contentAPI, newsletterAPI, getUploadUrl } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
@@ -39,6 +39,7 @@ const AdminDashboard = () => {
   const [duplicatesMeta, setDuplicatesMeta] = useState(null);
   const [loadingDuplicates, setLoadingDuplicates] = useState(false);
   const [duplicatesThreshold, setDuplicatesThreshold] = useState(85);
+  const [sendingDigest, setSendingDigest] = useState(false);
 
   // Check if user is admin
   useEffect(() => {
@@ -540,6 +541,35 @@ const AdminDashboard = () => {
               </Card>
             </Col>
           </Row>
+
+          {/* Newsletter digest */}
+          <Card className="card-custom mb-4">
+            <Card.Header className="bg-transparent border-0">
+              <h4 className="mb-0">Newsletter</h4>
+            </Card.Header>
+            <Card.Body>
+              <p className="text-muted mb-3">
+                Envía el digest semanal con los mejores chistes a los suscriptores (Resend Broadcast).
+              </p>
+              <Button
+                variant="warning"
+                onClick={async () => {
+                  setSendingDigest(true);
+                  try {
+                    await newsletterAPI.sendDigest();
+                    toast.success('Digest enviado correctamente');
+                  } catch (err) {
+                    toast.error(err.response?.data?.message || 'Error al enviar el digest');
+                  } finally {
+                    setSendingDigest(false);
+                  }
+                }}
+                disabled={sendingDigest}
+              >
+                {sendingDigest ? 'Enviando...' : 'Enviar digest semanal'}
+              </Button>
+            </Card.Body>
+          </Card>
 
           {/* Top Content */}
           <Card className="card-custom mb-4">

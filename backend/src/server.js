@@ -17,6 +17,7 @@ import contentRoutes from './routes/content.routes.js';
 import categoryRoutes from './routes/category.routes.js';
 import interactionRoutes from './routes/interaction.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import newsletterRoutes from './routes/newsletter.routes.js';
 import { serveOgHtml } from './controllers/og.controller.js';
 
 dotenv.config();
@@ -67,6 +68,7 @@ app.use('/api/content', contentRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/interactions', interactionRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

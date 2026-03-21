@@ -1,17 +1,36 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { categoriesAPI } from '../services/api';
+import { toast } from 'react-toastify';
+import { categoriesAPI, newsletterAPI } from '../services/api';
 import './Footer.css';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [categories, setCategories] = useState([]);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
 
   useEffect(() => {
     categoriesAPI.getAll()
       .then((res) => setCategories(res.data?.data || []))
       .catch(() => {});
   }, []);
+
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    const email = newsletterEmail.trim();
+    if (!email) return;
+    setNewsletterLoading(true);
+    try {
+      const res = await newsletterAPI.subscribe(email);
+      toast.success(res.data?.message || 'Revisa tu email para confirmar la suscripción');
+      setNewsletterEmail('');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error al suscribirse');
+    } finally {
+      setNewsletterLoading(false);
+    }
+  };
 
   return (
     <footer id="footer" className="chisteteca-footer">
@@ -34,7 +53,7 @@ const Footer = () => {
 
               <div className="col-lg-5">
                 <div className="widget subscribe-widget mb-0">
-                  <form className="mb-0" onSubmit={(e) => e.preventDefault()}>
+                  <form className="mb-0" onSubmit={handleNewsletterSubmit}>
                     <div className="input-group input-group-lg">
                       <input 
                         type="email" 
@@ -42,9 +61,12 @@ const Footer = () => {
                         className="form-control" 
                         placeholder="Tu email para risas semanales"
                         required
+                        value={newsletterEmail}
+                        onChange={(e) => setNewsletterEmail(e.target.value)}
+                        disabled={newsletterLoading}
                       />
-                      <button className="btn btn-primary" type="submit">
-                        ¡Suscribirme!
+                      <button className="btn btn-primary" type="submit" disabled={newsletterLoading}>
+                        {newsletterLoading ? '...' : '¡Suscribirme!'}
                       </button>
                     </div>
                     <p className="subscribe-legal small mt-2 mb-0">

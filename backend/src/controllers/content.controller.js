@@ -5,7 +5,6 @@ import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 import { containsProfanity } from '../utils/commentModeration.js';
 import { toAccentInsensitiveRegex } from '../utils/searchUtils.js';
-import { sendPendingReviewNotification } from '../services/email.service.js';
 
 const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -283,10 +282,13 @@ export const createContent = async (req, res) => {
         Content.countDocuments({ isApproved: false, isRejected: { $ne: true } }),
         Category.countDocuments({ isPending: true })
       ]);
-      setImmediate(() => {
-        sendPendingReviewNotification(pendingContent, pendingCategories).catch((err) =>
-          console.error('[Email] Pending review notification failed:', err)
-        );
+      setImmediate(async () => {
+        try {
+          const { sendPendingReviewNotification } = await import('../services/email.service.js');
+          await sendPendingReviewNotification(pendingContent, pendingCategories);
+        } catch (err) {
+          console.error('[Email] Pending review notification failed:', err);
+        }
       });
     }
 

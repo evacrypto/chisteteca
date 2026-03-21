@@ -144,6 +144,8 @@ PORT=5000
 MONGODB_URI=mongodb+srv://...
 JWT_SECRET=cambia_esto_por_algo_seguro
 FRONTEND_URL=https://chisteteca-frontend.pages.dev
+BACKEND_URL=https://tu-backend.up.railway.app
+RESEND_NEWSLETTER_SEGMENT_ID=xxx
 MAX_IMAGE_SIZE=5242880
 MAX_VIDEO_SIZE=52428800
 MAX_VIDEO_DURATION=120
@@ -158,7 +160,17 @@ VITE_CANONICAL_URL=https://chisteteca.es
 
 ---
 
-## 7. DEPLOYS FUTUROS
+## 7. NEWSLETTER (OPCIONAL)
+
+1. En Resend Dashboard → **Audiences** (o Segments) → crear segmento "Chisteteca Newsletter"
+2. Copiar el ID del segmento y añadir en Railway: `RESEND_NEWSLETTER_SEGMENT_ID=xxx`
+3. Añadir `BACKEND_URL=https://tu-backend.up.railway.app` en Railway (para enlaces de confirmación)
+4. Los suscriptores se confirman por email (double opt-in) y se añaden al segmento
+5. En Admin → Resumen → "Enviar digest semanal" para enviar el boletín de chistes
+
+---
+
+## 8. DEPLOYS FUTUROS
 
 Cada vez que hagas push a `main`:
 - **Railway** redeployará automáticamente el backend
@@ -173,7 +185,7 @@ git push
 
 ---
 
-## 8. SOLUCIÓN DE PROBLEMAS
+## 9. SOLUCIÓN DE PROBLEMAS
 
 ### Backend no arranca en Railway:
 - Revisa los logs en Railway → Deployments → View Logs

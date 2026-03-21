@@ -31,6 +31,7 @@ import AvisoLegalPage from './pages/AvisoLegalPage';
 import PrivacidadPage from './pages/PrivacidadPage';
 import CookiesPage from './pages/CookiesPage';
 import TerminosPage from './pages/TerminosPage';
+import NewsletterConfirmedPage from './pages/NewsletterConfirmedPage';
 import useAuthStore from './store/authStore';
 
 // Protected Route Component
@@ -128,6 +129,7 @@ function App() {
             <Route path="/privacidad" element={<PrivacidadPage />} />
             <Route path="/cookies" element={<CookiesPage />} />
             <Route path="/terminos" element={<TerminosPage />} />
+            <Route path="/newsletter/confirmed" element={<NewsletterConfirmedPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
