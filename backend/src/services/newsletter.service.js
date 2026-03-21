@@ -17,8 +17,13 @@ const getBaseUrl = () => {
 };
 
 const getBackendUrl = () => {
-  const url = process.env.BACKEND_URL || 'http://localhost:5000';
-  return url.replace(/\/$/, '');
+  if (process.env.BACKEND_URL) {
+    return process.env.BACKEND_URL.replace(/\/$/, '');
+  }
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+    return `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+  }
+  return 'http://localhost:5000';
 };
 
 /**
