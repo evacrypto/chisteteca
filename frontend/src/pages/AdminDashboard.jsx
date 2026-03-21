@@ -33,8 +33,8 @@ const AdminDashboard = () => {
   const [newCategoryForm, setNewCategoryForm] = useState({ name: '', emoji: '😂', color: '#ffc107' });
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [newCategoryEmojiModalOpen, setNewCategoryEmojiModalOpen] = useState(false);
-  const [usersSortBy, setUsersSortBy] = useState('username');
-  const [usersSortOrder, setUsersSortOrder] = useState('asc');
+  const [usersSortBy, setUsersSortBy] = useState('date');
+  const [usersSortOrder, setUsersSortOrder] = useState('desc');
   const [duplicateGroups, setDuplicateGroups] = useState([]);
   const [duplicatesMeta, setDuplicatesMeta] = useState(null);
   const [loadingDuplicates, setLoadingDuplicates] = useState(false);
@@ -89,6 +89,7 @@ const AdminDashboard = () => {
     const params = { limit: 100, sortOrder };
     if (sortBy === 'posts') params.sortBy = 'posts';
     else if (sortBy === 'username') params.sortBy = 'username';
+    else if (sortBy === 'date') params.sortBy = 'date';
     const usersRes = await adminAPI.getUsers(params);
     let data = usersRes.data.data || [];
     if (sortBy === 'username') {
@@ -97,6 +98,12 @@ const AdminDashboard = () => {
         const ua = (a.username || '').trim();
         const ub = (b.username || '').trim();
         return sortOrder === 'asc' ? collator.compare(ua, ub) : collator.compare(ub, ua);
+      });
+    } else if (sortBy === 'date') {
+      data = [...data].sort((a, b) => {
+        const da = new Date(a.createdAt || 0).getTime();
+        const db = new Date(b.createdAt || 0).getTime();
+        return sortOrder === 'desc' ? db - da : da - db;
       });
     }
     setUsers(data);
@@ -968,6 +975,17 @@ const AdminDashboard = () => {
                     <button
                       type="button"
                       className="admin-sort-th"
+                      onClick={() => handleUsersSort('date')}
+                      title="Ordenar por fecha de registro"
+                    >
+                      Registro
+                      <i className={`icon-chevron-${usersSortBy === 'date' ? (usersSortOrder === 'desc' ? 'down' : 'up') : 'down'} ms-1 admin-sort-icon ${usersSortBy !== 'date' ? 'admin-sort-icon-inactive' : ''}`} aria-hidden="true"></i>
+                    </button>
+                  </th>
+                  <th>
+                    <button
+                      type="button"
+                      className="admin-sort-th"
                       onClick={() => handleUsersSort('username')}
                       title="Ordenar por usuario (A-Z / Z-A)"
                     >
@@ -995,6 +1013,9 @@ const AdminDashboard = () => {
               <tbody>
                 {users.map((u) => (
                   <tr key={u._id}>
+                    <td className="text-muted small">
+                      {u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '-'}
+                    </td>
                     <td>{u.username}</td>
                     <td className="text-muted">{u.email}</td>
                     <td>

@@ -47,12 +47,23 @@ export const sendVerificationEmail = async (to, username, token) => {
   const from = getFromAddress();
 
   const html = `
-    <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto;">
-      <h2>¡Hola ${username}!</h2>
-      <p>Gracias por registrarte en Chisteteca. Para activar tu cuenta, haz clic en el siguiente enlace:</p>
-      <p><a href="${verifyUrl}" style="display: inline-block; padding: 12px 24px; background: #6f42c1; color: white; text-decoration: none; border-radius: 8px;">Confirmar mi email</a></p>
-      <p>Si no has creado una cuenta, puedes ignorar este mensaje.</p>
-      <p style="color: #666; font-size: 12px;">Este enlace expira en 24 horas.</p>
+    <div style="font-family: 'Segoe UI', system-ui, sans-serif; max-width: 520px; margin: 0 auto; background: #f8f9fa; padding: 24px; border-radius: 12px;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h1 style="color: #6f42c1; margin: 0; font-size: 24px;">Chisteteca</h1>
+        <p style="color: #666; margin: 4px 0 0; font-size: 14px;">Tu biblioteca de humor</p>
+      </div>
+      <div style="background: white; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+        <h2 style="color: #333; margin: 0 0 16px;">¡Hola ${username}!</h2>
+        <p style="color: #555; line-height: 1.6;">Gracias por registrarte. Haz clic en el botón para confirmar tu email:</p>
+        <p style="text-align: center; margin: 24px 0;">
+          <a href="${verifyUrl}" style="display: inline-block; padding: 14px 28px; background: #6f42c1; color: white !important; text-decoration: none; border-radius: 8px; font-weight: 600;">Confirmar mi email</a>
+        </p>
+        <p style="color: #888; font-size: 13px;">Si no creaste esta cuenta, ignora este mensaje.</p>
+        <p style="color: #999; font-size: 12px;">El enlace expira en 24 horas.</p>
+      </div>
+      <p style="text-align: center; margin-top: 20px;">
+        <a href="${baseUrl.replace(/\/$/, '')}" style="color: #6f42c1; font-size: 12px;">chisteteca.es</a>
+      </p>
     </div>
   `;
 
