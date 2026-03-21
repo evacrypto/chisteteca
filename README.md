@@ -341,6 +341,6 @@ cd backend && npm run dev
 cd frontend && npm run dev
 ```
 
-## Nota sobre documentación adicional
+## Nota sobre documentación adicional:
 
 La documentación vigente para trabajar y testear el proyecto es este `README.md`.
