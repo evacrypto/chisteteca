@@ -9,7 +9,7 @@ import {
 } from '../services/newsletter.service.js';
 import { protect, admin } from '../middleware/auth.middleware.js';
 
-const subscribeValidators = [body('email').isEmail().normalizeEmail().withMessage('Email no válido')];
+export const subscribeValidators = [body('email').isEmail().normalizeEmail().withMessage('Email no válido')];
 
 /**
  * POST /api/newsletter/subscribe
