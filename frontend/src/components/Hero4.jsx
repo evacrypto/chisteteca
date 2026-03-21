@@ -36,8 +36,7 @@ const Hero4 = () => {
 
         {/* Subtítulo */}
         <p className="hero4-subtitle">
-          Descubre, comparte y ríete con los mejores chistes, memes y videos graciosos. 
-          Únete a nuestra comunidad y haz reír a miles de usuarios.
+          Chisteteca es la biblioteca de chistes. Descubre, comparte y ríete con los mejores chistes. Únete a nuestra comunidad y haz reír a miles de usuarios.
         </p>
 
         {/* Botones */}
