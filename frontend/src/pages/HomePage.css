@@ -35,3 +35,10 @@
   margin: 0;
   text-align: center;
 }
+
+.home-popular-card-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 8px 0 0;
+  text-align: center;
+}

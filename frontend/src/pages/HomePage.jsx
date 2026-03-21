@@ -137,13 +137,14 @@ const HomePage = () => {
           /* Inicio: 3 tarjetas vacías con títulos */
           <Row xs={1} md={3} className="g-4">
             {[
-              { key: 'semana', title: 'Populares de la semana' },
+              { key: 'semana', title: 'Populares de la semana', subtitle: 'Pincha para ver los chistes más populares de esta semana' },
               { key: 'ano', title: 'Populares del año' },
               { key: 'siempre', title: 'Populares de siempre' }
-            ].map(({ key, title }) => (
+            ].map(({ key, title, subtitle }) => (
               <Col key={key} className="h-auto">
                 <div className="home-popular-card">
                   <h3 className="home-popular-card-title">{title}</h3>
+                  {subtitle && <p className="home-popular-card-subtitle">{subtitle}</p>}
                 </div>
               </Col>
             ))}
