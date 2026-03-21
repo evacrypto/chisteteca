@@ -23,7 +23,8 @@ const seedDatabase = async () => {
       username: 'admin',
       password: 'admin123',
       role: 'admin',
-      bio: 'Administrador de Chisteteca'
+      bio: 'Administrador de Chisteteca',
+      isEmailVerified: true
     });
 
     const demoUsers = await User.insertMany([
@@ -31,19 +32,22 @@ const seedDatabase = async () => {
         email: 'sofia@chisteteca.com',
         username: 'sofia',
         password: 'demo1234',
-        bio: 'Fan del humor cotidiano.'
+        bio: 'Fan del humor cotidiano.',
+        isEmailVerified: true
       },
       {
         email: 'diego@chisteteca.com',
         username: 'diego',
         password: 'demo1234',
-        bio: 'Coleccionista de chistes malos.'
+        bio: 'Coleccionista de chistes malos.',
+        isEmailVerified: true
       },
       {
         email: 'marta@chisteteca.com',
         username: 'marta',
         password: 'demo1234',
-        bio: 'Memes y cafe en ese orden.'
+        bio: 'Memes y cafe en ese orden.',
+        isEmailVerified: true
       }
     ]);
 

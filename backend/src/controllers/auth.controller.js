@@ -1,6 +1,8 @@
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 import User from '../models/User.model.js';
+import { sendVerificationEmail } from '../services/email.service.js';
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -24,23 +26,29 @@ export const register = async (req, res) => {
     // Check if user exists
     const userExists = await User.findOne({ $or: [{ email }, { username }] });
     if (userExists) {
-      return res.status(400).json({ 
-        success: false, 
-        message: userExists.email === email ? 'Email already registered' : 'Username already taken' 
+      return res.status(400).json({
+        success: false,
+        message: userExists.email === email ? 'Email already registered' : 'Username already taken'
       });
     }
 
-    // Create user
+    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+    const emailVerificationExpire = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
     const user = await User.create({
       email,
       username,
-      password
+      password,
+      isEmailVerified: false,
+      emailVerificationToken,
+      emailVerificationExpire
     });
 
-    const token = generateToken(user._id);
+    await sendVerificationEmail(user.email, user.username, emailVerificationToken);
 
     res.status(201).json({
       success: true,
+      message: 'Revisa tu email para confirmar tu cuenta',
       data: {
         user: {
           id: user._id,
@@ -48,8 +56,7 @@ export const register = async (req, res) => {
           username: user.username,
           role: user.role,
           avatar: user.avatar
-        },
-        token
+        }
       }
     });
   } catch (error) {
@@ -78,10 +85,19 @@ export const login = async (req, res) => {
 
     // Check if suspended
     if (user.isSuspended) {
-      return res.status(403).json({ 
-        success: false, 
+      return res.status(403).json({
+        success: false,
         message: 'Account suspended',
-        reason: user.suspendReason 
+        reason: user.suspendReason
+      });
+    }
+
+    // Check if email verified (users without field are legacy, treat as verified)
+    if (user.isEmailVerified === false) {
+      return res.status(403).json({
+        success: false,
+        message: 'Email not verified',
+        code: 'EMAIL_NOT_VERIFIED'
       });
     }
 
@@ -141,6 +157,83 @@ export const getMe = async (req, res) => {
   } catch (error) {
     console.error('Get me error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// @desc    Verify email with token
+// @route   GET /api/auth/verify-email/:token
+// @access  Public
+export const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const user = await User.findOne({
+      emailVerificationToken: token,
+      emailVerificationExpire: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token inválido o expirado'
+      });
+    }
+
+    user.isEmailVerified = true;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    res.json({
+      success: true,
+      message: 'Email verificado correctamente. Ya puedes iniciar sesión.'
+    });
+  } catch (error) {
+    console.error('Verify email error:', error);
+    res.status(500).json({ success: false, message: 'Error al verificar el email' });
+  }
+};
+
+// @desc    Resend verification email
+// @route   POST /api/auth/resend-verification
+// @access  Public
+export const resendVerification = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'No existe ninguna cuenta con ese email'
+      });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Esta cuenta ya está verificada'
+      });
+    }
+
+    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+    user.emailVerificationToken = emailVerificationToken;
+    user.emailVerificationExpire = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    await user.save({ validateBeforeSave: false });
+
+    await sendVerificationEmail(user.email, user.username, emailVerificationToken);
+
+    res.json({
+      success: true,
+      message: 'Se ha enviado un nuevo email de verificación'
+    });
+  } catch (error) {
+    console.error('Resend verification error:', error);
+    res.status(500).json({ success: false, message: 'Error al reenviar el email' });
   }
 };
 

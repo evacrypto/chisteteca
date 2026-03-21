@@ -6,8 +6,9 @@ import './AuthForms.css';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const { register, isLoading } = useAuthStore();
+  const { register, login, resendVerification, isLoading } = useAuthStore();
   const [activeTab, setActiveTab] = useState('register');
+  const [showResendVerification, setShowResendVerification] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -21,12 +22,12 @@ const RegisterPage = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    if (e.target.name === 'email') setShowResendVerification(false);
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const { login } = useAuthStore.getState();
     const result = await login(formData.email, formData.password);
 
     if (result.success) {
@@ -37,6 +38,9 @@ const RegisterPage = () => {
       } else {
         navigate('/profile/me');
       }
+    } else if (result.code === 'EMAIL_NOT_VERIFIED') {
+      setShowResendVerification(true);
+      toast.warning('Debes verificar tu email antes de iniciar sesión');
     } else {
       toast.error(result.message);
     }
@@ -68,12 +72,17 @@ const RegisterPage = () => {
     const result = await register(formData.email, formData.username, formData.password);
 
     if (result.success) {
-      toast.success('¡Cuenta creada exitosamente!');
-      const user = result.user || useAuthStore.getState().user;
-      if (user?.role === 'admin') {
-        navigate('/admin');
+      if (result.needsVerification) {
+        toast.success('¡Cuenta creada! Revisa tu email para confirmar.');
+        setActiveTab('login');
       } else {
-        navigate('/profile/me');
+        toast.success('¡Cuenta creada exitosamente!');
+        const user = result.user || useAuthStore.getState().user;
+        if (user?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/profile/me');
+        }
       }
     } else {
       toast.error(result.message);
@@ -167,6 +176,24 @@ const RegisterPage = () => {
                             >
                               {isLoading ? 'Iniciando...' : 'Iniciar Sesión'}
                             </button>
+                            {showResendVerification && (
+                              <button
+                                type="button"
+                                className="btn btn-link text-primary d-block mt-2"
+                                onClick={async () => {
+                                  const r = await resendVerification(formData.email);
+                                  if (r.success) {
+                                    toast.success('Email de verificación reenviado');
+                                    setShowResendVerification(false);
+                                  } else {
+                                    toast.error(r.message);
+                                  }
+                                }}
+                                disabled={isLoading}
+                              >
+                                Reenviar email de verificación
+                              </button>
+                            )}
                             <Link to="/reset-password" className="forgot-link">
                               ¿Olvidaste tu contraseña?
                             </Link>

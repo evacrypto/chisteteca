@@ -6,8 +6,9 @@ import './AuthForms.css';
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuthStore();
+  const { login, resendVerification, isLoading } = useAuthStore();
   const [activeTab, setActiveTab] = useState('login');
+  const [showResendVerification, setShowResendVerification] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -20,6 +21,7 @@ const LoginPage = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    if (e.target.name === 'email') setShowResendVerification(false);
   };
 
   const handleLogin = async (e) => {
@@ -35,6 +37,9 @@ const LoginPage = () => {
       } else {
         navigate('/profile/me');
       }
+    } else if (result.code === 'EMAIL_NOT_VERIFIED') {
+      setShowResendVerification(true);
+      toast.warning('Debes verificar tu email antes de iniciar sesión');
     } else {
       toast.error(result.message);
     }
@@ -162,6 +167,24 @@ const LoginPage = () => {
                             >
                               {isLoading ? 'Iniciando...' : 'Iniciar Sesión'}
                             </button>
+                            {showResendVerification && (
+                              <button
+                                type="button"
+                                className="btn btn-link text-primary d-block mt-2"
+                                onClick={async () => {
+                                  const r = await resendVerification(formData.email);
+                                  if (r.success) {
+                                    toast.success('Email de verificación reenviado');
+                                    setShowResendVerification(false);
+                                  } else {
+                                    toast.error(r.message);
+                                  }
+                                }}
+                                disabled={isLoading}
+                              >
+                                Reenviar email de verificación
+                              </button>
+                            )}
                             <Link to="/reset-password" className="forgot-link">
                               ¿Olvidaste tu contraseña?
                             </Link>

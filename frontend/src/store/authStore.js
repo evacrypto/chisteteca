@@ -36,12 +36,13 @@ const useAuthStore = create((set, get) => ({
       });
       return { success: true, user };
     } catch (error) {
-      const msg = error.response?.data?.message || error.response?.data?.error || 
+      const code = error.response?.data?.code;
+      const msg = error.response?.data?.message || error.response?.data?.error ||
         (error.response?.status === 401 ? 'Email o contraseña incorrectos' : null) ||
         (error.code === 'ERR_NETWORK' ? 'No se pudo conectar. Revisa tu conexión.' : null) ||
         'Error al iniciar sesión';
       set({ error: msg, isLoading: false });
-      return { success: false, message: msg };
+      return { success: false, message: msg, code };
     }
   },
 
@@ -49,18 +50,9 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await authAPI.register({ email, username, password });
-      const { user, token } = response.data.data;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      
-      set({ 
-        user, 
-        token, 
-        isAuthenticated: true, 
-        isLoading: false 
-      });
-      return { success: true, user };
+      const { user } = response.data.data || {};
+      set({ isLoading: false });
+      return { success: true, user, needsVerification: true };
     } catch (error) {
       const msg = error.response?.data?.message || error.response?.data?.error ||
         (error.code === 'ERR_NETWORK' ? 'No se pudo conectar. Revisa tu conexión.' : null) ||
@@ -114,6 +106,20 @@ const useAuthStore = create((set, get) => ({
       const updatedUser = { ...user, avatar: avatarUrl };
       localStorage.setItem('user', JSON.stringify(updatedUser));
       set({ user: updatedUser });
+    }
+  },
+
+  resendVerification: async (email) => {
+    set({ isLoading: true, error: null });
+    try {
+      await authAPI.resendVerification(email);
+      set({ isLoading: false });
+      return { success: true };
+    } catch (error) {
+      const msg = error.response?.data?.message || error.response?.data?.error ||
+        'Error al reenviar el email';
+      set({ error: msg, isLoading: false });
+      return { success: false, message: msg };
     }
   },
 

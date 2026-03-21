@@ -463,7 +463,7 @@ const AdminDashboard = () => {
           onClick={() => setActiveTab('categories')}
           aria-pressed={activeTab === 'categories'}
         >
-          Categorías ({pendingCategories.length})
+          Categorías ({allCategories.length})
         </button>
         <button
           type="button"

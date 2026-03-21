@@ -14,6 +14,7 @@
     "clean:orphan-content": "node src/utils/clean-orphan-content.js",
     "update:comments-count": "node src/utils/update-comments-count.js",
     "import:jokes": "node src/utils/import-jokes.js",
+    "migrate:email-verification": "node src/utils/migrate-email-verification.js",
     "recover:categories": "node src/utils/recover-content-categories.js",
     "qa:handoff": "npm run seed && npm run qa:scan-legacy && npm run qa:e2e",
     "qa:e2e": "powershell -ExecutionPolicy Bypass -File qa/e2e-user-admin.ps1",
@@ -40,6 +41,7 @@
     "mongoose": "^8.0.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^8.0.3",
     "string-similarity": "^4.0.4"
   },
   "devDependencies": {

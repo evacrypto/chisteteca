@@ -27,3 +27,11 @@ export const loginValidator = [
     .notEmpty()
     .withMessage('Password is required')
 ];
+
+export const resendVerificationValidator = [
+  body('email')
+    .trim()
+    .isEmail()
+    .withMessage('Please provide a valid email')
+    .normalizeEmail()
+];
