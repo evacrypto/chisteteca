@@ -51,7 +51,7 @@ export const sendVerificationEmail = async (to, username, token) => {
     <div style="font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; max-width: 520px; margin: 0 auto; background: #f8f9fa; padding: 24px; border-radius: 12px;">
       <div style="text-align: center; margin-bottom: 24px;">
         <img src="${logoUrl}" alt="Chisteteca" width="120" height="auto" style="display: block; margin: 0 auto 12px;" />
-        <p style="color: #1a1a2e; margin: 0; font-size: 14px; font-weight: 500;">Tu biblioteca de humor</p>
+        <p style="color: #1a1a2e; margin: 0; font-size: 14px; font-weight: 500;">La biblioteca de chistes</p>
       </div>
       <div style="background: white; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
         <h2 style="color: #1a1a2e; margin: 0 0 16px;">¡Hola ${username}!</h2>
