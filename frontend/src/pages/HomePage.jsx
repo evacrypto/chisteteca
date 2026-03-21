@@ -97,7 +97,12 @@ const HomePage = () => {
       return <>📁 Contenido por Categoría</>;
     }
 
-    return <>LOS MÁS POPULARES</>;
+    return (
+      <>
+        <i className="icon-fire text-warning me-2" aria-hidden="true"></i>
+        Los más populares
+      </>
+    );
   };
 
   const handleLoadMore = () => {
