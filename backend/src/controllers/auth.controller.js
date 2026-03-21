@@ -187,6 +187,15 @@ export const verifyEmail = async (req, res) => {
     user.emailVerificationExpire = undefined;
     await user.save({ validateBeforeSave: false });
 
+    setImmediate(async () => {
+      try {
+        const { sendNewUserConfirmationNotification } = await import('../services/email.service.js');
+        await sendNewUserConfirmationNotification(user.username, user.email, user.createdAt);
+      } catch (err) {
+        console.error('[Auth] New user confirmation notification failed:', err);
+      }
+    });
+
     res.json({
       success: true,
       message: 'Email verificado correctamente. Ya puedes iniciar sesión.'

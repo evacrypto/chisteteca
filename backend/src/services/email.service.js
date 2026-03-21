@@ -238,6 +238,82 @@ export const sendVipNotification = async (to, username) => {
   }
 };
 
+/**
+ * Notifica al admin cuando un usuario se registra y confirma su email.
+ * Un solo email cuando se cumplen ambas condiciones.
+ * @param {string} username - Nombre del usuario
+ * @param {string} email - Email del usuario
+ * @param {Date} createdAt - Fecha de registro
+ * @returns {Promise<boolean>}
+ */
+export const sendNewUserConfirmationNotification = async (username, email, createdAt) => {
+  const to = process.env.ADMIN_NEW_USER_EMAIL || 'guillotiname@gmail.com';
+  const baseUrl = getBaseUrl().replace(/\/$/, '');
+  const logoUrl = `${baseUrl}/logo_chisteteca.png`;
+  const from = getFromAddress();
+  const safeUsername = escapeHtml(username || '');
+  const safeEmail = escapeHtml(email || '');
+  const dateStr = createdAt ? new Date(createdAt).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+
+  const html = `
+    <div style="font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; max-width: 520px; margin: 0 auto; background: #f8f9fa; padding: 24px; border-radius: 12px;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <img src="${logoUrl}" alt="Chisteteca" width="120" height="auto" style="display: block; margin: 0 auto 12px;" />
+        <p style="color: #1a1a2e; margin: 0; font-size: 14px; font-weight: 500;">La biblioteca de chistes</p>
+      </div>
+      <div style="background: white; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+        <h2 style="color: #1a1a2e; margin: 0 0 16px;">Nuevo usuario registrado y verificado</h2>
+        <p style="color: #555; line-height: 1.6;">Un usuario se ha registrado y ha confirmado su email:</p>
+        <ul style="color: #555; line-height: 1.8;">
+          <li><strong>Usuario:</strong> ${safeUsername}</li>
+          <li><strong>Email:</strong> ${safeEmail}</li>
+          <li><strong>Registrado:</strong> ${dateStr}</li>
+        </ul>
+        <p style="text-align: center; margin: 24px 0;">
+          <a href="${baseUrl}/admin" style="display: inline-block; padding: 14px 28px; background: #ffc107; color: #1a1a2e !important; text-decoration: none; border-radius: 8px; font-weight: 600;">Ir al panel de admin</a>
+        </p>
+      </div>
+      <p style="text-align: center; margin-top: 20px;">
+        <a href="${baseUrl}" style="color: #e0a800; font-size: 12px;">chisteteca.es</a>
+      </p>
+    </div>
+  `;
+
+  const resend = getResendClient();
+  if (resend) {
+    const { error } = await resend.emails.send({
+      from,
+      to,
+      subject: `Chisteteca: nuevo usuario ${safeUsername} registrado y verificado`,
+      html
+    });
+    if (error) {
+      console.error('[Email] New user confirmation notification error:', error);
+      return false;
+    }
+    return true;
+  }
+
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.log('[Email] Sin Resend ni SMTP. No se envió notificación de nuevo usuario.');
+    return false;
+  }
+
+  try {
+    await transporter.sendMail({
+      from,
+      to,
+      subject: `Chisteteca: nuevo usuario ${safeUsername} registrado y verificado`,
+      html
+    });
+    return true;
+  } catch (err) {
+    console.error('[Email] New user confirmation notification error:', err);
+    return false;
+  }
+};
+
 const escapeHtml = (str) => {
   if (!str || typeof str !== 'string') return '';
   return str
