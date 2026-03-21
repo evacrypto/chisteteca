@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isVip: {
+    type: Boolean,
+    default: false
+  },
   suspendReason: {
     type: String,
     default: ''

@@ -26,7 +26,7 @@ export const getDashboardStats = async (req, res) => {
       .sort({ views: -1 })
       .limit(30)
       .select('title text type likes views')
-      .populate('author', 'username avatar');
+      .populate('author', 'username avatar isVip');
 
     res.json({
       success: true,
@@ -60,7 +60,7 @@ export const getPendingContent = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const content = await Content.find({ isApproved: false, isRejected: { $ne: true } })
-      .populate('author', 'username avatar')
+      .populate('author', 'username avatar isVip')
       .populate('categories', 'name slug emoji')
       .sort({ createdAt: -1 })
       .limit(limit)
@@ -133,7 +133,7 @@ export const getAllContentForAdmin = async (req, res) => {
             localField: 'author',
             foreignField: '_id',
             as: 'author',
-            pipeline: [{ $project: { username: 1, avatar: 1 } }]
+            pipeline: [{ $project: { username: 1, avatar: 1, isVip: 1 } }]
           }
         },
         { $unwind: { path: '$author', preserveNullAndEmptyArrays: true } },
@@ -150,7 +150,7 @@ export const getAllContentForAdmin = async (req, res) => {
       content = await Content.aggregate(pipeline);
     } else {
       const q = Content.find(query)
-        .populate('author', 'username avatar')
+        .populate('author', 'username avatar isVip')
         .populate('categories', 'name slug emoji color')
         .sort(sort)
         .limit(limit)
@@ -393,6 +393,37 @@ export const unsuspendUser = async (req, res) => {
   }
 };
 
+// @desc    Toggle VIP status
+// @route   PUT /api/admin/users/:id/vip
+// @access  Private/Admin
+export const toggleUserVip = async (req, res) => {
+  try {
+    if (!isValidId(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid user ID' });
+    }
+
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    user.isVip = !user.isVip;
+    await user.save();
+
+    res.json({
+      success: true,
+      data: {
+        id: user.id,
+        username: user.username,
+        isVip: user.isVip
+      }
+    });
+  } catch (error) {
+    console.error('Toggle VIP error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 // @desc    Delete user
 // @route   DELETE /api/admin/users/:id
 // @access  Private/Admin
@@ -435,7 +466,7 @@ export const deleteUser = async (req, res) => {
 export const getReportedContent = async (req, res) => {
   try {
     const content = await Content.find({ 'reportedBy.0': { $exists: true } })
-      .populate('author', 'username avatar')
+      .populate('author', 'username avatar isVip')
       .populate('reportedBy.user', 'username')
       .sort({ 'reportedBy.createdAt': -1 });
 
@@ -636,7 +667,7 @@ export const getDuplicateContent = async (req, res) => {
 
     const chistes = await Content.find({ type: 'chiste', text: { $exists: true, $ne: '' } })
       .select('_id title text author authorName createdAt likes views isApproved')
-      .populate('author', 'username avatar')
+      .populate('author', 'username avatar isVip')
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();

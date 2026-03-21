@@ -3,6 +3,7 @@ import { Container, Card, Row, Col, Table, Button, Badge, Pagination, Modal, For
 import { toast } from 'react-toastify';
 import { adminAPI, categoriesAPI, contentAPI, newsletterAPI, getUploadUrl } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
+import VipBadge from '../components/VipBadge';
 import { Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import EmojiPicker from 'emoji-picker-react';
@@ -382,6 +383,17 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleToggleVipUser = async (targetUser) => {
+    if (targetUser.role === 'admin') return;
+    try {
+      await adminAPI.toggleUserVip(targetUser._id);
+      toast.success(targetUser.isVip ? 'VIP quitado' : 'Usuario marcado como VIP');
+      await loadUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Error al cambiar VIP');
+    }
+  };
+
   const handleApproveCategory = async (id) => {
     try {
       await adminAPI.approveCategory(id);
@@ -757,6 +769,7 @@ const AdminDashboard = () => {
                               </span>
                             )}
                             <span>{item.authorName || item.author?.username || 'Desconocido'}</span>
+                            {item.author?.isVip && <VipBadge className="ms-2" />}
                           </div>
                         </td>
                         <td className="text-muted">
@@ -1095,6 +1108,7 @@ const AdminDashboard = () => {
                     <td>
                       {u.username}
                       {u.role === 'admin' && <Badge bg="warning" className="ms-2">admin</Badge>}
+                      {u.isVip && <VipBadge className="ms-2" />}
                     </td>
                     <td className="text-muted">{u.email}</td>
                     <td>
@@ -1104,6 +1118,15 @@ const AdminDashboard = () => {
                     </td>
                     <td>{u.stats?.totalPosts || 0}</td>
                     <td className="text-end admin-actions-cell">
+                      <Button
+                        size="sm"
+                        variant={u.isVip ? 'outline-secondary' : 'outline-primary'}
+                        onClick={() => handleToggleVipUser(u)}
+                        disabled={u.role === 'admin'}
+                        title={u.isVip ? 'Quitar VIP' : 'Hacer VIP'}
+                      >
+                        {u.isVip ? '★ Quitar VIP' : '★ VIP'}
+                      </Button>
                       <Button
                         size="sm"
                         variant={u.isSuspended ? 'success' : 'outline-warning'}

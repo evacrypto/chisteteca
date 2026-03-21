@@ -9,6 +9,7 @@ import {
   deleteContent,
   suspendUser,
   unsuspendUser,
+  toggleUserVip,
   deleteUser,
   getReportedContent,
   getAnalytics,
@@ -47,6 +48,7 @@ router.put('/categories/:id/reject', rejectCategory);
 
 router.put('/users/:id/suspend', suspendUser);
 router.put('/users/:id/unsuspend', unsuspendUser);
+router.put('/users/:id/vip', toggleUserVip);
 router.delete('/users/:id', deleteUser);
 
 export default router;

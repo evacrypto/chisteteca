@@ -168,6 +168,7 @@ export const adminAPI = {
   deleteContent: (id) => api.delete(`/admin/content/${id}`),
   suspendUser: (id, reason) => api.put(`/admin/users/${id}/suspend`, { reason }),
   unsuspendUser: (id) => api.put(`/admin/users/${id}/unsuspend`),
+  toggleUserVip: (id) => api.put(`/admin/users/${id}/vip`),
   deleteUser: (id) => api.delete(`/admin/users/${id}`),
   getReportedContent: () => api.get('/admin/content/reported'),
   getDuplicates: (params) => api.get('/admin/content/duplicates', { params }),

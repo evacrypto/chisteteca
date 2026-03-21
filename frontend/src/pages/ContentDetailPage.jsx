@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { contentAPI, interactionsAPI, usersAPI, getUploadUrl, getShareUrl } from '../services/api';
 import useAuthStore from '../store/authStore';
 import LoadingSpinner from '../components/LoadingSpinner';
+import VipBadge from '../components/VipBadge';
 import './ContentDetailPage.css';
 
 const ContentDetailPage = () => {
@@ -412,6 +413,7 @@ const ContentDetailPage = () => {
                     ) : (
                       <span className="author-name">{authorName}</span>
                     )}
+                    {(content?.author?.isVip) && <VipBadge className="ms-1" />}
                   </div>
 
                   {content.categories?.length > 0 && (

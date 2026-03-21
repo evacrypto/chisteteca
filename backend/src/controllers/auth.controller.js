@@ -120,7 +120,8 @@ export const login = async (req, res) => {
           username: user.username,
           role: user.role,
           avatar: user.avatar,
-          bio: user.bio
+          bio: user.bio,
+          isVip: user.isVip
         },
         token
       }
@@ -150,6 +151,7 @@ export const getMe = async (req, res) => {
           role: user.role,
           avatar: user.avatar,
           bio: user.bio,
+          isVip: user.isVip,
           stats: user.stats,
           favorites: user.favorites,
           following: user.following

@@ -3,6 +3,7 @@ import { Container, Card, Row, Col, Modal, Button, Badge } from 'react-bootstrap
 import { useParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ContentCard from '../components/ContentCard';
+import VipBadge from '../components/VipBadge';
 import LoadingSpinner from '../components/LoadingSpinner';
 import useAuthStore from '../store/authStore';
 import { usersAPI, contentAPI, getUploadUrl } from '../services/api';
@@ -243,6 +244,7 @@ const ProfilePage = () => {
                         {profileUser?.role === 'admin' && (
                           <Badge bg="warning" className="ms-2">Admin</Badge>
                         )}
+                        {profileUser?.isVip && <VipBadge className="ms-2" />}
                       </h2>
                       <p className="profile-bio text-muted mb-3">
                         {profileUser?.bio || 'Sin biografía'}

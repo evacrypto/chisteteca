@@ -39,6 +39,7 @@ export const getUserProfile = async (req, res) => {
           avatar: user.avatar,
           bio: user.bio,
           role: user.role,
+          isVip: user.isVip,
           stats: user.stats,
           joinedAt: user.createdAt
         }

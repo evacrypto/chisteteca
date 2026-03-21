@@ -60,7 +60,7 @@ export const getAllContent = async (req, res) => {
     const sort = { [sortBy]: sortOrder };
 
     const content = await Content.find(query)
-      .populate('author', 'username avatar')
+      .populate('author', 'username avatar isVip')
       .populate('categories', 'name slug emoji color')
       .sort(sort)
       .limit(limit)
@@ -170,7 +170,7 @@ export const getContent = async (req, res) => {
     }
 
     const content = await Content.findById(req.params.id)
-      .populate('author', 'username avatar bio')
+      .populate('author', 'username avatar bio isVip')
       .populate('categories', 'name slug emoji color')
       .populate('likes', 'username avatar');
 
@@ -238,8 +238,8 @@ export const createContent = async (req, res) => {
     if (text) contentData.text = text;
     if (categories) contentData.categories = categories;
 
-    // Auto-approve if admin, otherwise pending
-    if (user.role === 'admin') {
+    // Auto-approve if admin or VIP, otherwise pending
+    if (user.role === 'admin' || user.isVip) {
       contentData.isApproved = true;
     }
 
@@ -273,7 +273,7 @@ export const createContent = async (req, res) => {
       }
     }
 
-    const addedPendingContent = user.role !== 'admin';
+    const addedPendingContent = user.role !== 'admin' && !user.isVip;
     const queueBecameNonEmpty =
       (addedPendingContent && countPendingContentBefore === 0) ||
       (addedPendingCategory && countPendingCategoriesBefore === 0);
@@ -298,7 +298,7 @@ export const createContent = async (req, res) => {
     });
 
     const populatedContent = await Content.findById(content._id)
-      .populate('author', 'username avatar')
+      .populate('author', 'username avatar isVip')
       .populate('categories', 'name slug emoji color');
 
     res.status(201).json({
@@ -347,7 +347,7 @@ export const updateContent = async (req, res) => {
     await content.save();
 
     content = await Content.findById(content._id)
-      .populate('author', 'username avatar bio')
+      .populate('author', 'username avatar bio isVip')
       .populate('categories', 'name slug emoji color');
 
     res.json({

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import useAuthStore from '../store/authStore';
 import { interactionsAPI, usersAPI, getUploadUrl, getShareUrl } from '../services/api';
 import { toast } from 'react-toastify';
+import VipBadge from './VipBadge';
 import './ContentCard.css';
 
 const CHISTE_GRADIENT_COUNT = 8;
@@ -169,6 +170,7 @@ const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = fa
             ) : (
               <span className="author-name">{authorName}</span>
             )}
+            {(content.author?.isVip) && <VipBadge className="ms-1" />}
           </div>
 
           {/* Categorías */}

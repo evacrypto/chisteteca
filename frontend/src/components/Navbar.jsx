@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import VipBadge from './VipBadge';
 import { useState, useEffect, useRef } from 'react';
 import useAuthStore from '../store/authStore';
 import { getUploadUrl } from '../services/api';
@@ -150,6 +151,7 @@ const Navbar = () => {
                         />
                       </span>
                       <span className="user-name">{user?.username}</span>
+                      {user?.isVip && <VipBadge className="ms-1" />}
                     </button>
                     <button onClick={handleLogout} className="logout-btn">
                       <i className="icon-sign-out-alt" aria-hidden="true"></i> Salir
