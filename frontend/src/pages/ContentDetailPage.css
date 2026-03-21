@@ -91,60 +91,6 @@
 }
 
 /* ============================================
-   CONTENT TRANSITION (navegación entre chistes)
-   ============================================ */
-.content-transition {
-  animation-duration: 0.45s;
-  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  animation-fill-mode: both;
-}
-
-.content-transition--enter {
-  animation-name: contentEnter;
-}
-
-.content-transition--prev {
-  animation-name: contentSlideFromLeft;
-}
-
-.content-transition--next {
-  animation-name: contentSlideFromRight;
-}
-
-@keyframes contentEnter {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes contentSlideFromLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes contentSlideFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* ============================================
    ARTICLE MAIN
    ============================================ */
 .detail-article {

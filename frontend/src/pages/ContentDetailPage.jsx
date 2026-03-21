@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'react-toastify';
 import { contentAPI, interactionsAPI, usersAPI, getUploadUrl, getShareUrl } from '../services/api';
@@ -228,7 +229,7 @@ const ContentDetailPage = () => {
     }
   };
 
-  if (loading) {
+  if (loading && !content) {
     return <LoadingSpinner text="Cargando contenido..." />;
   }
 
@@ -314,12 +315,58 @@ const ContentDetailPage = () => {
         <div className="row">
           
           {/* Main Content */}
-          <div className="col-lg-9">
-            
-            <article 
-              key={id} 
-              className={`detail-article detail-article--card-style content-transition content-transition--${navDirection || 'enter'}`}
-            >
+          <div className="col-lg-9" style={{ position: 'relative', perspective: 1200 }}>
+            <AnimatePresence>
+              {loading && content && (
+                <motion.div
+                  key="loading-overlay"
+                  className="content-loading-overlay"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(255,255,255,0.7)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10,
+                    borderRadius: 15
+                  }}
+                >
+                  <LoadingSpinner text="Cargando..." />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <AnimatePresence mode="wait">
+              <motion.article
+                key={content?._id ?? id}
+                className="detail-article detail-article--card-style"
+                initial={
+                  navDirection === 'prev'
+                    ? { opacity: 0, x: -80, rotateY: 25 }
+                    : navDirection === 'next'
+                    ? { opacity: 0, x: 80, rotateY: -25 }
+                    : { opacity: 0, y: 24, scale: 0.96 }
+                }
+                animate={{ opacity: 1, x: 0, y: 0, scale: 1, rotateY: 0 }}
+                exit={
+                  navDirection === 'prev'
+                    ? { opacity: 0, x: 80, rotateY: -25 }
+                    : navDirection === 'next'
+                    ? { opacity: 0, x: -80, rotateY: 25 }
+                    : { opacity: 0, scale: 0.98 }
+                }
+                transition={{
+                  type: 'spring',
+                  stiffness: 320,
+                  damping: 30,
+                  mass: 0.8
+                }}
+                style={{ transformOrigin: 'center center' }}
+              >
               
               {/* Contenido (caja de color / imagen / vídeo) */}
               <div className="detail-content-block">
@@ -405,7 +452,8 @@ const ContentDetailPage = () => {
                 </div>
               </div>
 
-            </article>
+            </motion.article>
+            </AnimatePresence>
 
             {/* Share box - between joke and comments */}
             <div className="share-box">
