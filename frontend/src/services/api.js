@@ -125,7 +125,10 @@ export const contentAPI = {
   update: (id, data) => api.put(`/content/${id}`, data),
   delete: (id) => api.delete(`/content/${id}`),
   getPopular: (params) => api.get('/content/popular', { params: typeof params === 'number' ? { limit: params } : params }),
-  getRandom: (limit) => api.get('/content/random', withLimitParam(limit)),
+  getRandom: (params) => {
+    const p = typeof params === 'number' ? { limit: params } : (params || {});
+    return api.get('/content/random', { params: p });
+  },
   report: (id, reason) => api.post(`/content/${id}/report`, { reason }),
   share: (id) => api.post(`/content/${id}/share`)
 };

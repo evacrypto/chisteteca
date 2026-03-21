@@ -470,13 +470,19 @@ export const getTrendingContent = async (req, res) => {
 
 // @desc    Get random content
 // @route   GET /api/content/random
+// @query   limit (default 5), category (optional ObjectId to filter by category)
 // @access  Public
 export const getRandomContent = async (req, res) => {
   try {
     const limit = parsePositiveInt(req.query.limit, 5);
+    const categoryId = req.query.category;
+    const matchStage = { isApproved: true };
+    if (categoryId && isValidObjectId(categoryId)) {
+      matchStage.categories = new mongoose.Types.ObjectId(categoryId);
+    }
 
     const content = await Content.aggregate([
-      { $match: { isApproved: true } },
+      { $match: matchStage },
       { $sample: { size: limit } },
       {
         $lookup: {

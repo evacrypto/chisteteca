@@ -1,34 +1,23 @@
 /**
- * Carga Google Analytics solo si el usuario ha dado su consentimiento.
- * Usa VITE_GA_MEASUREMENT_ID de .env o el ID por defecto de Chisteteca.
- * En producción usa Cloudflare Google Tag Gateway (first-party) para mejor compatibilidad.
+ * Carga Google Analytics 4 solo cuando el usuario acepta cookies.
+ * Usar junto con CookieBanner para cumplir con RGPD.
  */
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-X8XJ314J27';
-const CANONICAL_URL = import.meta.env.VITE_CANONICAL_URL || (typeof window !== 'undefined' ? window.location.origin : '');
-
 export const loadGoogleAnalytics = () => {
-  if (!GA_MEASUREMENT_ID) return;
+  const id = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  if (!id) return;
+  if (typeof window === 'undefined') return;
+  if (window.gtag) return; // Ya cargado
 
   const script = document.createElement('script');
   script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
   document.head.appendChild(script);
 
   window.dataLayer = window.dataLayer || [];
-  function gtag(...args) {
-    window.dataLayer.push(args);
+  function gtag() {
+    window.dataLayer.push(arguments);
   }
-  gtag('js', new Date());
-
-  const config = {
-    anonymize_ip: true
-  };
-  if (CANONICAL_URL && !CANONICAL_URL.includes('localhost')) {
-    config.transport_url = `${CANONICAL_URL.replace(/\/$/, '')}/analytics`;
-    config.first_party_collection = true;
-  }
-
-  gtag('config', GA_MEASUREMENT_ID, config);
-
   window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', id, { send_page_view: true });
 };

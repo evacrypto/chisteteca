@@ -21,6 +21,7 @@ import ContentDetailPage from './pages/ContentDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
 import RandomPage from './pages/RandomPage';
 import LatestEntryPage from './pages/LatestEntryPage';
+import CategoryRandomEntryPage from './pages/CategoryRandomEntryPage';
 import PopularWeekEntryPage from './pages/PopularWeekEntryPage';
 import PopularYearEntryPage from './pages/PopularYearEntryPage';
 import MostViewedEntryPage from './pages/MostViewedEntryPage';
@@ -60,12 +61,6 @@ const ProfileMeRedirect = () => {
 };
 
 function App() {
-  useEffect(() => {
-    if (hasAcceptedCookies()) {
-      loadGoogleAnalytics();
-    }
-  }, []);
-
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ScrollToTop />
@@ -123,7 +118,7 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            <Route path="/category/:id" element={<HomePage />} />
+            <Route path="/category/:id" element={<CategoryRandomEntryPage />} />
             <Route path="/content/:id" element={<ContentDetailPage />} />
             <Route path="/aviso-legal" element={<AvisoLegalPage />} />
             <Route path="/privacidad" element={<PrivacidadPage />} />
