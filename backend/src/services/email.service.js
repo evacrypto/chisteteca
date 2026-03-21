@@ -1,13 +1,10 @@
 import nodemailer from 'nodemailer';
 
-let etherealAccount = null;
-
 /**
- * Obtiene el transporter de nodemailer.
- * - Con SMTP configurado: usa credenciales reales.
- * - Sin SMTP: usa Ethereal (emails de prueba; no llegan al destinatario real).
+ * Crea el transporter de nodemailer.
+ * En desarrollo sin SMTP configurado, usa Ethereal (credenciales de prueba).
  */
-const getTransporter = async () => {
+const getTransporter = () => {
   if (process.env.SMTP_HOST && process.env.SMTP_USER) {
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -19,20 +16,8 @@ const getTransporter = async () => {
       }
     });
   }
-  // Sin SMTP: usar Ethereal para desarrollo (el email se puede ver en la URL de preview)
-  if (!etherealAccount) {
-    etherealAccount = await nodemailer.createTestAccount();
-    console.log('[Email] SMTP no configurado. Usando Ethereal (emails de prueba).');
-  }
-  return nodemailer.createTransport({
-    host: etherealAccount.smtp.host,
-    port: etherealAccount.smtp.port,
-    secure: etherealAccount.smtp.secure,
-    auth: {
-      user: etherealAccount.user,
-      pass: etherealAccount.pass
-    }
-  });
+  // Sin SMTP: en desarrollo se puede usar Ethereal o simplemente loguear
+  return null;
 };
 
 /**
@@ -40,14 +25,20 @@ const getTransporter = async () => {
  * @param {string} to - Email del destinatario
  * @param {string} username - Nombre de usuario
  * @param {string} token - Token de verificación
- * @returns {Promise<boolean>} true si se envió correctamente
+ * @returns {Promise<boolean>} true si se envió, false si no hay SMTP
  */
 export const sendVerificationEmail = async (to, username, token) => {
   const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
   const verifyUrl = `${baseUrl}/verify-email?token=${token}`;
 
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.log('[Email] SMTP no configurado. Enlace de verificación:', verifyUrl);
+    return false;
+  }
+
   const mailOptions = {
-    from: process.env.SMTP_FROM || '"Chisteteca" <mail@chisteteca.es>',
+    from: process.env.SMTP_FROM || '"Chisteteca" <noreply@chisteteca.es>',
     to,
     subject: 'Confirma tu cuenta en Chisteteca',
     html: `
@@ -61,20 +52,6 @@ export const sendVerificationEmail = async (to, username, token) => {
     `
   };
 
-  try {
-    const transporter = await getTransporter();
-    const info = await transporter.sendMail(mailOptions);
-
-    // Si usamos Ethereal, loguear la URL para ver el email en el navegador
-    if (!process.env.SMTP_HOST && nodemailer.getTestMessageUrl) {
-      const previewUrl = nodemailer.getTestMessageUrl(info);
-      if (previewUrl) {
-        console.log('[Email] Vista previa del email de verificación:', previewUrl);
-      }
-    }
-    return true;
-  } catch (err) {
-    console.error('[Email] Error al enviar verificación:', err.message);
-    throw err;
-  }
+  await transporter.sendMail(mailOptions);
+  return true;
 };
