@@ -828,12 +828,12 @@
 /* Espacio reservado para publicidad futura. Visible para dejar hueco a la derecha. */
 
 .sidebar-ad-slot {
-  min-height: 200px;
+  min-height: 400px;
   text-align: center;
 }
 
 .sidebar-ad-slot .sidebar-logo {
-  max-width: 100px;
+  max-width: 160px;
   height: auto;
   margin-bottom: 16px;
   display: block;
