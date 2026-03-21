@@ -12,7 +12,7 @@ const ContentDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { contentIds = [], returnPath = '/' } = location.state || {};
+  const { contentIds = [], returnPath = '/', navDirection } = location.state || {};
   const { isAuthenticated, user } = useAuthStore();
   
   const [content, setContent] = useState(null);
@@ -286,7 +286,7 @@ const ContentDetailPage = () => {
                   <>
                     <button 
                       className="btn-nav-prev" 
-                      onClick={() => prevId && navigate(`/content/${prevId}`, { state: { contentIds, returnPath } })}
+                      onClick={() => prevId && navigate(`/content/${prevId}`, { state: { contentIds, returnPath, navDirection: 'prev' } })}
                       disabled={!prevId}
                       title="Chiste anterior"
                     >
@@ -294,7 +294,7 @@ const ContentDetailPage = () => {
                     </button>
                     <button 
                       className="btn-nav-next" 
-                      onClick={() => nextId && navigate(`/content/${nextId}`, { state: { contentIds, returnPath } })}
+                      onClick={() => nextId && navigate(`/content/${nextId}`, { state: { contentIds, returnPath, navDirection: 'next' } })}
                       disabled={!nextId}
                       title="Siguiente chiste"
                     >
@@ -316,7 +316,10 @@ const ContentDetailPage = () => {
           {/* Main Content */}
           <div className="col-lg-9">
             
-            <article className="detail-article detail-article--card-style">
+            <article 
+              key={id} 
+              className={`detail-article detail-article--card-style content-transition content-transition--${navDirection || 'enter'}`}
+            >
               
               {/* Contenido (caja de color / imagen / vídeo) */}
               <div className="detail-content-block">
