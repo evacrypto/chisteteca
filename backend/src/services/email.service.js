@@ -36,9 +36,14 @@ const getFromAddress = () =>
  * @param {string} token - Token de verificación
  * @returns {Promise<boolean>} true si se envió o se intentó, false si no hay config
  */
+const getBaseUrl = () => {
+  const url = process.env.CANONICAL_URL || process.env.FRONTEND_URL || 'http://localhost:3000';
+  return url.split(',')[0].trim() || 'http://localhost:3000';
+};
+
 export const sendVerificationEmail = async (to, username, token) => {
-  const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-  const verifyUrl = `${baseUrl}/verify-email?token=${token}`;
+  const baseUrl = getBaseUrl();
+  const verifyUrl = `${baseUrl.replace(/\/$/, '')}/verify-email?token=${token}`;
   const from = getFromAddress();
 
   const html = `
