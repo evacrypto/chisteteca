@@ -1,6 +1,7 @@
 import User from '../models/User.model.js';
 import Content from '../models/Content.model.js';
 import Category from '../models/Category.model.js';
+import NewsletterSubscriber from '../models/NewsletterSubscriber.model.js';
 import mongoose from 'mongoose';
 import { toAccentInsensitiveRegex } from '../utils/searchUtils.js';
 import stringSimilarity from 'string-similarity';
@@ -963,5 +964,51 @@ export const mergeCategories = async (req, res) => {
       success: false,
       message: error.message || 'Server error'
     });
+  }
+};
+
+// @desc    Get newsletter subscribers
+// @route   GET /api/admin/newsletter/subscribers
+// @access  Private/Admin
+export const getNewsletterSubscribers = async (req, res) => {
+  try {
+    const subscribers = await NewsletterSubscriber.find()
+      .sort({ verifiedAt: -1, subscribedAt: -1 })
+      .lean();
+
+    const emails = subscribers.map((s) => s.email.toLowerCase());
+    const users = await User.find({ email: { $in: emails } })
+      .select('email username _id')
+      .lean();
+    const userByEmail = Object.fromEntries(users.map((u) => [u.email?.toLowerCase(), u]));
+
+    const data = subscribers.map((s) => ({
+      ...s,
+      isRegistered: !!userByEmail[s.email?.toLowerCase()]
+    }));
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Get newsletter subscribers error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// @desc    Delete newsletter subscriber
+// @route   DELETE /api/admin/newsletter/subscribers/:id
+// @access  Private/Admin
+export const deleteNewsletterSubscriber = async (req, res) => {
+  try {
+    if (!isValidId(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID inválido' });
+    }
+    const deleted = await NewsletterSubscriber.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Suscriptor no encontrado' });
+    }
+    res.json({ success: true, message: 'Suscriptor eliminado' });
+  } catch (error) {
+    console.error('Delete newsletter subscriber error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };

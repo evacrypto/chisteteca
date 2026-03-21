@@ -20,7 +20,9 @@ import {
   approveAllPendingCategories,
   getDuplicateContent,
   getDuplicateCategories,
-  mergeCategories
+  mergeCategories,
+  getNewsletterSubscribers,
+  deleteNewsletterSubscriber
 } from '../controllers/admin.controller.js';
 import { protect, admin } from '../middleware/auth.middleware.js';
 
@@ -52,5 +54,8 @@ router.put('/users/:id/suspend', suspendUser);
 router.put('/users/:id/unsuspend', unsuspendUser);
 router.put('/users/:id/vip', toggleUserVip);
 router.delete('/users/:id', deleteUser);
+
+router.get('/newsletter/subscribers', getNewsletterSubscribers);
+router.delete('/newsletter/subscribers/:id', deleteNewsletterSubscriber);
 
 export default router;

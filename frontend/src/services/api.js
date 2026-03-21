@@ -181,7 +181,9 @@ export const adminAPI = {
   getPendingCategories: () => api.get('/admin/categories/pending'),
   approveAllCategories: () => api.put('/admin/categories/approve-all'),
   approveCategory: (id) => api.put(`/admin/categories/${id}/approve`),
-  rejectCategory: (id, reason) => api.put(`/admin/categories/${id}/reject`, { reason })
+  rejectCategory: (id, reason) => api.put(`/admin/categories/${id}/reject`, { reason }),
+  getNewsletterSubscribers: () => api.get('/admin/newsletter/subscribers'),
+  deleteNewsletterSubscriber: (id) => api.delete(`/admin/newsletter/subscribers/${id}`)
 };
 
 export default api;

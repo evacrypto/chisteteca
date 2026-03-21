@@ -47,6 +47,8 @@ const AdminDashboard = () => {
   const [categoryMergeTargets, setCategoryMergeTargets] = useState({});
   const [mergingCategories, setMergingCategories] = useState(false);
   const [sendingDigest, setSendingDigest] = useState(false);
+  const [newsletterSubscribers, setNewsletterSubscribers] = useState([]);
+  const [loadingNewsletter, setLoadingNewsletter] = useState(false);
 
   // Check if user is admin
   useEffect(() => {
@@ -562,6 +564,21 @@ const AdminDashboard = () => {
         >
           🔍 Duplicados ({duplicateGroups.length})
         </button>
+        <button
+          type="button"
+          className={`admin-tab-btn ${activeTab === 'newsletter' ? 'active' : ''}`}
+          onClick={() => {
+            setActiveTab('newsletter');
+            setLoadingNewsletter(true);
+            adminAPI.getNewsletterSubscribers()
+              .then((res) => setNewsletterSubscribers(res.data.data || []))
+              .catch(() => { toast.error('Error al cargar suscriptores'); setNewsletterSubscribers([]); })
+              .finally(() => setLoadingNewsletter(false));
+          }}
+          aria-pressed={activeTab === 'newsletter'}
+        >
+          Newsletter {newsletterSubscribers.length > 0 ? `(${newsletterSubscribers.length})` : ''}
+        </button>
       </div>
 
       {activeTab === 'overview' && (
@@ -605,82 +622,6 @@ const AdminDashboard = () => {
               </Card>
             </Col>
           </Row>
-
-          {/* Newsletter digest */}
-          <Card className="card-custom mb-4">
-            <Card.Header className="bg-transparent border-0">
-              <h4 className="mb-0">Newsletter</h4>
-            </Card.Header>
-            <Card.Body>
-              <p className="text-muted mb-3">
-                Envía el digest semanal con los mejores chistes a los suscriptores (Resend Broadcast).
-              </p>
-              <Button
-                variant="warning"
-                onClick={async () => {
-                  setSendingDigest(true);
-                  try {
-                    await newsletterAPI.sendDigest();
-                    toast.success('Digest enviado correctamente');
-                  } catch (err) {
-                    toast.error(err.response?.data?.message || 'Error al enviar el digest');
-                  } finally {
-                    setSendingDigest(false);
-                  }
-                }}
-                disabled={sendingDigest}
-              >
-                {sendingDigest ? 'Enviando...' : 'Enviar digest semanal'}
-              </Button>
-            </Card.Body>
-          </Card>
-
-          {/* Top Content */}
-          <Card className="card-custom mb-4">
-            <Card.Header className="bg-transparent border-0">
-              <h4 className="mb-0">Contenido Más Popular</h4>
-            </Card.Header>
-            <Card.Body>
-              <Table responsive hover>
-                <thead>
-                  <tr>
-                    <th>Contenido</th>
-                    <th>Autor</th>
-                    <th>Vistas</th>
-                    <th>Likes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats?.topContent?.map((item) => (
-                    <tr key={item._id}>
-                      <td>
-                        <Link to={`/content/${item._id}`} className="text-gradient">
-                          {(() => {
-                            const t = (item.type === 'chiste' ? item.text : item.title) || item.title || item.text || 'Sin título';
-                            return t.length > 60 ? t.substring(0, 60) + '...' : t;
-                          })()}
-                        </Link>
-                      </td>
-                      <td>
-                        <span className="d-inline-flex align-items-center gap-1">
-                          {item.author?._id ? (
-                            <Link to={`/profile/${item.author._id}`} className="text-decoration-none">
-                              {item.author?.username || item.authorName || 'Desconocido'}
-                            </Link>
-                          ) : (
-                            item.author?.username || item.authorName || 'Desconocido'
-                          )}
-                          {item.author?.isVip && <VipBadge className="ms-1" />}
-                        </span>
-                      </td>
-                      <td>{item.views || 0}</td>
-                      <td>{item.likes?.length || 0}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Card.Body>
-          </Card>
 
           <Card className="card-custom mb-4">
             <Card.Body>
@@ -1333,6 +1274,106 @@ const AdminDashboard = () => {
             )}
           </Card.Body>
         </Card>
+        </>
+      )}
+
+      {activeTab === 'newsletter' && (
+        <>
+          <Card className="card-custom mb-4">
+            <Card.Header className="bg-transparent border-0">
+              <h4 className="mb-0">Newsletter</h4>
+            </Card.Header>
+            <Card.Body>
+              <p className="text-muted mb-3">
+                Envía el digest semanal con los mejores chistes a los suscriptores (Resend Broadcast).
+              </p>
+              <Button
+                variant="warning"
+                onClick={async () => {
+                  setSendingDigest(true);
+                  try {
+                    await newsletterAPI.sendDigest();
+                    toast.success('Digest enviado correctamente');
+                  } catch (err) {
+                    toast.error(err.response?.data?.message || 'Error al enviar el digest');
+                  } finally {
+                    setSendingDigest(false);
+                  }
+                }}
+                disabled={sendingDigest}
+              >
+                {sendingDigest ? 'Enviando...' : 'Enviar digest semanal'}
+              </Button>
+            </Card.Body>
+          </Card>
+
+          <Card className="card-custom">
+            <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <h4 className="mb-0">Suscriptores ({newsletterSubscribers.length})</h4>
+              <Button variant="outline-secondary" size="sm" onClick={() => {
+                setLoadingNewsletter(true);
+                adminAPI.getNewsletterSubscribers()
+                  .then((res) => setNewsletterSubscribers(res.data.data || []))
+                  .catch(() => toast.error('Error al cargar'))
+                  .finally(() => setLoadingNewsletter(false));
+              }} disabled={loadingNewsletter}>
+                {loadingNewsletter ? 'Cargando...' : '🔄 Actualizar'}
+              </Button>
+            </Card.Header>
+            <Card.Body>
+              {loadingNewsletter && newsletterSubscribers.length === 0 ? (
+                <div className="text-center py-5">
+                  <LoadingSpinner text="Cargando suscriptores..." />
+                </div>
+              ) : newsletterSubscribers.length === 0 ? (
+                <p className="text-muted text-center py-4 mb-0">No hay suscriptores.</p>
+              ) : (
+                <Table responsive hover>
+                  <thead>
+                    <tr>
+                      <th>Email</th>
+                      <th>Fecha suscripción</th>
+                      <th>Usuario registrado</th>
+                      <th className="text-end">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {newsletterSubscribers.map((sub) => (
+                      <tr key={sub._id}>
+                        <td>{sub.email}</td>
+                        <td>{new Date(sub.verifiedAt || sub.subscribedAt || sub.createdAt).toLocaleDateString('es-ES')}</td>
+                        <td>
+                          {sub.isRegistered ? (
+                            <Badge bg="success">Sí</Badge>
+                          ) : (
+                            <Badge bg="secondary">No</Badge>
+                          )}
+                        </td>
+                        <td className="text-end">
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={async () => {
+                              if (!window.confirm(`¿Eliminar suscriptor ${sub.email}?`)) return;
+                              try {
+                                await adminAPI.deleteNewsletterSubscriber(sub._id);
+                                toast.success('Suscriptor eliminado');
+                                setNewsletterSubscribers((prev) => prev.filter((s) => s._id !== sub._id));
+                              } catch (err) {
+                                toast.error(err.response?.data?.message || 'Error al eliminar');
+                              }
+                            }}
+                          >
+                            Eliminar
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              )}
+            </Card.Body>
+          </Card>
         </>
       )}
 
