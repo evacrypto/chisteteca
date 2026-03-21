@@ -24,7 +24,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [editingCategory, setEditingCategory] = useState(null);
-  const [editForm, setEditForm] = useState({ emoji: '', color: '#ffc107' });
+  const [editForm, setEditForm] = useState({ name: '', description: '', emoji: '', color: '#ffc107' });
   const [editingContent, setEditingContent] = useState(null);
   const [editContentText, setEditContentText] = useState('');
   const [editContentCategories, setEditContentCategories] = useState([]);
@@ -372,13 +372,27 @@ const AdminDashboard = () => {
 
   const handleEditCategory = (cat) => {
     setEditingCategory(cat);
-    setEditForm({ emoji: cat.emoji || '😂', color: cat.color || '#ffc107' });
+    setEditForm({
+      name: cat.name || '',
+      description: cat.description || '',
+      emoji: cat.emoji || '😂',
+      color: cat.color || '#ffc107'
+    });
   };
 
   const handleSaveCategory = async () => {
     if (!editingCategory) return;
+    if (!editForm.name?.trim()) {
+      toast.error('El nombre es obligatorio');
+      return;
+    }
     try {
-      await categoriesAPI.update(editingCategory._id, { emoji: editForm.emoji, color: editForm.color });
+      await categoriesAPI.update(editingCategory._id, {
+        name: editForm.name,
+        description: editForm.description,
+        emoji: editForm.emoji,
+        color: editForm.color
+      });
       toast.success(`Categoría "${editingCategory.name}" actualizada`);
       setEditingCategory(null);
       await fetchData();
@@ -1374,7 +1388,28 @@ const AdminDashboard = () => {
         <Modal.Body>
           {editingCategory && (
             <>
-              <p className="text-muted mb-3">Modifica el emoji y el color de <strong>{editingCategory.name}</strong></p>
+              <Form.Group className="mb-3">
+                <Form.Label>Nombre</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Ej: Chistes de programadores"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm(f => ({ ...f, name: e.target.value }))}
+                  maxLength={50}
+                  required
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Descripción (opcional)</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={2}
+                  placeholder="Breve descripción de la categoría"
+                  value={editForm.description}
+                  onChange={(e) => setEditForm(f => ({ ...f, description: e.target.value }))}
+                  maxLength={500}
+                />
+              </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Emoji</Form.Label>
                 <p className="text-muted small mb-2">Busca en el cuadro de búsqueda y elige un emoji de la lista (no se puede escribir texto libre)</p>

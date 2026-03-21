@@ -4,6 +4,7 @@ import User from '../models/User.model.js';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 import { containsProfanity } from '../utils/commentModeration.js';
+import { sendNewCommentNotification } from '../services/email.service.js';
 
 // @desc    Like content
 // @route   POST /api/interactions/like/:contentId
@@ -119,6 +120,24 @@ export const createComment = async (req, res) => {
             message: `${user.username} commented on your content`,
             isRead: false
           }
+        }
+      });
+
+      // Email al autor del chiste (en segundo plano)
+      setImmediate(async () => {
+        try {
+          const author = await User.findById(content.author).select('email username').lean();
+          if (author?.email) {
+            await sendNewCommentNotification(
+              author.email,
+              author.username,
+              user.username,
+              text,
+              content._id.toString()
+            );
+          }
+        } catch (err) {
+          console.error('[Comment] Email notification failed:', err.message);
         }
       });
     }

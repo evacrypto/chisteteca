@@ -21,6 +21,7 @@ const createCategoryValidators = [
 
 const updateCategoryValidators = [
   body('name').optional().trim().isLength({ min: 1, max: 50 }).withMessage('Category name must be between 1 and 50 characters'),
+  body('description').optional().trim().isLength({ max: 500 }).withMessage('Description max 500 characters'),
   body('emoji').optional().trim(),
   body('color').optional().trim()
 ];

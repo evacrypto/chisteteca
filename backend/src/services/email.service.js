@@ -171,3 +171,87 @@ export const sendPendingReviewNotification = async (pendingContent, pendingCateg
     return false;
   }
 };
+
+const escapeHtml = (str) => {
+  if (!str || typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
+/**
+ * Notifica al autor de un chiste que alguien ha comentado.
+ * @param {string} to - Email del autor
+ * @param {string} authorUsername - Nombre del autor del chiste
+ * @param {string} commenterUsername - Quién comentó
+ * @param {string} commentText - Texto del comentario (preview)
+ * @param {string} contentId - ID del contenido para el enlace
+ * @returns {Promise<boolean>}
+ */
+export const sendNewCommentNotification = async (to, authorUsername, commenterUsername, commentText, contentId) => {
+  const baseUrl = getBaseUrl().replace(/\/$/, '');
+  const contentUrl = `${baseUrl}/content/${contentId}`;
+  const logoUrl = `${baseUrl}/logo_chisteteca.png`;
+  const from = getFromAddress();
+  const commentPreview = escapeHtml(commentText?.substring(0, 150) || '');
+  const commentDisplay = commentPreview + (commentText?.length > 150 ? '...' : '');
+
+  const html = `
+    <div style="font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; max-width: 520px; margin: 0 auto; background: #f8f9fa; padding: 24px; border-radius: 12px;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <img src="${logoUrl}" alt="Chisteteca" width="120" height="auto" style="display: block; margin: 0 auto 12px;" />
+        <p style="color: #1a1a2e; margin: 0; font-size: 14px; font-weight: 500;">La biblioteca de chistes</p>
+      </div>
+      <div style="background: white; padding: 24px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+        <h2 style="color: #1a1a2e; margin: 0 0 16px;">Nuevo comentario en tu chiste</h2>
+        <p style="color: #555; line-height: 1.6;">¡Hola ${escapeHtml(authorUsername)}! <strong>${escapeHtml(commenterUsername)}</strong> ha comentado en tu chiste:</p>
+        <blockquote style="margin: 16px 0; padding: 12px 16px; background: #f8f9fa; border-left: 4px solid #ffc107; color: #555; font-style: italic;">
+          ${commentDisplay || '(sin texto)'}
+        </blockquote>
+        <p style="text-align: center; margin: 24px 0;">
+          <a href="${contentUrl}" style="display: inline-block; padding: 14px 28px; background: #ffc107; color: #1a1a2e !important; text-decoration: none; border-radius: 8px; font-weight: 600;">Ver comentario</a>
+        </p>
+      </div>
+      <p style="text-align: center; margin-top: 20px;">
+        <a href="${baseUrl}" style="color: #e0a800; font-size: 12px;">chisteteca.es</a>
+      </p>
+    </div>
+  `;
+
+  const resend = getResendClient();
+  if (resend) {
+    const { error } = await resend.emails.send({
+      from,
+      to,
+      subject: `${commenterUsername} comentó en tu chiste - Chisteteca`,
+      html
+    });
+    if (error) {
+      console.error('[Email] New comment notification error:', error);
+      return false;
+    }
+    return true;
+  }
+
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.log('[Email] Sin Resend ni SMTP. No se envió notificación de comentario.');
+    return false;
+  }
+
+  try {
+    await transporter.sendMail({
+      from,
+      to,
+      subject: `${commenterUsername} comentó en tu chiste - Chisteteca`,
+      html
+    });
+    return true;
+  } catch (err) {
+    console.error('[Email] New comment notification error:', err);
+    return false;
+  }
+};
