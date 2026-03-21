@@ -1059,7 +1059,9 @@ const AdminDashboard = () => {
                       {u.createdAt ? new Date(u.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '-'}
                     </td>
                     <td>
-                      {u.username}
+                      <Link to={`/profile/${u._id}`} className="text-decoration-none fw-semibold">
+                        {u.username}
+                      </Link>
                       {u.role === 'admin' && <Badge bg="warning" className="ms-2">admin</Badge>}
                       {u.isVip && <VipBadge className="ms-2" />}
                     </td>
