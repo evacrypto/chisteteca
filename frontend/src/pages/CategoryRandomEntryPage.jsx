@@ -59,7 +59,7 @@ const CategoryRandomEntryPage = () => {
 
         navigate(`/content/${shuffledIds[0]}`, {
           replace: true,
-          state: { contentIds: shuffledIds, returnPath: '/' }
+          state: { contentIds: shuffledIds, returnPath: `/category/${categoryId}` }
         });
       } catch (error) {
         toast.error('Error al cargar chistes de la categoría');

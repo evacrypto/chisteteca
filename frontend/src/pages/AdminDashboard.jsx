@@ -662,13 +662,16 @@ const AdminDashboard = () => {
                         </Link>
                       </td>
                       <td>
-                        {item.author?._id ? (
-                          <Link to={`/profile/${item.author._id}`} className="text-decoration-none">
-                            {item.author?.username || item.authorName || 'Desconocido'}
-                          </Link>
-                        ) : (
-                          item.author?.username || item.authorName || 'Desconocido'
-                        )}
+                        <span className="d-inline-flex align-items-center gap-1">
+                          {item.author?._id ? (
+                            <Link to={`/profile/${item.author._id}`} className="text-decoration-none">
+                              {item.author?.username || item.authorName || 'Desconocido'}
+                            </Link>
+                          ) : (
+                            item.author?.username || item.authorName || 'Desconocido'
+                          )}
+                          {item.author?.isVip && <VipBadge className="ms-1" />}
+                        </span>
                       </td>
                       <td>{item.views || 0}</td>
                       <td>{item.likes?.length || 0}</td>
@@ -1423,13 +1426,16 @@ const AdminDashboard = () => {
                     <td className="text-center">{item.likes?.length ?? 0}</td>
                     <td className="text-center">{item.commentsCount ?? 0}</td>
                     <td>
-                      {(item.author?._id || item.author) ? (
-                        <Link to={`/profile/${item.author?._id || item.author}`} className="text-decoration-none">
-                          {item.authorName || item.author?.username || 'Desconocido'}
-                        </Link>
-                      ) : (
-                        item.authorName || 'Desconocido'
-                      )}
+                      <span className="d-inline-flex align-items-center gap-1">
+                        {(item.author?._id || item.author) ? (
+                          <Link to={`/profile/${item.author?._id || item.author}`} className="text-decoration-none">
+                            {item.authorName || item.author?.username || 'Desconocido'}
+                          </Link>
+                        ) : (
+                          item.authorName || 'Desconocido'
+                        )}
+                        {item.author?.isVip && <VipBadge className="ms-1" />}
+                      </span>
                     </td>
                     <td>
                       {item.categories?.length > 0 ? (
