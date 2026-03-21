@@ -70,8 +70,9 @@ const HomePage = () => {
   useEffect(() => {
     setPage(1);
     pageRef.current = 1;
-    fetchData(1, true);
-  }, [fetchData]);
+    if (isSpecialPage) fetchData(1, true);
+    else setLoading(false);
+  }, [fetchData, isSpecialPage]);
 
   const getPageTitle = () => {
     if (isPopularPage) {
@@ -96,7 +97,7 @@ const HomePage = () => {
       return <>📁 Contenido por Categoría</>;
     }
 
-    return <>📢 Últimos chistes</>;
+    return <>LOS MÁS POPULARES</>;
   };
 
   const handleLoadMore = () => {
@@ -127,7 +128,22 @@ const HomePage = () => {
           )}
         </div>
         
-        {loading ? (
+        {!isSpecialPage ? (
+          /* Inicio: 3 tarjetas vacías con títulos */
+          <Row xs={1} md={3} className="g-4">
+            {[
+              { key: 'semana', title: 'Populares de la semana' },
+              { key: 'ano', title: 'Populares del año' },
+              { key: 'siempre', title: 'Populares de siempre' }
+            ].map(({ key, title }) => (
+              <Col key={key} className="h-auto">
+                <div className="home-popular-card">
+                  <h3 className="home-popular-card-title">{title}</h3>
+                </div>
+              </Col>
+            ))}
+          </Row>
+        ) : loading ? (
           <LoadingSpinner text="Cargando contenido..." />
         ) : content.length === 0 ? (
           <div className="text-center py-5">
