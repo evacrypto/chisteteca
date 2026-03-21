@@ -66,10 +66,15 @@ export const subscribe = async (req, res) => {
  * Confirma la suscripción y añade el contacto a Resend.
  */
 export const confirm = async (req, res) => {
+  const baseUrl = (process.env.CANONICAL_URL || process.env.FRONTEND_URL || 'http://localhost:3000')
+    .split(',')[0]
+    .trim()
+    .replace(/\/$/, '') || 'http://localhost:3000';
+
   try {
     const { token } = req.query;
     if (!token) {
-      return res.status(400).json({ success: false, message: 'Token inválido' });
+      return res.redirect(302, `${baseUrl}/newsletter/confirmed?error=invalid`);
     }
 
     const subscriber = await NewsletterSubscriber.findOne({
@@ -78,10 +83,7 @@ export const confirm = async (req, res) => {
     });
 
     if (!subscriber) {
-      return res.status(400).json({
-        success: false,
-        message: 'Enlace expirado o inválido. Puedes suscribirte de nuevo.'
-      });
+      return res.redirect(302, `${baseUrl}/newsletter/confirmed?error=expired`);
     }
 
     subscriber.isVerified = true;
@@ -90,22 +92,22 @@ export const confirm = async (req, res) => {
     subscriber.verifyExpire = undefined;
     await subscriber.save();
 
-    const segmentId = process.env.RESEND_NEWSLETTER_SEGMENT_ID || (await getOrCreateNewsletterSegment());
-    if (segmentId) {
-      addContactToResendSegment(subscriber.email, segmentId).catch((err) =>
-        console.error('[Newsletter] Error añadiendo a Resend:', err.message)
-      );
+    // Resend: opcional, no bloquear la confirmación
+    try {
+      const segmentId = process.env.RESEND_NEWSLETTER_SEGMENT_ID || (await getOrCreateNewsletterSegment());
+      if (segmentId) {
+        addContactToResendSegment(subscriber.email, segmentId).catch((err) =>
+          console.error('[Newsletter] Error añadiendo a Resend:', err.message)
+        );
+      }
+    } catch (resendErr) {
+      console.error('[Newsletter] Resend/segment error (suscripción confirmada igual):', resendErr.message);
     }
 
-    const baseUrl = (process.env.CANONICAL_URL || process.env.FRONTEND_URL || 'http://localhost:3000')
-      .split(',')[0]
-      .trim()
-      .replace(/\/$/, '');
-
-    res.redirect(`${baseUrl}/newsletter/confirmed`);
+    return res.redirect(302, `${baseUrl}/newsletter/confirmed`);
   } catch (error) {
     console.error('Newsletter confirm error:', error);
-    res.status(500).json({ success: false, message: 'Error al confirmar' });
+    return res.redirect(302, `${baseUrl}/newsletter/confirmed?error=confirm`);
   }
 };
 
