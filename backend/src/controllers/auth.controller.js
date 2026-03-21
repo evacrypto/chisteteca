@@ -44,7 +44,11 @@ export const register = async (req, res) => {
       emailVerificationExpire
     });
 
-    await sendVerificationEmail(user.email, user.username, emailVerificationToken);
+    try {
+      await sendVerificationEmail(user.email, user.username, emailVerificationToken);
+    } catch (emailErr) {
+      console.error('[Register] Email no enviado (la cuenta se creó):', emailErr.message);
+    }
 
     res.status(201).json({
       success: true,
