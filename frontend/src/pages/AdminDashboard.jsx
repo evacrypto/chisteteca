@@ -33,8 +33,12 @@ const AdminDashboard = () => {
   const [newCategoryForm, setNewCategoryForm] = useState({ name: '', emoji: '😂', color: '#ffc107' });
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [newCategoryEmojiModalOpen, setNewCategoryEmojiModalOpen] = useState(false);
-  const [usersSortBy, setUsersSortBy] = useState('date');
-  const [usersSortOrder, setUsersSortOrder] = useState('desc');
+  const [usersSortBy, setUsersSortBy] = useState('username');
+  const [usersSortOrder, setUsersSortOrder] = useState('asc');
+  const [duplicateGroups, setDuplicateGroups] = useState([]);
+  const [duplicatesMeta, setDuplicatesMeta] = useState(null);
+  const [loadingDuplicates, setLoadingDuplicates] = useState(false);
+  const [duplicatesThreshold, setDuplicatesThreshold] = useState(85);
 
   // Check if user is admin
   useEffect(() => {
@@ -84,8 +88,23 @@ const AdminDashboard = () => {
     const sortOrder = sortOverride?.sortOrder ?? usersSortOrder;
     const params = { limit: 50, sortOrder };
     if (sortBy === 'posts') params.sortBy = 'posts';
+    else if (sortBy === 'username') params.sortBy = 'username';
     const usersRes = await adminAPI.getUsers(params);
     setUsers(usersRes.data.data || []);
+  };
+
+  const loadDuplicates = async () => {
+    setLoadingDuplicates(true);
+    try {
+      const res = await adminAPI.getDuplicates({ threshold: duplicatesThreshold / 100, limit: 200 });
+      setDuplicateGroups(res.data.data?.groups || []);
+      setDuplicatesMeta(res.data.data || null);
+    } catch (error) {
+      toast.error('Error al cargar duplicados');
+      setDuplicateGroups([]);
+    } finally {
+      setLoadingDuplicates(false);
+    }
   };
 
   const handleUsersSort = (field) => {
@@ -93,7 +112,7 @@ const AdminDashboard = () => {
     if (usersSortBy === field) {
       newOrder = usersSortOrder === 'desc' ? 'asc' : 'desc';
     } else {
-      newOrder = field === 'posts' ? 'asc' : 'desc';
+      newOrder = (field === 'posts' || field === 'username') ? 'asc' : 'desc';
     }
     setUsersSortBy(field);
     setUsersSortOrder(newOrder);
@@ -420,6 +439,14 @@ const AdminDashboard = () => {
           aria-pressed={activeTab === 'content'}
         >
           Contenidos ({contentPagination.total || allContent.length})
+        </button>
+        <button
+          type="button"
+          className={`admin-tab-btn ${activeTab === 'duplicates' ? 'active' : ''}`}
+          onClick={() => { setActiveTab('duplicates'); loadDuplicates(); }}
+          aria-pressed={activeTab === 'duplicates'}
+        >
+          Duplicados ({duplicateGroups.length})
         </button>
       </div>
 
@@ -904,7 +931,17 @@ const AdminDashboard = () => {
             <Table responsive hover className="align-middle">
               <thead>
                 <tr>
-                  <th>Usuario</th>
+                  <th>
+                    <button
+                      type="button"
+                      className="admin-sort-th"
+                      onClick={() => handleUsersSort('username')}
+                      title="Ordenar por usuario (A-Z / Z-A)"
+                    >
+                      Usuario
+                      <i className={`icon-chevron-${usersSortBy === 'username' ? (usersSortOrder === 'asc' ? 'up' : 'down') : 'down'} ms-1 admin-sort-icon ${usersSortBy !== 'username' ? 'admin-sort-icon-inactive' : ''}`} aria-hidden="true"></i>
+                    </button>
+                  </th>
                   <th>Email</th>
                   <th>Rol</th>
                   <th>Estado</th>
@@ -957,6 +994,93 @@ const AdminDashboard = () => {
                 ))}
               </tbody>
             </Table>
+          </Card.Body>
+        </Card>
+      )}
+
+      {activeTab === 'duplicates' && (
+        <Card className="card-custom">
+          <Card.Header className="bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h4 className="mb-0">Chistes duplicados o similares</h4>
+            <div className="d-flex align-items-center gap-2 flex-wrap">
+              <label className="d-flex align-items-center gap-1 small">
+                Umbral:
+                <Form.Control
+                  type="number"
+                  min={50}
+                  max={100}
+                  value={duplicatesThreshold}
+                  onChange={(e) => setDuplicatesThreshold(Number(e.target.value) || 85)}
+                  style={{ width: 60 }}
+                />
+                %
+              </label>
+              <Button variant="outline-secondary" size="sm" onClick={loadDuplicates} disabled={loadingDuplicates}>
+                {loadingDuplicates ? 'Buscando...' : '🔄 Buscar duplicados'}
+              </Button>
+            </div>
+          </Card.Header>
+          <Card.Body>
+            {duplicatesMeta && (
+              <p className="text-muted small mb-3">
+                Escaneados: {duplicatesMeta.scanned} chistes · Grupos detectados: {duplicateGroups.length} (umbral ≥{duplicatesMeta.threshold}%)
+              </p>
+            )}
+            {loadingDuplicates ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status"><span className="visually-hidden">Cargando...</span></div>
+                <p className="mt-2 text-muted">Comparando chistes...</p>
+              </div>
+            ) : duplicateGroups.length === 0 ? (
+              <div className="text-center py-5 text-muted">
+                <i className="icon-check-circle mb-2" style={{ fontSize: '40px' }} aria-hidden="true"></i>
+                <p className="mb-0">No se encontraron duplicados con el umbral actual. Prueba bajando el umbral (ej. 75%) para detectar más similitudes.</p>
+              </div>
+            ) : (
+              <div className="duplicate-groups">
+                {duplicateGroups.map((group, gIdx) => (
+                  <Card key={gIdx} className="mb-3 border-warning">
+                    <Card.Header className="py-2 bg-warning bg-opacity-10">
+                      <strong>Grupo {gIdx + 1}</strong> — Similitud media: {group.avgSimilarity}%
+                    </Card.Header>
+                    <Card.Body className="py-2">
+                      {group.items.map((item) => (
+                        <div key={item._id} className="d-flex justify-content-between align-items-start gap-2 py-2 border-bottom border-light">
+                          <div className="flex-grow-1 min-w-0">
+                            <p className="mb-1 small text-break">{item.text}{item.text?.length >= 200 ? '...' : ''}</p>
+                            <small className="text-muted">
+                              @{item.authorName} · {item.likesCount} likes · {item.views} vistas
+                              {item.isApproved && <Badge bg="success" className="ms-1">Aprobado</Badge>}
+                            </small>
+                          </div>
+                          <div className="d-flex gap-1 flex-shrink-0">
+                            <Button size="sm" variant="outline-primary" as={Link} to={`/content/${item._id}`} target="_blank">
+                              Ver
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={async () => {
+                                if (!window.confirm('¿Eliminar este chiste?')) return;
+                                try {
+                                  await adminAPI.deleteContent(item._id);
+                                  toast.success('Chiste eliminado');
+                                  loadDuplicates();
+                                } catch (e) {
+                                  toast.error('Error al eliminar');
+                                }
+                              }}
+                            >
+                              Eliminar
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </Card.Body>
+                  </Card>
+                ))}
+              </div>
+            )}
           </Card.Body>
         </Card>
       )}

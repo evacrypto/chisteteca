@@ -158,6 +158,7 @@ export const adminAPI = {
   unsuspendUser: (id) => api.put(`/admin/users/${id}/unsuspend`),
   deleteUser: (id) => api.delete(`/admin/users/${id}`),
   getReportedContent: () => api.get('/admin/content/reported'),
+  getDuplicates: (params) => api.get('/admin/content/duplicates', { params }),
   getPendingCategories: () => api.get('/admin/categories/pending'),
   approveCategory: (id) => api.put(`/admin/categories/${id}/approve`),
   rejectCategory: (id, reason) => api.put(`/admin/categories/${id}/reject`, { reason })

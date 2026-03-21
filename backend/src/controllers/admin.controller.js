@@ -3,6 +3,7 @@ import Content from '../models/Content.model.js';
 import Category from '../models/Category.model.js';
 import mongoose from 'mongoose';
 import { toAccentInsensitiveRegex } from '../utils/searchUtils.js';
+import stringSimilarity from 'string-similarity';
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 
@@ -586,6 +587,130 @@ export const rejectCategory = async (req, res) => {
     });
   } catch (error) {
     console.error('Reject category error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+// Normaliza texto para comparación (minúsculas, sin espacios extra, sin puntuación)
+const normalizeForCompare = (str) => {
+  if (!str || typeof str !== 'string') return '';
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // quitar acentos
+    .replace(/[^\p{L}\p{N}\s]/gu, '') // quitar puntuación
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+// @desc    Get potential duplicate jokes (fuzzy similarity)
+// @route   GET /api/admin/content/duplicates
+// @access  Private/Admin
+export const getDuplicateContent = async (req, res) => {
+  try {
+    const threshold = Math.min(1, Math.max(0.5, parseFloat(req.query.threshold) || 0.85));
+    const limit = Math.min(500, Math.max(50, parseInt(req.query.limit) || 200));
+
+    const chistes = await Content.find({ type: 'chiste', text: { $exists: true, $ne: '' } })
+      .select('_id title text author authorName createdAt likes views isApproved')
+      .populate('author', 'username avatar')
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+    const normalized = chistes.map((c) => ({
+      ...c,
+      normalized: normalizeForCompare(c.text || c.title || '')
+    })).filter((c) => c.normalized.length >= 10);
+
+    const pairs = [];
+    const seen = new Set();
+
+    for (let i = 0; i < normalized.length; i++) {
+      for (let j = i + 1; j < normalized.length; j++) {
+        const a = normalized[i];
+        const b = normalized[j];
+        const lenRatio = Math.min(a.normalized.length, b.normalized.length) / Math.max(a.normalized.length, b.normalized.length);
+        if (lenRatio < 0.5) continue;
+
+        const sim = stringSimilarity.compareTwoStrings(a.normalized, b.normalized);
+        if (sim >= threshold) {
+          const key = [a._id.toString(), b._id.toString()].sort().join('-');
+          if (!seen.has(key)) {
+            seen.add(key);
+            pairs.push({ a, b, similarity: Math.round(sim * 100) });
+          }
+        }
+      }
+    }
+
+    const groups = [];
+    const idToGroup = new Map();
+
+    for (const { a, b, similarity } of pairs) {
+      const idA = a._id.toString();
+      const idB = b._id.toString();
+      let groupA = idToGroup.get(idA);
+      let groupB = idToGroup.get(idB);
+
+      if (!groupA && !groupB) {
+        const group = { items: [a, b], similarities: [similarity] };
+        groups.push(group);
+        idToGroup.set(idA, group);
+        idToGroup.set(idB, group);
+      } else if (groupA && !groupB) {
+        const idx = groupA.items.findIndex((x) => x._id.toString() === idB);
+        if (idx === -1) {
+          groupA.items.push(b);
+          groupA.similarities.push(similarity);
+          idToGroup.set(idB, groupA);
+        }
+      } else if (!groupA && groupB) {
+        const idx = groupB.items.findIndex((x) => x._id.toString() === idA);
+        if (idx === -1) {
+          groupB.items.push(a);
+          groupB.similarities.push(similarity);
+          idToGroup.set(idA, groupB);
+        }
+      } else if (groupA !== groupB) {
+        for (const item of groupB.items) {
+          idToGroup.set(item._id.toString(), groupA);
+          if (!groupA.items.some((x) => x._id.toString() === item._id.toString())) {
+            groupA.items.push(item);
+          }
+        }
+        groupA.similarities.push(...groupB.similarities);
+        const idx = groups.indexOf(groupB);
+        if (idx !== -1) groups.splice(idx, 1);
+      }
+    }
+
+    const result = groups.map((g) => ({
+      items: g.items.map(({ _id, title, text, author, authorName, createdAt, likes, views, isApproved }) => ({
+        _id,
+        title,
+        text: (text || '').substring(0, 200),
+        author,
+        authorName,
+        createdAt,
+        likesCount: Array.isArray(likes) ? likes.length : 0,
+        views,
+        isApproved
+      })),
+      avgSimilarity: Math.round(g.similarities.reduce((s, v) => s + v, 0) / g.similarities.length)
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        groups: result,
+        total: result.length,
+        scanned: normalized.length,
+        threshold: threshold * 100
+      }
+    });
+  } catch (error) {
+    console.error('Get duplicates error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };

@@ -360,13 +360,20 @@ export const getAllUsers = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
-    const sortBy = req.query.sortBy === 'posts' ? 'stats.totalPosts' : 'createdAt';
     const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
-    const sort = { [sortBy]: sortOrder };
+    const sortBy = req.query.sortBy || 'date';
+    let sort = { createdAt: sortOrder };
+    if (sortBy === 'posts') {
+      sort = { 'stats.totalPosts': sortOrder };
+    } else if (sortBy === 'username') {
+      sort = { username: sortOrder };
+    }
 
-    const users = await User.find()
-      .select('-password')
-      .sort(sort)
+    const query = User.find().select('-password').sort(sort);
+    if (sortBy === 'username') {
+      query.collation({ locale: 'es', strength: 1 });
+    }
+    const users = await query
       .limit(limit)
       .skip(skip);
 

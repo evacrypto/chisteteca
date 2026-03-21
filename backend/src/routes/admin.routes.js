@@ -14,7 +14,8 @@ import {
   getAnalytics,
   getPendingCategories,
   approveCategory,
-  rejectCategory
+  rejectCategory,
+  getDuplicateContent
 } from '../controllers/admin.controller.js';
 import { protect, admin } from '../middleware/auth.middleware.js';
 
@@ -28,6 +29,7 @@ router.get('/analytics', getAnalytics);
 router.get('/content/pending', getPendingContent);
 router.get('/content/all', getAllContentForAdmin);
 router.get('/content/reported', getReportedContent);
+router.get('/content/duplicates', getDuplicateContent);
 router.put('/content/approve-all', approveAllPendingContent);
 router.put('/content/:id/approve', approveContent);
 router.put('/content/:id/reject', rejectContent);
