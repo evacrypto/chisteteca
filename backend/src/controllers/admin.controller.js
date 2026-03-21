@@ -935,10 +935,17 @@ export const mergeCategories = async (req, res) => {
     }
 
     for (const src of sources) {
+      const contentIds = await Content.distinct('_id', { categories: src._id });
       await Content.updateMany(
         { categories: src._id },
-        { $addToSet: { categories: targetObjId }, $pull: { categories: src._id } }
+        { $pull: { categories: src._id } }
       );
+      if (contentIds.length > 0) {
+        await Content.updateMany(
+          { _id: { $in: contentIds } },
+          { $addToSet: { categories: targetObjId } }
+        );
+      }
       await src.deleteOne();
     }
 

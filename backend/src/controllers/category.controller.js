@@ -71,7 +71,9 @@ export const createCategory = async (req, res) => {
       description,
       emoji: emoji || '😂',
       color: color || '#ffc107',
-      createdBy: req.user.id
+      createdBy: req.user.id,
+      isPending: false,
+      isActive: true
     });
 
     res.status(201).json({
