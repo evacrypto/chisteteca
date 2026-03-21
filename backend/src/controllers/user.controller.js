@@ -358,7 +358,7 @@ export const markNotificationRead = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
+    const limit = Math.min(100, parseInt(req.query.limit) || 50);
     const skip = (page - 1) * limit;
     const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
     const sortBy = req.query.sortBy || 'date';

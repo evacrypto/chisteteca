@@ -86,11 +86,19 @@ const AdminDashboard = () => {
   const loadUsers = async (sortOverride) => {
     const sortBy = sortOverride?.sortBy ?? usersSortBy;
     const sortOrder = sortOverride?.sortOrder ?? usersSortOrder;
-    const params = { limit: 50, sortOrder };
+    const params = { limit: 100, sortOrder };
     if (sortBy === 'posts') params.sortBy = 'posts';
     else if (sortBy === 'username') params.sortBy = 'username';
     const usersRes = await adminAPI.getUsers(params);
-    setUsers(usersRes.data.data || []);
+    let data = usersRes.data.data || [];
+    if (sortBy === 'username') {
+      data = [...data].sort((a, b) => {
+        const ua = (a.username || '').toLowerCase();
+        const ub = (b.username || '').toLowerCase();
+        return sortOrder === 'asc' ? ua.localeCompare(ub, 'es') : ub.localeCompare(ua, 'es');
+      });
+    }
+    setUsers(data);
   };
 
   const loadDuplicates = async () => {
@@ -445,8 +453,9 @@ const AdminDashboard = () => {
           className={`admin-tab-btn ${activeTab === 'duplicates' ? 'active' : ''}`}
           onClick={() => { setActiveTab('duplicates'); loadDuplicates(); }}
           aria-pressed={activeTab === 'duplicates'}
+          title="Buscar chistes similares o duplicados"
         >
-          Duplicados ({duplicateGroups.length})
+          🔍 Duplicados ({duplicateGroups.length})
         </button>
       </div>
 
