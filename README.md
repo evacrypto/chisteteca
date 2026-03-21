@@ -104,7 +104,7 @@ npm run seed
 ```
 
 El seed actual crea:
-- 1 admin: `admin@chisteteca.com` / `admin123`
+- 1 admin: `info@chisteteca.es` / `admin123`
 - 3 usuarios demo: `sofia@chisteteca.com`, `diego@chisteteca.com`, `marta@chisteteca.com`
 - Password de usuarios demo: `demo1234`
 - 6 categorías activas
@@ -153,7 +153,7 @@ Pruebas recomendadas:
 ### Flujo como admin
 
 Credenciales:
-- Email: `admin@chisteteca.com`
+- Email: `info@chisteteca.es`
 - Password: `admin123`
 
 Pruebas recomendadas:
@@ -257,7 +257,7 @@ chisteteca/
 - En `Populares`, recuerda que solo cuentan contenidos de los últimos 7 días
 
 ### El colaborador necesita cuentas de prueba
-- Admin: `admin@chisteteca.com` / `admin123`
+- Admin: `info@chisteteca.es` / `admin123`
 - Demo user: `sofia@chisteteca.com` / `demo1234`
 - Demo user: `diego@chisteteca.com` / `demo1234`
 - Demo user: `marta@chisteteca.com` / `demo1234`
@@ -290,7 +290,7 @@ npm run dev
 ```
 
 5. Comparte estas credenciales al colaborador:
-- Admin: `admin@chisteteca.com` / `admin123` (redirige a `/admin`)
+- Admin: `info@chisteteca.es` / `admin123` (redirige a `/admin`)
 - User demo: `sofia@chisteteca.com` / `demo1234` (redirige a `/profile/:id`)
 
 6. Indícale que la documentación válida es solo este `README.md`

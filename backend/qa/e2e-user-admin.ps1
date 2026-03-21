@@ -82,7 +82,7 @@ try {
   $comment = Invoke-Api -Method 'POST' -Path "/api/interactions/comment/$contentId" -Token $userToken -Body @{ text='comentario qa' }
   Write-Result 'OK' 'comment_create' "status=$($comment.Code)"
 
-  $adminLogin = Invoke-Api -Method 'POST' -Path '/api/auth/login' -Body @{ email='admin@chisteteca.com'; password='admin123' }
+  $adminLogin = Invoke-Api -Method 'POST' -Path '/api/auth/login' -Body @{ email='info@chisteteca.es'; password='admin123' }
   $adminToken = $adminLogin.Data.data.token
   Write-Result 'OK' 'admin_login' "status=$($adminLogin.Code)"
 

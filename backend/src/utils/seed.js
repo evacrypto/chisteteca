@@ -19,7 +19,7 @@ const seedDatabase = async () => {
     console.log('Cleared existing data');
 
     const admin = await User.create({
-      email: 'admin@chisteteca.com',
+      email: 'info@chisteteca.es',
       username: 'admin',
       password: 'admin123',
       role: 'admin',
@@ -125,7 +125,7 @@ const seedDatabase = async () => {
 
     console.log('Database seeded successfully');
     console.log('Summary:');
-    console.log(' - 1 Admin user (admin@chisteteca.com / admin123)');
+    console.log(' - 1 Admin user (info@chisteteca.es / admin123)');
     console.log(` - ${demoUsers.length} Demo users (password: demo1234)`);
     console.log(` - ${categories.length} Categories`);
     console.log(` - ${contents.length} Content items`);

@@ -92,8 +92,8 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check if email verified (users without field are legacy, treat as verified)
-    if (user.isEmailVerified === false) {
+    // Check if email verified (admins skip; users without field are legacy, treat as verified)
+    if (user.role !== 'admin' && user.isEmailVerified === false) {
       return res.status(403).json({
         success: false,
         message: 'Email not verified',
