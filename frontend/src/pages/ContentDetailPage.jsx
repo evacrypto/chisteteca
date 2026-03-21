@@ -84,11 +84,14 @@ const ContentDetailPage = () => {
       // Registrar visita solo una vez por visitante (localStorage)
       try {
         const viewed = JSON.parse(localStorage.getItem(VIEWED_KEY) || '[]');
-        if (!viewed.includes(id)) {
-          await contentAPI.registerView(id);
-          const updated = [...viewed, id].slice(-200);
+        const idStr = String(id);
+        if (!viewed.includes(idStr)) {
+          // Guardar ANTES de la llamada para evitar doble conteo (React Strict Mode, etc.)
+          const updated = [...viewed, idStr].slice(-200);
           localStorage.setItem(VIEWED_KEY, JSON.stringify(updated));
-          setContent((prev) => prev ? { ...prev, views: (prev.views || 0) + 1 } : prev);
+          contentAPI.registerView(id).then(() => {
+            setContent((prev) => prev ? { ...prev, views: (prev.views || 0) + 1 } : prev);
+          }).catch(() => {});
         }
       } catch {
         // Ignorar errores de registro de vista
