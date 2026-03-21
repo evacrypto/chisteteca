@@ -978,14 +978,18 @@ export const getNewsletterSubscribers = async (req, res) => {
 
     const emails = subscribers.map((s) => s.email.toLowerCase());
     const users = await User.find({ email: { $in: emails } })
-      .select('email username _id')
+      .select('email username _id isVip')
       .lean();
     const userByEmail = Object.fromEntries(users.map((u) => [u.email?.toLowerCase(), u]));
 
-    const data = subscribers.map((s) => ({
-      ...s,
-      isRegistered: !!userByEmail[s.email?.toLowerCase()]
-    }));
+    const data = subscribers.map((s) => {
+      const user = userByEmail[s.email?.toLowerCase()];
+      return {
+        ...s,
+        isRegistered: !!user,
+        user: user ? { _id: user._id, username: user.username, isVip: user.isVip } : null
+      };
+    });
 
     res.json({ success: true, data });
   } catch (error) {

@@ -1343,8 +1343,13 @@ const AdminDashboard = () => {
                         <td>{sub.email}</td>
                         <td>{new Date(sub.verifiedAt || sub.subscribedAt || sub.createdAt).toLocaleDateString('es-ES')}</td>
                         <td>
-                          {sub.isRegistered ? (
-                            <Badge bg="success">Sí</Badge>
+                          {sub.user ? (
+                            <span className="d-inline-flex align-items-center gap-1">
+                              <Link to={`/profile/${sub.user._id}`} className="text-decoration-none">
+                                {sub.user.username}
+                              </Link>
+                              {sub.user.isVip && <VipBadge className="ms-1" />}
+                            </span>
                           ) : (
                             <Badge bg="secondary">No</Badge>
                           )}
