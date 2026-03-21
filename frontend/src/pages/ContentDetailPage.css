@@ -825,6 +825,17 @@
   border-bottom: 2px solid #ffc107;
 }
 
+/* Espacio reservado para publicidad futura - oculto hasta que se añada banner.
+   Para mostrar: quitar display:none de .sidebar--ad-placeholder y cambiar
+   el col del contenido principal a col-lg-9 para dejar espacio al sidebar. */
+.sidebar--ad-placeholder {
+  display: none;
+}
+
+.sidebar-ad-slot {
+  min-height: 200px;
+}
+
 /* Stats Grid */
 .stats-grid {
   display: grid;

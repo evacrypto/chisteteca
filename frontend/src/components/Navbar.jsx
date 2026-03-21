@@ -1,35 +1,45 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import useAuthStore from '../store/authStore';
 import { getUploadUrl } from '../services/api';
 import './Navbar.css';
 
 const BASE_NAV_ITEMS = [
-  { to: '/', icon: 'icon-home', label: 'Inicio' },
-  { to: '/popular', icon: 'icon-fire', label: 'Populares' },
-  { to: '/random', icon: 'icon-random', label: 'Aleatorio' },
-  { to: '/search', icon: 'icon-search', label: 'Buscar' }
+  { to: '/', icon: 'icon-home', label: 'Inicio' }
+];
+
+const POPULAR_SUBMENU = [
+  { to: '/popular-week', label: 'De la semana' },
+  { to: '/popular-year', label: 'Del año' },
+  { to: '/popular-always', label: 'De siempre' },
+  { to: '/most-viewed', label: 'Los más vistos' }
 ];
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuthStore();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isPopularOpen, setIsPopularOpen] = useState(false);
+  const popularRef = useRef(null);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
+  useEffect(() => {
+    if (!isPopularOpen) return;
+    const handler = (e) => {
+      if (popularRef.current && !popularRef.current.contains(e.target)) {
+        setIsPopularOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isPopularOpen]);
 
   const handleAvatarClick = () => {
     if (isAuthenticated && user) {
       navigate('/profile/me');
     }
   };
-
-  const navItems = [
-    ...BASE_NAV_ITEMS,
-    ...(isAuthenticated && user?.role === 'admin'
-      ? [{ to: '/admin', icon: 'icon-cog', label: 'Admin', className: 'admin-link' }]
-      : [])
-  ];
 
   const handleLogout = async () => {
     await logout();
@@ -71,7 +81,7 @@ const Navbar = () => {
             {/* Navegación principal */}
             <nav className={`primary-menu ${isMobileMenuOpen ? 'is-open' : ''}`}>
               <ul className="menu-container">
-                {navItems.map((item) => (
+                {BASE_NAV_ITEMS.map((item) => (
                   <li key={item.to} className="menu-item">
                     <Link
                       to={item.to}
@@ -82,6 +92,43 @@ const Navbar = () => {
                     </Link>
                   </li>
                 ))}
+                {/* Populares dropdown */}
+                <li className="menu-item menu-item-dropdown" ref={popularRef}>
+                  <button
+                    type="button"
+                    className={`menu-link menu-link-dropdown ${isPopularOpen ? 'is-open' : ''}`}
+                    onClick={() => setIsPopularOpen((prev) => !prev)}
+                    aria-expanded={isPopularOpen}
+                    aria-haspopup="true"
+                  >
+                    <div><i className="menu-icon icon-fire" aria-hidden="true"></i> Populares <i className={`icon-chevron-${isPopularOpen ? 'up' : 'down'} dropdown-chevron`} aria-hidden="true"></i></div>
+                  </button>
+                  <ul className={`dropdown-menu-nav ${isPopularOpen ? 'is-open' : ''}`}>
+                    {POPULAR_SUBMENU.map((sub) => (
+                      <li key={sub.to}>
+                        <Link
+                          to={sub.to}
+                          className="dropdown-item-nav"
+                          onClick={() => { setIsPopularOpen(false); closeMobileMenu(); }}
+                        >
+                          {sub.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+                <li className="menu-item">
+                  <Link to="/search" className="menu-link" onClick={closeMobileMenu}>
+                    <div><i className="menu-icon icon-search" aria-hidden="true"></i> Buscar</div>
+                  </Link>
+                </li>
+                {isAuthenticated && user?.role === 'admin' && (
+                  <li className="menu-item">
+                    <Link to="/admin" className="menu-link admin-link" onClick={closeMobileMenu}>
+                      <div><i className="menu-icon icon-cog" aria-hidden="true"></i> Admin</div>
+                    </Link>
+                  </li>
+                )}
               </ul>
             </nav>
 

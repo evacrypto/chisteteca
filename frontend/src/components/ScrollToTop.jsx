@@ -3,14 +3,24 @@ import { useLocation } from 'react-router-dom';
 
 /**
  * Hace scroll al inicio de la página en cada cambio de ruta.
- * Así, al pinchar cualquier enlace, la nueva página se muestra desde arriba.
+ * Si hay hash (ej. #home-top-cards), hace scroll a ese elemento para mostrar las primeras tarjetas.
  */
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    if (hash) {
+      const id = hash.slice(1);
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo(0, 0);
+      }
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, hash]);
 
   return null;
 };

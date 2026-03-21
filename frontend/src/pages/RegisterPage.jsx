@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import useAuthStore from '../store/authStore';
 import './AuthForms.css';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { register, login, resendVerification, isLoading } = useAuthStore();
   const [activeTab, setActiveTab] = useState('register');
   const [showResendVerification, setShowResendVerification] = useState(false);
@@ -78,10 +79,11 @@ const RegisterPage = () => {
       } else {
         toast.success('¡Cuenta creada exitosamente!');
         const user = result.user || useAuthStore.getState().user;
-        if (user?.role === 'admin') {
+        const from = location.state?.from;
+        if (user?.role === 'admin' && !from) {
           navigate('/admin');
         } else {
-          navigate('/profile/me');
+          navigate(from || '/profile/me');
         }
       }
     } else {

@@ -40,6 +40,7 @@ const CategoryFilter = ({ selectedCategory, onSelectCategory }) => {
             <i className="icon-tag me-2" aria-hidden="true"></i>
             Categorías
           </h5>
+          <p className="text-muted small mb-0 mt-1 d-md-none">Desliza para ver las categorías</p>
         </Col>
         
         <Col xs={12}>

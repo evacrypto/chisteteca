@@ -135,53 +135,7 @@ const CreateContentPage = () => {
 
           <div className="row justify-content-between align-items-start">
             
-            {/* Columna Izquierda: Beneficios */}
-            <div className="col-lg-5 mb-5 mb-lg-0" style={{ marginTop: '7px' }}>
-              <div className="benefits-panel">
-                <h3 className="benefits-title">¿Por qué publicar en Chisteteca?</h3>
-                
-                <ul className="benefits-list">
-                  <li className="benefit-item">
-                    <i className="benefit-icon icon-check-circle" aria-hidden="true"></i>
-                    <div>
-                      <strong>Alcance masivo</strong>
-                      <p>Comparte tu contenido con miles de usuarios cada día</p>
-                    </div>
-                  </li>
-                  <li className="benefit-item">
-                    <i className="benefit-icon icon-lightbulb" aria-hidden="true"></i>
-                    <div>
-                      <strong>Feedback inmediato</strong>
-                      <p>Recibe likes, comentarios y comparte risas</p>
-                    </div>
-                  </li>
-                  <li className="benefit-item">
-                    <i className="benefit-icon icon-shield-alt" aria-hidden="true"></i>
-                    <div>
-                      <strong>Comunidad segura</strong>
-                      <p>Moderación activa para mantener el buen humor</p>
-                    </div>
-                  </li>
-                  <li className="benefit-item">
-                    <i className="benefit-icon icon-rocket" aria-hidden="true"></i>
-                    <div>
-                      <strong>Viraliza tu contenido</strong>
-                      <p>Los mejores contenidos llegan a portada</p>
-                    </div>
-                  </li>
-                </ul>
-
-                <div className="tips-card">
-                  <h4><i className="icon-lightbulb me-2" aria-hidden="true"></i> Consejos para tu publicación</h4>
-                  <ul className="tips-list">
-                    <li>Elige la categoría correcta para más visibilidad</li>
-                    <li>Escribe chistes claros y divertidos</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Columna Derecha: Formulario */}
+            {/* Columna Izquierda: Formulario para publicar (primero) */}
             <div className="col-lg-6 px-0 pt-4">
               <div className="content-card">
                 <div className="card-body">
@@ -346,6 +300,52 @@ const CreateContentPage = () => {
                     </div>
 
                   </form>
+                </div>
+              </div>
+            </div>
+
+            {/* Columna Derecha: Beneficios (después del formulario) */}
+            <div className="col-lg-5 mb-5 mb-lg-0" style={{ marginTop: '7px' }}>
+              <div className="benefits-panel">
+                <h3 className="benefits-title">¿Por qué publicar en Chisteteca?</h3>
+                
+                <ul className="benefits-list">
+                  <li className="benefit-item">
+                    <i className="benefit-icon icon-check-circle" aria-hidden="true"></i>
+                    <div>
+                      <strong>Alcance masivo</strong>
+                      <p>Comparte tu contenido con miles de usuarios cada día</p>
+                    </div>
+                  </li>
+                  <li className="benefit-item">
+                    <i className="benefit-icon icon-lightbulb" aria-hidden="true"></i>
+                    <div>
+                      <strong>Feedback inmediato</strong>
+                      <p>Recibe likes, comentarios y comparte risas</p>
+                    </div>
+                  </li>
+                  <li className="benefit-item">
+                    <i className="benefit-icon icon-shield-alt" aria-hidden="true"></i>
+                    <div>
+                      <strong>Comunidad segura</strong>
+                      <p>Moderación activa para mantener el buen humor</p>
+                    </div>
+                  </li>
+                  <li className="benefit-item">
+                    <i className="benefit-icon icon-rocket" aria-hidden="true"></i>
+                    <div>
+                      <strong>Viraliza tu contenido</strong>
+                      <p>Los mejores contenidos llegan a portada</p>
+                    </div>
+                  </li>
+                </ul>
+
+                <div className="tips-card">
+                  <h4><i className="icon-lightbulb me-2" aria-hidden="true"></i> Consejos para tu publicación</h4>
+                  <ul className="tips-list">
+                    <li>Elige la categoría correcta para más visibilidad</li>
+                    <li>Escribe chistes claros y divertidos</li>
+                  </ul>
                 </div>
               </div>
             </div>

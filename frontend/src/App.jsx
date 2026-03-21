@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -20,6 +20,11 @@ import AdminDashboard from './pages/AdminDashboard';
 import ContentDetailPage from './pages/ContentDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
 import RandomPage from './pages/RandomPage';
+import LatestEntryPage from './pages/LatestEntryPage';
+import PopularWeekEntryPage from './pages/PopularWeekEntryPage';
+import PopularYearEntryPage from './pages/PopularYearEntryPage';
+import MostViewedEntryPage from './pages/MostViewedEntryPage';
+import PopularAlwaysEntryPage from './pages/PopularAlwaysEntryPage';
 import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
 import AvisoLegalPage from './pages/AvisoLegalPage';
@@ -29,11 +34,13 @@ import TerminosPage from './pages/TerminosPage';
 import useAuthStore from './store/authStore';
 
 // Protected Route Component
-const ProtectedRoute = ({ children, adminOnly = false }) => {
+const ProtectedRoute = ({ children, adminOnly = false, redirectTo }) => {
+  const location = useLocation();
   const { isAuthenticated, user } = useAuthStore();
   
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    const to = redirectTo || '/login';
+    return <Navigate to={to} replace state={{ from: location.pathname }} />;
   }
   
   if (adminOnly && user?.role !== 'admin') {
@@ -74,7 +81,7 @@ function App() {
             <Route
               path="/create"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute redirectTo="/register">
                   <CreateContentPage />
                 </ProtectedRoute>
               }
@@ -90,6 +97,11 @@ function App() {
             />
 
             <Route path="/popular" element={<HomePage />} />
+            <Route path="/popular-week" element={<PopularWeekEntryPage />} />
+            <Route path="/popular-year" element={<PopularYearEntryPage />} />
+            <Route path="/most-viewed" element={<MostViewedEntryPage />} />
+            <Route path="/popular-always" element={<PopularAlwaysEntryPage />} />
+            <Route path="/latest" element={<LatestEntryPage />} />
             <Route path="/trending" element={<Navigate to="/popular" replace />} />
             <Route path="/random" element={<RandomPage />} />
             <Route path="/search" element={<SearchPage />} />

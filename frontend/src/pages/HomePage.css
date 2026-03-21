@@ -15,30 +15,58 @@
 .home-popular-card {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
   padding: 40px 24px;
   min-height: 200px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   transition: box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.home-popular-card:has(.home-popular-card-img) {
+  padding-bottom: 0;
 }
 
 .home-popular-card:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
 }
 
 .home-popular-card-title {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #333;
   margin: 0;
   text-align: center;
+  display: block;
+  width: 100%;
+}
+
+.home-popular-card-divider {
+  margin: 10px auto;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .home-popular-card-subtitle {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: #666;
   margin: 8px 0 0;
   text-align: center;
+  display: block;
+  width: 100%;
+}
+
+.home-popular-card-img {
+  margin: 12px -24px 0;
+  width: calc(100% + 48px);
+  padding: 0;
+  height: auto;
+  object-fit: cover;
+  display: block;
 }

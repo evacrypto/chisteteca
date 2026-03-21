@@ -39,7 +39,7 @@ const NotFoundPage = () => {
 
           {/* Botones de acción */}
           <div className="notfound-actions">
-            <Link to="/" className="btn-home">
+            <Link to="/#home-top-cards" className="btn-home">
               <i className="icon-home me-2" aria-hidden="true"></i>
               Volver al Inicio
             </Link>

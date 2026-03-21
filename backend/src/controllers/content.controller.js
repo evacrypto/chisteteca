@@ -55,10 +55,14 @@ export const getAllContent = async (req, res) => {
       ];
     }
 
+    const sortBy = req.query.sortBy === 'views' ? 'views' : 'createdAt';
+    const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
+    const sort = { [sortBy]: sortOrder };
+
     const content = await Content.find(query)
       .populate('author', 'username avatar')
       .populate('categories', 'name slug emoji color')
-      .sort({ createdAt: -1 })
+      .sort(sort)
       .limit(limit)
       .skip(skip);
 
@@ -370,16 +374,18 @@ const POPULAR_LIMIT = 30;
 export const getTrendingContent = async (req, res) => {
   try {
     const limit = Math.min(parsePositiveInt(req.query.limit, POPULAR_LIMIT), POPULAR_LIMIT);
+    const period = req.query.period || 'week'; // 'week' | 'year' | 'all'
 
-    // Weekly popularity is determined by number of likes.
+    // Weekly: last 7 days. Year: current year. All: no date filter (by likes).
+    const now = new Date();
     const sevenDaysAgo = new Date(Date.now() - WEEK_IN_MS);
+    const yearStart = new Date(now.getFullYear(), 0, 1);
 
-    const matchStage = {
-      $match: {
-        isApproved: true,
-        createdAt: { $gte: sevenDaysAgo }
-      }
-    };
+    const dateFilter = period === 'year' ? { $gte: yearStart } : period === 'all' ? undefined : { $gte: sevenDaysAgo };
+    const matchQuery = { isApproved: true };
+    if (dateFilter) matchQuery.createdAt = dateFilter;
+
+    const matchStage = { $match: matchQuery };
 
     const [countResult, content] = await Promise.all([
       Content.aggregate([

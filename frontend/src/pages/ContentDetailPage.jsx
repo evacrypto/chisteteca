@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import { contentAPI, interactionsAPI, usersAPI, getUploadUrl, getShareUrl } from '../services/api';
 import useAuthStore from '../store/authStore';
 import LoadingSpinner from '../components/LoadingSpinner';
-import ContentCard from '../components/ContentCard';
 import './ContentDetailPage.css';
 
 const ContentDetailPage = () => {
@@ -19,7 +18,6 @@ const ContentDetailPage = () => {
   
   const [content, setContent] = useState(null);
   const [comments, setComments] = useState([]);
-  const [related, setRelated] = useState([]);
   const [adjacent, setAdjacent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
@@ -144,13 +142,7 @@ const ContentDetailPage = () => {
         setIsFavorite(false);
       }
 
-      if (contentRes.data.data.categories?.length > 0) {
-        const relatedRes = await contentAPI.getAll({
-          category: contentRes.data.data.categories[0]._id,
-          limit: 7
-        });
-        setRelated(relatedRes.data.data.filter(c => c._id !== id).slice(0, 6));
-      }
+      // Espacio reservado para publicidad futura (antes: contenido relacionado por categoría)
     } catch (error) {
       toast.error('Error loading content');
       console.error(error);
@@ -271,7 +263,7 @@ const ContentDetailPage = () => {
     return (
       <div className="not-found-container">
         <h2>Contenido no encontrado</h2>
-        <Link to="/" className="btn-back">
+        <Link to="/#home-top-cards" className="btn-back">
           <i className="icon-arrow-left me-2" aria-hidden="true"></i> Volver al inicio
         </Link>
       </div>
@@ -306,7 +298,7 @@ const ContentDetailPage = () => {
         <div className="detail-nav-buttons">
           {(contentIds.length > 0 || useAdjacentNav) ? (
             <>
-              <button className="btn-back-top" onClick={() => navigate(returnPath)} title="Volver">
+              <button className="btn-back-top" onClick={() => navigate(returnPath?.startsWith('/#') ? returnPath : '/#home-top-cards')} title="Volver al inicio">
                 <i className="icon-home" aria-hidden="true"></i>
               </button>
               {(prevId || nextId) && (
@@ -330,7 +322,7 @@ const ContentDetailPage = () => {
               </button>
             </>
           ) : (
-            <button className="btn-back-top" onClick={() => navigate(returnPath)} title="Volver">
+            <button className="btn-back-top" onClick={() => navigate(returnPath?.startsWith('/#') ? returnPath : '/#home-top-cards')} title="Volver al inicio">
               <i className="icon-home" aria-hidden="true"></i>
             </button>
           )}
@@ -340,7 +332,7 @@ const ContentDetailPage = () => {
           
           {/* Main Content - gestos swipe en móvil cuando hay prev/next */}
           <div 
-            className="col-lg-9" 
+            className="col-12" 
             style={{ position: 'relative', perspective: 1200 }}
             {...(isMobile && (prevId || nextId) ? swipeHandlers : {})}
           >
@@ -590,19 +582,12 @@ const ContentDetailPage = () => {
 
           </div>
 
-          {/* Sidebar - Related Content */}
-          {related.length > 0 && (
-            <aside className="col-lg-3 sidebar">
-              <div className="sidebar-widget related-sidebar">
-                <h4>Contenido Relacionado</h4>
-                <div className="related-grid related-grid--sidebar">
-                  {related.map((item) => (
-                    <ContentCard key={item._id} content={item} compact />
-                  ))}
-                </div>
-              </div>
-            </aside>
-          )}
+          {/* Sidebar - Reservado para publicidad. Oculto. Para mostrar: quitar display:none en CSS y cambiar col-12 a col-lg-9 arriba. */}
+          <aside className="col-lg-3 sidebar sidebar--ad-placeholder">
+            <div className="sidebar-widget sidebar-ad-slot">
+              {/* Añadir aquí el banner de publicidad cuando se desee */}
+            </div>
+          </aside>
 
         </div>
       </div>

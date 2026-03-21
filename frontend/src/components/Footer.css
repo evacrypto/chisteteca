@@ -359,8 +359,7 @@
   }
 
   .widget-title::after {
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
   }
 
   .widget_links a:hover {
