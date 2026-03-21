@@ -320,6 +320,7 @@ const AdminDashboard = () => {
     setEditContentCategories(prev =>
       prev.includes(catId) ? prev.filter(id => id !== catId) : [...prev, catId]
     );
+    setEditCatDropdownOpen(false);
   };
 
   const handleSaveContentEdit = async () => {
