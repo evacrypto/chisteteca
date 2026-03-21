@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import useAuthStore from '../store/authStore';
-import { interactionsAPI, usersAPI, getUploadUrl } from '../services/api';
+import { interactionsAPI, usersAPI, getUploadUrl, getShareUrl } from '../services/api';
 import { toast } from 'react-toastify';
 import './ContentCard.css';
 
@@ -37,7 +37,7 @@ const ContentCard = ({ content, onLike, onToggleFavorite, initialIsFavorite = fa
 
   const handleShare = async (e) => {
     e.preventDefault();
-    const contentUrl = `${window.location.origin}/content/${content._id}`;
+    const contentUrl = getShareUrl(content._id);
     try {
       if (navigator.share) {
         await navigator.share({

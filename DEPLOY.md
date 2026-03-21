@@ -104,6 +104,7 @@ mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/chisteteca?retryW
 |---------------|-------|
 | `VITE_API_URL` | `https://TU-URL-RAILWAY.up.railway.app/api` |
 | `VITE_FRONTEND_URL` | `https://chisteteca-frontend.pages.dev` |
+| `VITE_CANONICAL_URL` | `https://chisteteca.es` (o tu dominio custom; evita que salga Railway en enlaces compartidos) |
 
 7. Click en **"Save and Deploy"**
 
@@ -152,6 +153,7 @@ MAX_VIDEO_DURATION=120
 ```
 VITE_API_URL=https://TU-URL-RAILWAY.up.railway.app/api
 VITE_FRONTEND_URL=https://chisteteca-frontend.pages.dev
+VITE_CANONICAL_URL=https://chisteteca.es
 ```
 
 ---

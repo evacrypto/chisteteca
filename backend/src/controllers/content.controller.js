@@ -5,6 +5,7 @@ import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 import { containsProfanity } from '../utils/commentModeration.js';
 import { toAccentInsensitiveRegex } from '../utils/searchUtils.js';
+import { sendPendingReviewNotification } from '../services/email.service.js';
 
 const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -243,8 +244,15 @@ export const createContent = async (req, res) => {
       contentData.isApproved = true;
     }
 
+    // Count pending BEFORE create (para notificar solo cuando una cola pasa de vacía a tener items)
+    const [countPendingContentBefore, countPendingCategoriesBefore] = await Promise.all([
+      Content.countDocuments({ isApproved: false, isRejected: { $ne: true } }),
+      Category.countDocuments({ isPending: true })
+    ]);
+
     const content = await Content.create(contentData);
 
+    let addedPendingCategory = false;
     // Handle new category suggestion AFTER content creation
     if (req.body.newCategory) {
       try {
@@ -260,9 +268,26 @@ export const createContent = async (req, res) => {
           isActive: suggestedByAdmin,
           rejectionReason: ''
         });
+        addedPendingCategory = !suggestedByAdmin;
       } catch (catError) {
         console.error('Error creating category:', catError);
       }
+    }
+
+    const addedPendingContent = user.role !== 'admin';
+    const queueBecameNonEmpty =
+      (addedPendingContent && countPendingContentBefore === 0) ||
+      (addedPendingCategory && countPendingCategoriesBefore === 0);
+    if (queueBecameNonEmpty) {
+      const [pendingContent, pendingCategories] = await Promise.all([
+        Content.countDocuments({ isApproved: false, isRejected: { $ne: true } }),
+        Category.countDocuments({ isPending: true })
+      ]);
+      setImmediate(() => {
+        sendPendingReviewNotification(pendingContent, pendingCategories).catch((err) =>
+          console.error('[Email] Pending review notification failed:', err)
+        );
+      });
     }
 
     // Update user stats

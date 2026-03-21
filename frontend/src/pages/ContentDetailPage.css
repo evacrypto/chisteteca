@@ -1022,9 +1022,13 @@
 
 /* Móvil: más margen arriba y cajas de chistes menos altas en contenido relacionado */
 @media (max-width: 767px) {
+  .detail-article {
+    margin-bottom: 24px;
+  }
+
   .sidebar,
   .related-sidebar {
-    margin-top: 40px;
+    margin-top: 24px;
   }
 
   .sidebar--ad-placeholder {
@@ -1032,7 +1036,15 @@
   }
 
   .comments-section {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+  }
+
+  .share-box {
+    margin-bottom: 24px;
+  }
+
+  .content-detail-page .row > [class*="col-"] {
+    margin-bottom: 0;
   }
 
   .related-grid .card-image-wrapper--chiste {

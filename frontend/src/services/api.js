@@ -4,10 +4,13 @@ import { toast } from 'react-toastify';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const API_BASE = API_URL.replace(/\/api\/?$/, '') || 'http://localhost:5000';
 
-/** URL para compartir en redes sociales. Usa el endpoint /o/:id del backend que devuelve HTML con meta OG para crawlers (Facebook, X). */
+/** URL para compartir en redes sociales. Usa dominio canónico (VITE_CANONICAL_URL) para que no aparezca Railway en el enlace. */
 export const getShareUrl = (contentId) => {
-  const base = API_URL.replace(/\/api\/?$/, '') || 'http://localhost:5000';
-  return `${base.replace(/\/$/, '')}/o/${contentId}`;
+  const base =
+    import.meta.env.VITE_CANONICAL_URL ||
+    import.meta.env.VITE_FRONTEND_URL ||
+    (typeof window !== 'undefined' ? window.location.origin : '');
+  return `${(base || '').replace(/\/$/, '')}/content/${contentId}`;
 };
 
 /** Convierte rutas de uploads a URL válida. En dev usa ruta relativa (proxy Vite). En prod usa URL completa del backend. */
