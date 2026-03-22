@@ -145,7 +145,10 @@ MONGODB_URI=mongodb+srv://...
 JWT_SECRET=cambia_esto_por_algo_seguro
 FRONTEND_URL=https://chisteteca-frontend.pages.dev
 BACKEND_URL=https://tu-backend.up.railway.app
+RESEND_API_KEY=re_xxxxxxxxx
+RESEND_API_KEY_FULL=re_yyyyyyyyy
 RESEND_NEWSLETTER_SEGMENT_ID=xxx
+RESEND_FROM="Chisteteca" <noreply@chisteteca.es>
 MAX_IMAGE_SIZE=5242880
 MAX_VIDEO_SIZE=52428800
 MAX_VIDEO_DURATION=120
@@ -166,7 +169,20 @@ VITE_CANONICAL_URL=https://chisteteca.es
 2. Copiar el ID del segmento y añadir en Railway: `RESEND_NEWSLETTER_SEGMENT_ID=xxx`
 3. Añadir `BACKEND_URL=https://tu-backend.up.railway.app` en Railway (para enlaces de confirmación)
 4. Los suscriptores se confirman por email (double opt-in) y se añaden al segmento
-5. En Admin → Resumen → "Enviar digest semanal" para enviar el boletín de chistes
+5. En Admin → Newsletter → "Enviar digest semanal" para enviar el boletín de chistes
+
+### API Keys de Resend (dos opciones)
+
+**Opción A – Una sola key con Full access:**  
+Define solo `RESEND_API_KEY` con permisos **Full access**. Sirve para todo (emails, broadcasts, contactos, segmentos).
+
+**Opción B – Dos keys (recomendado, más seguro):**
+1. En Resend → **API Keys** → Create API Key
+2. Key 1: **Sending access** → Copia el valor → Railway: `RESEND_API_KEY=re_xxx`
+3. Key 2: **Full access** → Copia el valor → Railway: `RESEND_API_KEY_FULL=re_yyy`
+
+- `RESEND_API_KEY`: emails (verificación de cuenta, confirmación newsletter, notificaciones)
+- `RESEND_API_KEY_FULL`: digest semanal, contactos, segmentos
 
 ---
 

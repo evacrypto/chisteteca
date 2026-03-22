@@ -1,9 +1,19 @@
 import { Resend } from 'resend';
 import Content from '../models/Content.model.js';
 
+/** Cliente Resend con Sending access (solo emails.send) */
 const getResendClient = () => {
   if (process.env.RESEND_API_KEY) {
     return new Resend(process.env.RESEND_API_KEY);
+  }
+  return null;
+};
+
+/** Cliente Resend con Full access (broadcasts, contacts, segments). Usa RESEND_API_KEY_FULL o fallback a RESEND_API_KEY */
+const getResendClientFull = () => {
+  const key = process.env.RESEND_API_KEY_FULL || process.env.RESEND_API_KEY;
+  if (key) {
+    return new Resend(key);
   }
   return null;
 };
@@ -77,7 +87,7 @@ export const sendNewsletterVerificationEmail = async (email, token) => {
  * Añade un contacto verificado al segmento de Resend para recibir broadcasts.
  */
 export const addContactToResendSegment = async (email, segmentId) => {
-  const resend = getResendClient();
+  const resend = getResendClientFull();
   if (!resend || !segmentId) return false;
 
   const { error: createError } = await resend.contacts.create({
@@ -102,9 +112,9 @@ export const addContactToResendSegment = async (email, segmentId) => {
  * @returns {Promise<{id: string}>}
  */
 export const sendWeeklyDigestBroadcast = async (segmentId) => {
-  const resend = getResendClient();
+  const resend = getResendClientFull();
   if (!resend || !segmentId) {
-    throw new Error('RESEND_API_KEY y RESEND_NEWSLETTER_SEGMENT_ID son requeridos');
+    throw new Error('RESEND_API_KEY (o RESEND_API_KEY_FULL) y RESEND_NEWSLETTER_SEGMENT_ID son requeridos');
   }
 
   const content = await Content.find({ isApproved: true, isRejected: { $ne: true } })
@@ -175,7 +185,7 @@ const escapeHtml = (str) => {
  * Crea el segmento en Resend si no existe. Devuelve el ID.
  */
 export const getOrCreateNewsletterSegment = async () => {
-  const resend = getResendClient();
+  const resend = getResendClientFull();
   if (!resend) return null;
 
   const existingId = process.env.RESEND_NEWSLETTER_SEGMENT_ID;

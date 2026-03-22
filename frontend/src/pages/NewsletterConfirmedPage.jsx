@@ -46,7 +46,7 @@ const NewsletterConfirmedPage = () => {
                   </>
                 )}
                 <Link to="/" className="btn-submit">
-                  Volver al inicio
+                  Ir al inicio
                 </Link>
               </div>
             </div>
